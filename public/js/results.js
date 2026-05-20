@@ -42,11 +42,22 @@ $('adminToggleBtn').addEventListener('click', () => {
   }
 });
 
-$('adminLoginBtn').addEventListener('click', () => {
+$('adminLoginBtn').addEventListener('click', async () => {
   const pwd = $('adminPwdInput').value.trim();
   if (!pwd) return;
+  $('adminLoginBtn').disabled = true;
+  $('adminLoginBtn').textContent = 'Checking…';
+  const ok = await API.verifyAdmin(pwd);
+  $('adminLoginBtn').disabled = false;
+  $('adminLoginBtn').textContent = 'Login';
+  if (!ok) {
+    $('adminError').textContent = '✗ Incorrect password';
+    $('adminError').classList.remove('hidden');
+    return;
+  }
   adminPassword = pwd;
   isAdmin = true;
+  $('adminError').classList.add('hidden');
   $('adminModal').classList.remove('open');
   $('adminLabel').textContent = '✓ Admin active';
   $('adminToggleBtn').textContent = 'Exit Admin';

@@ -26,6 +26,7 @@ const API = {
   myPredictions: (userId) => API.get(`/api/predictions/${userId}`),
   savePredictions: (userId, predictions) => API.post(`/api/predictions/${userId}`, { predictions }),
   results: () => API.get('/api/results'),
+  verifyAdmin: (pwd) => fetch('/api/admin/verify', { headers: { 'x-admin-password': pwd } }).then(r => r.ok),
   saveResult: (matchId, homeGoals, awayGoals, pwd) =>
     API.post('/api/results', { matchId, homeGoals, awayGoals }, pwd),
   deleteResult: (matchId, pwd) => API.del(`/api/results/${matchId}`, pwd),

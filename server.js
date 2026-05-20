@@ -43,6 +43,14 @@ function getMatchRound(matchId, fixtures) {
   return null;
 }
 
+// ── Admin verify ─────────────────────────────────────────────────────────────
+
+app.get('/api/admin/verify', (req, res) => {
+  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
+    return res.status(401).json({ error: 'Unauthorized' });
+  res.json({ ok: true });
+});
+
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
 app.get('/api/fixtures', (req, res) => {
