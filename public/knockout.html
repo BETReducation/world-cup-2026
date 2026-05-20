@@ -100,27 +100,6 @@
 
 </div>
 
-<!-- Prediction entry deadlines (always visible) -->
-<hr class="divider divider--spaced">
-
-<div class="section section--slim">
-  <p class="section-label text-center">All times shown in ET · UK · VN</p>
-  <h2 class="section-title text-center">Prediction Deadlines</h2>
-  <div class="card" style="max-width:760px; margin:0 auto;">
-    <table class="deadlines-table" id="deadlinesTable">
-      <thead>
-        <tr>
-          <th>Stage</th>
-          <th>Eastern Time</th>
-          <th>UK Time</th>
-          <th>Vietnam Time</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
 <footer>
   <span>WC26 Prediction League</span>
   <span>Final · 19 July 2026 · MetLife Stadium</span>
@@ -138,34 +117,6 @@
     localStorage.setItem('wc26_theme', next);
     toggle.textContent = next === 'dark' ? '🌙' : '☀️';
   });
-</script>
-<script>
-  const DEADLINES = [
-    { stage: 'Group Stage — Round 1', iso: '2026-06-11T19:00:00Z', note: 'Before Mexico vs South Africa' },
-    { stage: 'Group Stage — Round 2', iso: '2026-06-18T16:00:00Z', note: 'Before Czechia vs South Africa' },
-    { stage: 'Group Stage — Round 3', iso: '2026-06-25T01:00:00Z', note: 'Before Czechia vs Mexico' },
-    { stage: 'Round of 32',           iso: '2026-06-28T19:00:00Z', note: 'Before first Last-32 match' },
-    { stage: 'Round of 16',           iso: '2026-07-04T17:00:00Z', note: 'Before first Last-16 match' },
-    { stage: 'Quarter-finals',        iso: '2026-07-09T20:00:00Z', note: 'Before first quarter-final' },
-    { stage: 'Semi-finals',           iso: '2026-07-14T19:00:00Z', note: 'Before first semi-final' },
-    { stage: '3rd Place &amp; Final', iso: '2026-07-18T21:00:00Z', note: 'Bronze Final + Final (Sun 19 Jul)' },
-  ];
-  function fmtTz(iso, tz) {
-    const d = new Date(iso);
-    const date = d.toLocaleDateString('en-GB', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
-    const time = d.toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
-    return `<span class="deadline-date">${date}</span><span class="deadline-time">${time}</span>`;
-  }
-  const now = new Date();
-  document.querySelector('#deadlinesTable tbody').innerHTML = DEADLINES.map(row => {
-    const past = new Date(row.iso) < now;
-    return `<tr class="${past ? 'deadline-past' : ''}">
-      <td><strong>${row.stage}</strong><br><span class="deadline-note">${row.note}</span></td>
-      <td>${fmtTz(row.iso, 'America/New_York')}</td>
-      <td>${fmtTz(row.iso, 'Europe/London')}</td>
-      <td>${fmtTz(row.iso, 'Asia/Ho_Chi_Minh')}</td>
-    </tr>`;
-  }).join('');
 </script>
 <script src="js/auth.js"></script>
 <script src="js/api.js"></script>
