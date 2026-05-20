@@ -22,20 +22,90 @@
   </div>
 </nav>
 
-<div class="coming-soon">
-  <span class="big-icon">🏟️</span>
-  <h2>Knockout Stage</h2>
-  <p>This section opens once the group stage is complete and the Round of 32 draw is confirmed — expected around <strong>4 July 2026</strong>.</p>
-  <p>You'll predict every knockout match from the last 32 all the way through to the Final on <strong>19 July 2026</strong>. Same points system applies: 3 pts for the correct result, +2 bonus for the exact score.</p>
-  <div class="cta-row">
-    <a href="predictions.html" class="btn btn-primary">Enter Group Stage Predictions</a>
-    <a href="results.html" class="btn btn-outline">View Current Results</a>
+<!-- Register modal -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <h2>⚽ Join the League</h2>
+    <p>Enter your name and PIN to load your predictions. Same details as the group stage.</p>
+    <div id="registerError" class="error-msg hidden"></div>
+    <div class="form-group">
+      <label for="regName">Your name</label>
+      <input type="text" id="regName" placeholder="e.g. Gary" maxlength="30" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="regPin">4-digit PIN</label>
+      <input type="number" id="regPin" placeholder="e.g. 1234" min="1000" max="9999" inputmode="numeric">
+    </div>
+    <button class="btn btn-primary btn-full" id="registerBtn">Sign in →</button>
+    <button class="btn btn-outline btn-full" id="browseBtn" style="margin-top:8px;">Browse without signing in</button>
   </div>
 </div>
 
+<!-- Admin modal -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <h2>🔑 Admin Login</h2>
+    <p>Enter the admin password to record knockout results.</p>
+    <div id="adminError" class="error-msg hidden"></div>
+    <div class="form-group">
+      <label for="adminPwdInput">Password</label>
+      <input type="password" id="adminPwdInput" placeholder="Admin password">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="adminLoginBtn">Login</button>
+      <button class="btn btn-outline" id="adminCancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading-state" id="loadingState">
+  <div class="spinner"></div>
+  <p>Loading knockout fixtures…</p>
+</div>
+
+<!-- Main app -->
+<div id="knockoutApp" style="display:none;">
+
+  <div class="section section--no-bottom">
+    <p class="section-label">Knockout Stage · 32 Matches</p>
+    <h2 class="section-title">Predict the Knockout Stage</h2>
+    <p class="section-desc">Teams are filled in automatically as group results are confirmed. Predict scorelines before each round's deadline — same points system as the group stage. Points are awarded on the 90-minute score.</p>
+  </div>
+
+  <div class="section section--flush section--wide">
+
+    <!-- Admin bar -->
+    <div class="admin-bar" style="padding-top:16px;">
+      <span class="admin-label" id="adminLabel"></span>
+      <button class="btn btn-outline btn-sm" id="adminToggleBtn">🔑 Admin Mode</button>
+    </div>
+
+    <!-- Round tabs -->
+    <div class="tab-bar" id="roundTabs"></div>
+
+    <!-- Round panels -->
+    <div id="roundPanels"></div>
+
+    <!-- Save bar -->
+    <div class="save-bar">
+      <span class="user-info">Playing as <strong id="playerName"></strong></span>
+      <span class="save-status" id="saveStatus"></span>
+      <button class="btn btn-outline btn-sm" id="logoutBtn">Change user</button>
+      <button class="btn btn-outline" id="editBtn" style="display:none;">✏️ Edit</button>
+      <button class="btn btn-primary" id="saveBtn">Save Predictions</button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Prediction entry deadlines (always visible) -->
+<hr class="divider divider--spaced">
+
 <div class="section section--slim">
   <p class="section-label text-center">All times shown in ET · UK · VN</p>
-  <h2 class="section-title text-center">Prediction Entry Deadlines</h2>
+  <h2 class="section-title text-center">Prediction Deadlines</h2>
   <div class="card" style="max-width:760px; margin:0 auto;">
     <table class="deadlines-table" id="deadlinesTable">
       <thead>
@@ -51,44 +121,15 @@
   </div>
 </div>
 
-<hr class="divider">
-
-<div class="bracket-preview">
-  <p class="section-label text-center">Bracket preview — unlocks after the group stage</p>
-  <div class="bracket-grid">
-    <div>
-      <p class="bracket-col-label">Round of 32</p>
-      <div class="bracket-slot">TBD vs TBD</div>
-      <div class="bracket-slot">TBD vs TBD</div>
-      <div class="bracket-slot">TBD vs TBD</div>
-      <div class="bracket-slot">TBD vs TBD</div>
-    </div>
-    <div>
-      <p class="bracket-col-label">Quarter-finals</p>
-      <div class="bracket-slot">TBD vs TBD</div>
-      <div class="bracket-slot">TBD vs TBD</div>
-    </div>
-    <div>
-      <p class="bracket-col-label">Semi-finals</p>
-      <div class="bracket-slot">TBD vs TBD</div>
-      <div class="bracket-slot">TBD vs TBD</div>
-    </div>
-    <div>
-      <p class="bracket-col-label">Final</p>
-      <div class="bracket-slot final">TBD vs TBD</div>
-    </div>
-  </div>
-</div>
-
 <footer>
   <span>WC26 Prediction League</span>
-  <span>Final · 19 July 2026</span>
+  <span>Final · 19 July 2026 · MetLife Stadium</span>
 </footer>
 
 <script>
   const toggle = document.getElementById('themeToggle');
-  const html = document.documentElement;
-  const saved = localStorage.getItem('wc26_theme') || 'dark';
+  const html   = document.documentElement;
+  const saved  = localStorage.getItem('wc26_theme') || 'dark';
   html.dataset.theme = saved;
   toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
   toggle.addEventListener('click', () => {
@@ -98,30 +139,25 @@
     toggle.textContent = next === 'dark' ? '🌙' : '☀️';
   });
 </script>
-<script src="js/auth.js"></script>
-<script src="js/tables.js"></script>
 <script>
   const DEADLINES = [
-    { stage: 'Group Stage — Round 1',  iso: '2026-06-11T19:00:00Z', note: 'Before Mexico vs South Africa' },
-    { stage: 'Group Stage — Round 2',  iso: '2026-06-18T16:00:00Z', note: 'Before Czechia vs South Africa' },
-    { stage: 'Group Stage — Round 3',  iso: '2026-06-25T01:00:00Z', note: 'Before Czechia vs Mexico' },
-    { stage: 'Round of 32',            iso: '2026-06-28T19:00:00Z', note: 'Before first Last-32 match' },
-    { stage: 'Round of 16',            iso: '2026-07-04T17:00:00Z', note: 'Before first Last-16 match' },
-    { stage: 'Quarter-finals',         iso: '2026-07-09T20:00:00Z', note: 'Before first quarter-final' },
-    { stage: 'Semi-finals',            iso: '2026-07-14T19:00:00Z', note: 'Before first semi-final' },
-    { stage: '3rd Place &amp; Final',  iso: '2026-07-18T21:00:00Z', note: 'Before Bronze Final kick-off (Final: Sun 19 Jul, 15:00 ET)' },
+    { stage: 'Group Stage — Round 1', iso: '2026-06-11T19:00:00Z', note: 'Before Mexico vs South Africa' },
+    { stage: 'Group Stage — Round 2', iso: '2026-06-18T16:00:00Z', note: 'Before Czechia vs South Africa' },
+    { stage: 'Group Stage — Round 3', iso: '2026-06-25T01:00:00Z', note: 'Before Czechia vs Mexico' },
+    { stage: 'Round of 32',           iso: '2026-06-28T19:00:00Z', note: 'Before first Last-32 match' },
+    { stage: 'Round of 16',           iso: '2026-07-04T17:00:00Z', note: 'Before first Last-16 match' },
+    { stage: 'Quarter-finals',        iso: '2026-07-09T20:00:00Z', note: 'Before first quarter-final' },
+    { stage: 'Semi-finals',           iso: '2026-07-14T19:00:00Z', note: 'Before first semi-final' },
+    { stage: '3rd Place &amp; Final', iso: '2026-07-18T21:00:00Z', note: 'Bronze Final + Final (Sun 19 Jul)' },
   ];
-
   function fmtTz(iso, tz) {
     const d = new Date(iso);
     const date = d.toLocaleDateString('en-GB', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
     const time = d.toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
     return `<span class="deadline-date">${date}</span><span class="deadline-time">${time}</span>`;
   }
-
   const now = new Date();
-  const tbody = document.querySelector('#deadlinesTable tbody');
-  tbody.innerHTML = DEADLINES.map(row => {
+  document.querySelector('#deadlinesTable tbody').innerHTML = DEADLINES.map(row => {
     const past = new Date(row.iso) < now;
     return `<tr class="${past ? 'deadline-past' : ''}">
       <td><strong>${row.stage}</strong><br><span class="deadline-note">${row.note}</span></td>
@@ -131,5 +167,9 @@
     </tr>`;
   }).join('');
 </script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/tables.js"></script>
+<script src="js/knockout.js"></script>
 </body>
 </html>

@@ -64,6 +64,22 @@ Predictions lock by round when the first match of that round kicks off. Lock tim
 
 Admin routes require `x-admin-password` header matching `ADMIN_PASSWORD`.
 
+## Knockout stage
+
+All 32 knockout matches are defined in `data/fixtures.json` under the `"knockout"` key, across rounds R32 → R16 → QF → SF → 3P → F (32 matches total).
+
+**Auto-population:** Matches use `homeSlot`/`awaySlot` notation (e.g. `"1A"`, `"2B"`, `"3rd_1"`, `"W:R32_1"`, `"L:SF_2"`). The server resolves these automatically from group results on every `/api/fixtures` call — no manual admin action needed. Teams appear on `knockout.html` as results are entered.
+
+**Lock dates:** Added to `lockDates` in `fixtures.json` with keys `"R32"`, `"R16"`, `"QF"`, `"SF"`, `"3P"`, `"F"`. The existing lock logic handles them automatically.
+
+**Points:** Same system as group stage (3 pts correct result + 2 pts exact score), scored on the **90-minute result** only (extra time / penalties don't change the scored result).
+
+**Prediction entry:** `public/knockout.html` + `public/js/knockout.js` — same auth/session as `predictions.html`. Inputs are disabled when teams are TBD or round is locked.
+
+**Leaderboard:** `results.js` now shows a **KO Pts** column alongside the group-stage R1/R2/R3 breakdown. The "Entered" total updates to reflect all 104 matches (72 group + 32 knockout).
+
+**Provisional bracket note:** The R32 slot assignments (1A vs 2B etc.) are a reasonable placeholder. If FIFA's official bracket differs, update `homeSlot`/`awaySlot` values in `fixtures.json` — no code changes needed.
+
 ## Entry fee
 
 £10 in Zcash (ZEC) or a privacy coin. Winner takes all. Payment coordinated separately.

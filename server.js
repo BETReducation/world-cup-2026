@@ -40,7 +40,109 @@ function getMatchRound(matchId, fixtures) {
     const match = (group.matches || []).find(m => m.id === matchId);
     if (match) return match.round;
   }
+  for (const [roundKey, round] of Object.entries(fixtures.knockout || {})) {
+    const match = (round.matches || []).find(m => m.id === matchId);
+    if (match) return roundKey;
+  }
   return null;
+}
+
+// ── Knockout bracket auto-resolution ─────────────────────────────────────────
+
+function calcGroupStandings(teams, matches, results) {
+  const stats = {};
+  teams.forEach(t => {
+    stats[t.id] = { team: t, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+  });
+  matches.forEach(m => {
+    const r = results[m.id];
+    if (!r?.played) return;
+    const h = r.home, a = r.away;
+    const hs = stats[m.home], as = stats[m.away];
+    if (!hs || !as) return;
+    hs.p++; as.p++;
+    hs.gf += h; hs.ga += a;
+    as.gf += a; as.ga += h;
+    if (h > a)      { hs.w++; hs.pts += 3; as.l++; }
+    else if (h < a) { as.w++; as.pts += 3; hs.l++; }
+    else            { hs.d++; hs.pts++;    as.d++; as.pts++; }
+  });
+  return Object.values(stats).sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts;
+    const gdB = b.gf - b.ga, gdA = a.gf - a.ga;
+    if (gdB !== gdA) return gdB - gdA;
+    return b.gf - a.gf;
+  });
+}
+
+function findTeamById(fixtures, id) {
+  for (const group of Object.values(fixtures.groups || {})) {
+    const t = group.teams.find(t => t.id === id);
+    if (t) return t;
+  }
+  return null;
+}
+
+function resolveSlot(slot, slotMap, resolvedMatches, results) {
+  if (!slot) return null;
+  if (slotMap[slot] !== undefined) return slotMap[slot];
+  const m = slot.match(/^([WL]):(.+)$/);
+  if (m) {
+    const [, type, matchId] = m;
+    const resolved = resolvedMatches[matchId];
+    if (!resolved) return null;
+    const result = results[matchId];
+    if (!result?.played) return null;
+    if (result.home > result.away) return type === 'W' ? resolved.home : resolved.away;
+    if (result.away > result.home) return type === 'W' ? resolved.away : resolved.home;
+    return null; // draw — shouldn't occur in knockout
+  }
+  return null;
+}
+
+function resolveKnockoutFixtures(fixtures, results) {
+  if (!fixtures.knockout) return fixtures;
+
+  // Build slot map from group standings: "1A" → teamId, "2B" → teamId, "3rd_N" → teamId
+  const slotMap = {};
+  const thirdPlaceTeams = [];
+
+  for (const [groupKey, group] of Object.entries(fixtures.groups || {})) {
+    const rows = calcGroupStandings(group.teams, group.matches, results);
+    if (rows[0]) slotMap[`1${groupKey}`] = rows[0].team.id;
+    if (rows[1]) slotMap[`2${groupKey}`] = rows[1].team.id;
+    if (rows[2]) thirdPlaceTeams.push({
+      team: rows[2].team, pts: rows[2].pts,
+      gd: rows[2].gf - rows[2].ga, gf: rows[2].gf
+    });
+  }
+
+  // Rank best 8 third-place teams
+  thirdPlaceTeams.sort((a, b) =>
+    b.pts !== a.pts ? b.pts - a.pts :
+    b.gd  !== a.gd  ? b.gd  - a.gd  :
+    b.gf  - a.gf
+  );
+  thirdPlaceTeams.slice(0, 8).forEach((t, i) => { slotMap[`3rd_${i + 1}`] = t.team.id; });
+
+  // Resolve each round in bracket order
+  const resolvedMatches = {};
+  for (const roundKey of ['R32', 'R16', 'QF', 'SF', '3P', 'F']) {
+    const round = fixtures.knockout[roundKey];
+    if (!round) continue;
+    for (const match of round.matches) {
+      const homeId = resolveSlot(match.homeSlot, slotMap, resolvedMatches, results);
+      const awayId = resolveSlot(match.awaySlot, slotMap, resolvedMatches, results);
+      resolvedMatches[match.id] = { home: homeId, away: awayId };
+      match.home = homeId || null;
+      match.away = awayId || null;
+      const ht = homeId ? findTeamById(fixtures, homeId) : null;
+      const at = awayId ? findTeamById(fixtures, awayId) : null;
+      match.homeLabel = ht ? `${ht.flag} ${ht.name}` : (match.homeSlot || 'TBD');
+      match.awayLabel = at ? `${at.flag} ${at.name}` : (match.awaySlot || 'TBD');
+    }
+  }
+  return fixtures;
 }
 
 // ── Admin verify ─────────────────────────────────────────────────────────────
@@ -54,7 +156,9 @@ app.get('/api/admin/verify', (req, res) => {
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
 app.get('/api/fixtures', (req, res) => {
-  res.json(readJSON(FIXTURES_FILE, { groups: {}, lockDates: {} }));
+  const fixtures = readJSON(FIXTURES_FILE, { groups: {}, lockDates: {} });
+  const results  = readJSON(RESULTS_FILE,  { results: {} }).results || {};
+  res.json(resolveKnockoutFixtures(fixtures, results));
 });
 
 // ── Lock status ───────────────────────────────────────────────────────────────

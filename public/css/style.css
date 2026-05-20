@@ -1004,6 +1004,35 @@ footer span {
 /* ── Member nav link ─────────────────────────────────────────────────────── */
 .nav-member-link { color: var(--accent) !important; }
 
+/* ── Knockout round label ────────────────────────────────────────────────── */
+.ko-round-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.ko-round-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+}
+.ko-lock-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.tbd-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  border: 1px solid rgba(240,197,0,0.35);
+  border-radius: 3px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   nav.site-nav { padding: 0 1rem; gap: 0.75rem; }

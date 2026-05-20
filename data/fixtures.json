@@ -1,9 +1,15 @@
 {
   "note": "All times are Eastern Time (ET). Source: FIFA World Cup 2026 official schedule.",
   "lockDates": {
-    "1": "2026-06-11T19:00:00Z",
-    "2": "2026-06-18T16:00:00Z",
-    "3": "2026-06-25T01:00:00Z"
+    "1":   "2026-06-11T19:00:00Z",
+    "2":   "2026-06-18T16:00:00Z",
+    "3":   "2026-06-25T01:00:00Z",
+    "R32": "2026-06-28T19:00:00Z",
+    "R16": "2026-07-04T17:00:00Z",
+    "QF":  "2026-07-09T20:00:00Z",
+    "SF":  "2026-07-14T19:00:00Z",
+    "3P":  "2026-07-18T21:00:00Z",
+    "F":   "2026-07-18T21:00:00Z"
   },
   "groups": {
     "A": {
@@ -208,6 +214,71 @@
         { "id": "L4", "home": "PAN", "away": "CRO", "round": 2, "date": "2026-06-23", "time": "19:00", "venue": "Toronto" },
         { "id": "L5", "home": "PAN", "away": "ENG", "round": 3, "date": "2026-06-30", "time": "17:00", "venue": "New York / New Jersey" },
         { "id": "L6", "home": "CRO", "away": "GHA", "round": 3, "date": "2026-06-30", "time": "17:00", "venue": "Philadelphia" }
+      ]
+    }
+  },
+
+  "knockout": {
+    "R32": {
+      "name": "Round of 32",
+      "matches": [
+        { "id": "R32_1",  "round": "R32", "homeSlot": "1A",  "awaySlot": "2B",     "date": "2026-07-01", "time": "12:00", "venue": "TBD" },
+        { "id": "R32_2",  "round": "R32", "homeSlot": "1B",  "awaySlot": "2A",     "date": "2026-07-01", "time": "12:00", "venue": "TBD" },
+        { "id": "R32_3",  "round": "R32", "homeSlot": "1C",  "awaySlot": "2D",     "date": "2026-07-01", "time": "16:00", "venue": "TBD" },
+        { "id": "R32_4",  "round": "R32", "homeSlot": "1D",  "awaySlot": "2C",     "date": "2026-07-01", "time": "16:00", "venue": "TBD" },
+        { "id": "R32_5",  "round": "R32", "homeSlot": "1E",  "awaySlot": "2F",     "date": "2026-07-02", "time": "12:00", "venue": "TBD" },
+        { "id": "R32_6",  "round": "R32", "homeSlot": "1F",  "awaySlot": "2E",     "date": "2026-07-02", "time": "12:00", "venue": "TBD" },
+        { "id": "R32_7",  "round": "R32", "homeSlot": "1G",  "awaySlot": "2H",     "date": "2026-07-02", "time": "16:00", "venue": "TBD" },
+        { "id": "R32_8",  "round": "R32", "homeSlot": "1H",  "awaySlot": "2G",     "date": "2026-07-02", "time": "16:00", "venue": "TBD" },
+        { "id": "R32_9",  "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_1",  "date": "2026-07-02", "time": "20:00", "venue": "TBD" },
+        { "id": "R32_10", "round": "R32", "homeSlot": "1J",  "awaySlot": "3rd_2",  "date": "2026-07-02", "time": "20:00", "venue": "TBD" },
+        { "id": "R32_11", "round": "R32", "homeSlot": "1K",  "awaySlot": "3rd_3",  "date": "2026-07-03", "time": "12:00", "venue": "TBD" },
+        { "id": "R32_12", "round": "R32", "homeSlot": "1L",  "awaySlot": "3rd_4",  "date": "2026-07-03", "time": "12:00", "venue": "TBD" },
+        { "id": "R32_13", "round": "R32", "homeSlot": "2I",  "awaySlot": "3rd_5",  "date": "2026-07-03", "time": "16:00", "venue": "TBD" },
+        { "id": "R32_14", "round": "R32", "homeSlot": "2J",  "awaySlot": "3rd_6",  "date": "2026-07-03", "time": "16:00", "venue": "TBD" },
+        { "id": "R32_15", "round": "R32", "homeSlot": "2K",  "awaySlot": "3rd_7",  "date": "2026-07-03", "time": "20:00", "venue": "TBD" },
+        { "id": "R32_16", "round": "R32", "homeSlot": "2L",  "awaySlot": "3rd_8",  "date": "2026-07-03", "time": "20:00", "venue": "TBD" }
+      ]
+    },
+    "R16": {
+      "name": "Round of 16",
+      "matches": [
+        { "id": "R16_1", "round": "R16", "homeSlot": "W:R32_1",  "awaySlot": "W:R32_9",  "date": "2026-07-05", "time": "12:00", "venue": "TBD" },
+        { "id": "R16_2", "round": "R16", "homeSlot": "W:R32_2",  "awaySlot": "W:R32_10", "date": "2026-07-05", "time": "16:00", "venue": "TBD" },
+        { "id": "R16_3", "round": "R16", "homeSlot": "W:R32_3",  "awaySlot": "W:R32_11", "date": "2026-07-05", "time": "20:00", "venue": "TBD" },
+        { "id": "R16_4", "round": "R16", "homeSlot": "W:R32_4",  "awaySlot": "W:R32_12", "date": "2026-07-06", "time": "12:00", "venue": "TBD" },
+        { "id": "R16_5", "round": "R16", "homeSlot": "W:R32_5",  "awaySlot": "W:R32_13", "date": "2026-07-06", "time": "16:00", "venue": "TBD" },
+        { "id": "R16_6", "round": "R16", "homeSlot": "W:R32_6",  "awaySlot": "W:R32_14", "date": "2026-07-06", "time": "20:00", "venue": "TBD" },
+        { "id": "R16_7", "round": "R16", "homeSlot": "W:R32_7",  "awaySlot": "W:R32_15", "date": "2026-07-07", "time": "12:00", "venue": "TBD" },
+        { "id": "R16_8", "round": "R16", "homeSlot": "W:R32_8",  "awaySlot": "W:R32_16", "date": "2026-07-07", "time": "16:00", "venue": "TBD" }
+      ]
+    },
+    "QF": {
+      "name": "Quarter-finals",
+      "matches": [
+        { "id": "QF_1", "round": "QF", "homeSlot": "W:R16_1", "awaySlot": "W:R16_2", "date": "2026-07-10", "time": "16:00", "venue": "TBD" },
+        { "id": "QF_2", "round": "QF", "homeSlot": "W:R16_3", "awaySlot": "W:R16_4", "date": "2026-07-10", "time": "20:00", "venue": "TBD" },
+        { "id": "QF_3", "round": "QF", "homeSlot": "W:R16_5", "awaySlot": "W:R16_6", "date": "2026-07-11", "time": "16:00", "venue": "TBD" },
+        { "id": "QF_4", "round": "QF", "homeSlot": "W:R16_7", "awaySlot": "W:R16_8", "date": "2026-07-11", "time": "20:00", "venue": "TBD" }
+      ]
+    },
+    "SF": {
+      "name": "Semi-finals",
+      "matches": [
+        { "id": "SF_1", "round": "SF", "homeSlot": "W:QF_1", "awaySlot": "W:QF_2", "date": "2026-07-14", "time": "20:00", "venue": "TBD" },
+        { "id": "SF_2", "round": "SF", "homeSlot": "W:QF_3", "awaySlot": "W:QF_4", "date": "2026-07-15", "time": "20:00", "venue": "TBD" }
+      ]
+    },
+    "3P": {
+      "name": "Third-place Play-off",
+      "matches": [
+        { "id": "3P_1", "round": "3P", "homeSlot": "L:SF_1", "awaySlot": "L:SF_2", "date": "2026-07-18", "time": "15:00", "venue": "TBD" }
+      ]
+    },
+    "F": {
+      "name": "Final",
+      "matches": [
+        { "id": "F_1", "round": "F", "homeSlot": "W:SF_1", "awaySlot": "W:SF_2", "date": "2026-07-19", "time": "15:00", "venue": "New York / New Jersey" }
       ]
     }
   }

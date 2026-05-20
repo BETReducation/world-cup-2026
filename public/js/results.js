@@ -220,34 +220,63 @@ async function renderLeaderboard() {
     return;
   }
 
-  // Build matchId → round lookup from fixtures
-  const matchRound = {};
+  // Build matchId → round lookup for group stage
+  const matchRound  = {};
   const roundTotals = {};
+  let totalGroupMatches = 0;
   Object.values(fixtures.groups).forEach(g => {
     g.matches.forEach(m => {
       matchRound[m.id] = m.round;
       roundTotals[m.round] = (roundTotals[m.round] || 0) + 1;
+      totalGroupMatches++;
     });
   });
-  const rounds = Object.keys(roundTotals).sort();
+  const groupRounds = Object.keys(roundTotals).sort();
 
-  // Build userId → predictions lookup from allPredictions
+  // Build knockout match ID set
+  const koMatchIds = new Set();
+  let totalKoMatches = 0;
+  Object.values(fixtures.knockout || {}).forEach(r => {
+    (r.matches || []).forEach(m => { koMatchIds.add(m.id); totalKoMatches++; });
+  });
+
+  const totalMatches = totalGroupMatches + totalKoMatches;
+
+  // Build userId → predictions lookup
   const predsByUser = {};
   allPredictions.forEach(u => { predsByUser[u.id] = u.predictions || {}; });
 
   const medals = ['🥇', '🥈', '🥉'];
   const rows = board.map((p, i) => {
     const preds = predsByUser[p.id] || {};
+
+    // Count group predictions per round
     const roundCounts = {};
-    rounds.forEach(r => { roundCounts[r] = 0; });
+    groupRounds.forEach(r => { roundCounts[r] = 0; });
+
+    // Count KO predictions and KO points
+    let koPredCount = 0;
+    let koPts = 0;
     Object.entries(preds).forEach(([matchId, pred]) => {
-      const r = matchRound[matchId];
-      if (r && pred.home !== '' && pred.away !== '') roundCounts[r]++;
+      if (pred.home === '' || pred.away === '') return;
+      if (koMatchIds.has(matchId)) {
+        koPredCount++;
+      } else {
+        const r = matchRound[matchId];
+        if (r !== undefined) roundCounts[r]++;
+      }
+    });
+    Object.entries(p.matchPoints || {}).forEach(([matchId, pts]) => {
+      if (koMatchIds.has(matchId)) koPts += pts;
     });
 
-    const roundCells = rounds.map(r =>
+    const roundCells = groupRounds.map(r =>
       `<td style="font-family:'JetBrains Mono',monospace; color:var(--muted);">${roundCounts[r]}/${roundTotals[r]}</td>`
     ).join('');
+
+    const koCell = totalKoMatches > 0
+      ? `<td style="font-family:'JetBrains Mono',monospace; color:${koPts > 0 ? 'var(--teal)' : 'var(--muted)'};">${koPts > 0 ? '+' : ''}${koPts}</td>`
+      : '';
 
     return `
     <tr>
@@ -257,13 +286,18 @@ async function renderLeaderboard() {
       <td style="font-family:'JetBrains Mono',monospace;">${p.correctResults}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${p.correctScores}</td>
       ${roundCells}
-      <td style="font-family:'JetBrains Mono',monospace; color:var(--muted);">${p.predictionsEntered}/72</td>
+      ${koCell}
+      <td style="font-family:'JetBrains Mono',monospace; color:var(--muted);">${p.predictionsEntered}/${totalMatches}</td>
     </tr>`;
   }).join('');
 
-  const roundHeaders = rounds.map(r =>
+  const roundHeaders = groupRounds.map(r =>
     `<th title="Round ${r} predictions entered">R${r}</th>`
   ).join('');
+
+  const koHeader = totalKoMatches > 0
+    ? `<th title="Knockout points">KO Pts</th>`
+    : '';
 
   el.innerHTML = `
     <table class="leaderboard-table">
@@ -275,7 +309,8 @@ async function renderLeaderboard() {
           <th title="Correct results (3 pts)">Results</th>
           <th title="Exact scores (+2 pts)">Exact</th>
           ${roundHeaders}
-          <th title="Total predictions entered">Total Entered</th>
+          ${koHeader}
+          <th title="Total predictions entered">Entered</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
