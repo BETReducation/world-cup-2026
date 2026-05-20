@@ -291,46 +291,6 @@
       margin-bottom: 12px;
     }
 
-    /* ── Entry fee ────────────────────────────────────────────────────────── */
-    .fee-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 12px;
-    }
-    .fee-icon { font-size: 24px; flex-shrink: 0; }
-    .fee-amount {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700;
-      font-size: 20px;
-      color: var(--text);
-    }
-    .fee-label { font-size: 12px; color: var(--muted); margin-top: 1px; }
-    .fee-email-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .fee-email {
-      flex: 1;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      padding: 9px 12px;
-      border: 1px solid var(--border2);
-      border-radius: var(--radius-sm);
-      background: var(--surface2);
-      color: var(--text);
-    }
-    .fee-note {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
 
     /* ── Danger zone ──────────────────────────────────────────────────────── */
     .danger-section {
@@ -361,6 +321,12 @@
       border: 1px solid rgba(240,122,90,0.15);
       border-radius: var(--radius-sm);
       background: rgba(240,122,90,0.03);
+      display: flex;
+      flex-direction: column;
+    }
+    .danger-item .btn {
+      margin-top: auto;
+      align-self: flex-start;
     }
     .danger-title {
       font-family: 'JetBrains Mono', monospace;
@@ -438,7 +404,7 @@
       .member-page { padding: 24px 1rem 60px; }
       .profile-hero { flex-direction: column; align-items: flex-start; gap: 16px; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .danger-grid { grid-template-columns: 1fr; }
+      .danger-grid { gap: 10px; }
       .pin-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -577,26 +543,6 @@
       <button class="btn btn-outline" onclick="changePin()">Update PIN</button>
       <div class="field-feedback" id="pinFeedback"></div>
 
-    </div>
-  </div>
-
-  <!-- Entry Fee -->
-  <div class="profile-section">
-    <div class="section-hdr">Entry Fee</div>
-    <div class="section-body">
-      <div class="fee-row">
-        <div class="fee-icon">💷</div>
-        <div>
-          <div class="fee-amount">£10</div>
-          <div class="fee-label">One-off entry fee to join the league</div>
-        </div>
-      </div>
-      <p class="section-label" style="margin-bottom:8px;">Send payment to</p>
-      <div class="fee-email-row">
-        <div class="fee-email" id="feeEmail">wc2026league@gmail.com</div>
-        <button class="btn btn-outline btn-sm" onclick="copyEmail()">Copy</button>
-      </div>
-      <p class="fee-note">Send £10 via bank transfer, PayPal, or Monzo to the email above, then drop the organiser a message to confirm. No bank details needed on your end.</p>
     </div>
   </div>
 
@@ -934,11 +880,6 @@ function handleAvatarFile(e) {
 }
 
 // ── Email copy ─────────────────────────────────────────────────────────────────
-function copyEmail() {
-  const email = document.getElementById('feeEmail').textContent.trim();
-  navigator.clipboard.writeText(email).then(() => showToast('Email copied', 'ok')).catch(() => showToast('Copy failed', 'err'));
-}
-
 // ── Danger zone ────────────────────────────────────────────────────────────────
 function confirmReset() {
   pendingAction = { type: 'reset' };
@@ -1017,22 +958,14 @@ async function runConfirmedAction() {
 
   if (pendingAction.type === 'reset') {
     if (!pin) { err.textContent = 'PIN required.'; return; }
-    // Verify pin by attempting a profile update with no-op, or just proceed to save empty predictions
-    // We can't verify PIN directly without a dedicated endpoint, so we pass it to a safe action
     try {
-      // Use change-pin with same pin to verify, then reset
-      const verifyRes = await fetch(`/api/users/${currentUserId}/change-pin`, {
+      const r = await fetch(`/api/predictions/${currentUserId}/reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPin: pin, newPin: pin })
+        body: JSON.stringify({ pin })
       });
-      if (!verifyRes.ok) { const d = await verifyRes.json(); err.textContent = d.error || 'Incorrect PIN'; return; }
-
-      await fetch(`/api/predictions/${currentUserId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ predictions: {} })
-      });
+      const d = await r.json();
+      if (!r.ok) { err.textContent = d.error || 'Incorrect PIN'; return; }
       showToast('Predictions cleared', 'ok');
       closeConfirm();
       await loadProfile();

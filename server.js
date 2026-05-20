@@ -436,6 +436,21 @@ app.post('/api/users/:userId/change-pin', (req, res) => {
   res.json({ success: true });
 });
 
+// ── Reset predictions ─────────────────────────────────────────────────────────
+
+app.post('/api/predictions/:userId/reset', (req, res) => {
+  const { pin } = req.body;
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  const user = data.users.find(u => u.id === req.params.userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (String(user.pin) !== String(pin)) return res.status(401).json({ error: 'Incorrect PIN' });
+
+  user.predictions = {};
+  user.lastUpdated = new Date().toISOString();
+  writeJSON(PREDICTIONS_FILE, data);
+  res.json({ success: true });
+});
+
 // ── Delete user ───────────────────────────────────────────────────────────────
 
 app.delete('/api/users/:userId', (req, res) => {
