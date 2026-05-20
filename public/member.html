@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile · World Cup 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Page layout ──────────────────────────────────────────────────────── */
+    .member-page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 2rem 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── Not logged in ────────────────────────────────────────────────────── */
+    #notLoggedIn {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 56px);
+      gap: 16px;
+      text-align: center;
+      padding: 2rem;
+    }
+    .not-auth-icon { font-size: 48px; }
+    .not-auth-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .not-auth-sub { font-size: 14px; color: var(--muted); }
+
+    /* ── Section card ─────────────────────────────────────────────────────── */
+    .profile-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .section-hdr {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section-body { padding: 20px; }
+
+    /* ── Hero card ────────────────────────────────────────────────────────── */
+    .profile-hero {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .avatar-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .avatar-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4dc97a 0%, #1a7a45 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #0b0f1a;
+      border: 2px solid rgba(77,201,122,0.35);
+    }
+    .avatar-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(77,201,122,0.35);
+      display: none;
+    }
+    .avatar-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .avatar-wrap:hover .avatar-overlay { opacity: 1; }
+    .hero-info { flex: 1; min-width: 0; }
+    .hero-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hero-joined {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .hero-pills { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .rank-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--accent);
+      background: var(--accent-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+    .success-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 0.04em;
+    }
+    .hero-bio {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    /* ── Stats grid ───────────────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+    .stat-value.muted { color: var(--text); }
+    .stat-sub {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Predictions table ────────────────────────────────────────────────── */
+    .group-accordion {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .group-toggle {
+      width: 100%;
+      background: var(--surface2);
+      border: none;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: background 0.15s;
+    }
+    .group-toggle:hover { background: var(--border); }
+    .group-toggle .chevron { color: var(--muted); transition: transform 0.2s; }
+    .group-toggle.open .chevron { transform: rotate(180deg); }
+    .group-body { display: none; }
+    .group-body.open { display: block; }
+
+    .pred-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .pred-table th {
+      background: var(--surface2);
+      color: var(--muted);
+      padding: 7px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border2);
+      text-align: left;
+    }
+    .pred-table th.center { text-align: center; }
+    .pred-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .pred-table tr:last-child td { border-bottom: none; }
+    .pred-table td.center { text-align: center; }
+    .pred-table td.mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+    }
+    .pred-table td.muted-cell { color: var(--muted); text-align: center; font-size: 11px; }
+    .match-label { font-weight: 600; font-size: 12px; }
+    .match-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Settings form ────────────────────────────────────────────────────── */
+    .settings-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .settings-row:last-child { margin-bottom: 0; }
+    .settings-row .form-group { flex: 1; margin-bottom: 0; }
+    .field-feedback {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      margin-top: 6px;
+      min-height: 16px;
+    }
+    .field-feedback.ok  { color: var(--accent); }
+    .field-feedback.err { color: var(--red); }
+
+    .pin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    /* ── Entry fee ────────────────────────────────────────────────────────── */
+    .fee-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+    }
+    .fee-icon { font-size: 24px; flex-shrink: 0; }
+    .fee-amount {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--text);
+    }
+    .fee-label { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .fee-email-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .fee-email {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 9px 12px;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+      color: var(--text);
+    }
+    .fee-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Danger zone ──────────────────────────────────────────────────────── */
+    .danger-section {
+      background: var(--surface);
+      border: 1px solid rgba(240,122,90,0.2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .danger-hdr {
+      background: rgba(240,122,90,0.06);
+      border-bottom: 1px solid rgba(240,122,90,0.15);
+      padding: 9px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+    .danger-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 20px;
+    }
+    .danger-item {
+      padding: 16px;
+      border: 1px solid rgba(240,122,90,0.15);
+      border-radius: var(--radius-sm);
+      background: rgba(240,122,90,0.03);
+    }
+    .danger-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
+    .danger-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    /* ── Confirm modal ────────────────────────────────────────────────────── */
+    #confirmOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    #confirmOverlay.open { display: flex; }
+    .confirm-box {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+    .confirm-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+    .confirm-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .confirm-actions { display: flex; gap: 8px; }
+
+    /* ── Toast ────────────────────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      z-index: 9900;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    #toast.show { opacity: 1; }
+    #toast.ok  { background: var(--surface); border: 1px solid var(--accent); color: var(--accent); }
+    #toast.err { background: var(--surface); border: 1px solid var(--red); color: var(--red); }
+
+    /* ── Responsive ───────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .member-page { padding: 24px 1rem 60px; }
+      .profile-hero { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .danger-grid { grid-template-columns: 1fr; }
+      .pin-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">WC26 <span>Prediction League</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="predictions.html">My Predictions</a>
+    <a href="results.html">Results</a>
+    <a href="knockout.html">Knockout</a>
+    <a href="member.html" id="navMemberLink" class="nav-member-link active" style="display:none;"></a>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<!-- Not logged in -->
+<div id="notLoggedIn">
+  <div class="not-auth-icon">🔒</div>
+  <div class="not-auth-title">Sign In to View Your Profile</div>
+  <div class="not-auth-sub">You need to register or sign in to access your member area.</div>
+  <a href="predictions.html" class="btn btn-primary" style="margin-top: 8px;">Go to Predictions →</a>
+</div>
+
+<!-- Member page (shown when logged in) -->
+<div class="member-page" id="memberPage" style="display:none;">
+
+  <!-- Hero -->
+  <div class="profile-hero">
+    <div class="avatar-wrap" onclick="triggerAvatarUpload()" title="Click to change photo">
+      <img id="avatarImg" class="avatar-img" src="" alt="Profile photo">
+      <div class="avatar-circle" id="avatarCircle">?</div>
+      <div class="avatar-overlay">📷</div>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleAvatarFile(event)">
+    <div class="hero-info">
+      <div class="hero-name" id="heroName">—</div>
+      <div class="hero-joined" id="heroJoined">Joined —</div>
+      <div class="hero-pills">
+        <span class="rank-pill" id="rankPill">— —</span>
+        <span class="success-pill" id="successPill" style="display:none;">— success rate</span>
+      </div>
+      <div class="hero-bio" id="heroBio"></div>
+    </div>
+  </div>
+
+  <!-- Season Stats -->
+  <div class="profile-section">
+    <div class="section-hdr">Season Stats</div>
+    <div class="section-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Points</div>
+          <div class="stat-value" id="statPoints">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">League Rank</div>
+          <div class="stat-value muted" id="statRank">—</div>
+          <div class="stat-sub" id="statRankSub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Success Rate</div>
+          <div class="stat-value" id="statSuccess">—</div>
+          <div class="stat-sub" id="statSuccessSub">of played matches</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Correct Results</div>
+          <div class="stat-value muted" id="statResults">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Exact Scores</div>
+          <div class="stat-value muted" id="statScores">—</div>
+          <div class="stat-sub">+2 pts bonus</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Predictions Entered</div>
+          <div class="stat-value muted" id="statPreds">—</div>
+          <div class="stat-sub">of 72 matches</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Predictions -->
+  <div class="profile-section">
+    <div class="section-hdr">My Predictions</div>
+    <div class="section-body" id="predictionsBody">
+      <div class="loading-state" style="padding: 20px 0;">
+        <div class="spinner"></div>
+        <p>Loading predictions…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Settings -->
+  <div class="profile-section">
+    <div class="section-hdr">Account Settings</div>
+    <div class="section-body">
+
+      <!-- Display name + Bio -->
+      <p class="section-label" style="margin-bottom: 10px;">Display Name</p>
+      <div class="form-group" style="margin-bottom:12px;">
+        <input type="text" id="fieldDisplayName" placeholder="Your display name" maxlength="30"
+          style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;transition:border-color 0.15s;box-sizing:border-box;">
+      </div>
+
+      <p class="section-label" style="margin-bottom: 10px;">Bio <span style="color:var(--muted);font-size:10px;letter-spacing:0;">(max 160 chars)</span></p>
+      <div class="form-group" style="margin-bottom:12px;">
+        <textarea id="fieldBio" maxlength="160" rows="3" placeholder="A short intro — e.g. 'Arsenal fan, hoping for an England upset'"
+          style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+      <div class="field-feedback" id="displayNameFeedback" style="margin-top:8px;"></div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+
+      <!-- Change PIN -->
+      <p class="section-label" style="margin-bottom: 10px;">Change PIN</p>
+      <div class="pin-grid">
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="currentPin">Current PIN</label>
+          <input type="password" id="currentPin" inputmode="numeric" maxlength="4" placeholder="••••">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="newPin">New PIN</label>
+          <input type="password" id="newPin" inputmode="numeric" maxlength="4" placeholder="••••">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="confirmPin">Confirm New PIN</label>
+          <input type="password" id="confirmPin" inputmode="numeric" maxlength="4" placeholder="••••">
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="changePin()">Update PIN</button>
+      <div class="field-feedback" id="pinFeedback"></div>
+
+    </div>
+  </div>
+
+  <!-- Entry Fee -->
+  <div class="profile-section">
+    <div class="section-hdr">Entry Fee</div>
+    <div class="section-body">
+      <div class="fee-row">
+        <div class="fee-icon">💷</div>
+        <div>
+          <div class="fee-amount">£10</div>
+          <div class="fee-label">One-off entry fee to join the league</div>
+        </div>
+      </div>
+      <p class="section-label" style="margin-bottom:8px;">Send payment to</p>
+      <div class="fee-email-row">
+        <div class="fee-email" id="feeEmail">wc2026league@gmail.com</div>
+        <button class="btn btn-outline btn-sm" onclick="copyEmail()">Copy</button>
+      </div>
+      <p class="fee-note">Send £10 via bank transfer, PayPal, or Monzo to the email above, then drop the organiser a message to confirm. No bank details needed on your end.</p>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="danger-section">
+    <div class="danger-hdr">Danger Zone</div>
+    <div class="danger-grid">
+      <div class="danger-item">
+        <div class="danger-title">Reset Predictions</div>
+        <div class="danger-desc">Clear all your match predictions. This cannot be undone — you will need to re-enter all 72 scores before the round locks.</div>
+        <button class="btn btn-danger" onclick="confirmReset()">Reset Predictions</button>
+      </div>
+      <div class="danger-item">
+        <div class="danger-title">Delete Account</div>
+        <div class="danger-desc">Permanently remove your account and all predictions from the league. You will be signed out immediately and cannot re-join with the same name.</div>
+        <button class="btn btn-danger" onclick="confirmDelete()">Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /member-page -->
+
+<!-- Confirm modal -->
+<div id="confirmOverlay" onclick="if(event.target===this)closeConfirm()">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle">Confirm</div>
+    <div class="confirm-desc" id="confirmDesc">Are you sure?</div>
+    <div class="form-group" id="confirmPinGroup" style="display:none; margin-bottom:16px;">
+      <label for="confirmPinInput">Enter your PIN to confirm</label>
+      <input type="password" id="confirmPinInput" inputmode="numeric" maxlength="4" placeholder="••••">
+    </div>
+    <div class="field-feedback err" id="confirmError" style="margin-bottom:10px;"></div>
+    <div class="confirm-actions">
+      <button class="btn btn-danger" id="confirmOkBtn" onclick="runConfirmedAction()">Confirm</button>
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<footer>
+  <span>WC26 Prediction League</span>
+  <span>Member area</span>
+</footer>
+
+<script>
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('wc26_theme') || 'dark';
+  html.dataset.theme = saved;
+  toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+  toggle.addEventListener('click', () => {
+    const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    html.dataset.theme = next;
+    localStorage.setItem('wc26_theme', next);
+    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+  });
+</script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/tables.js"></script>
+<script>
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let currentUserId = null;
+let profileData   = null;
+let pendingAction = null;
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const session = Session.load();
+  if (!session.userId) {
+    document.getElementById('notLoggedIn').style.display = 'flex';
+    return;
+  }
+  currentUserId = session.userId;
+
+  // Show nav member link immediately
+  const navLink = document.getElementById('navMemberLink');
+  if (navLink) {
+    navLink.textContent = '👤 ' + session.name;
+    navLink.style.display = 'flex';
+  }
+
+  document.getElementById('memberPage').style.display = 'flex';
+  await loadProfile();
+  await loadPredictions();
+});
+
+// ── Load profile ───────────────────────────────────────────────────────────────
+async function loadProfile() {
+  try {
+    const data = await fetch(`/api/profile/${currentUserId}`).then(r => r.json());
+    profileData = data;
+    populateHero(data);
+    populateStats(data);
+    // Pre-fill display name field
+    document.getElementById('fieldDisplayName').value = data.displayName || data.name || '';
+  } catch (e) {
+    showToast('Could not load profile', 'err');
+  }
+}
+
+function populateHero(data) {
+  const displayName = data.displayName || data.name || '?';
+  document.getElementById('heroName').textContent = displayName;
+  document.getElementById('avatarCircle').textContent = displayName[0].toUpperCase();
+
+  if (data.avatar) {
+    const img = document.getElementById('avatarImg');
+    img.src = data.avatar;
+    img.style.display = 'block';
+    document.getElementById('avatarCircle').style.display = 'none';
+  }
+
+  const joined = data.joinedAt ? new Date(data.joinedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+  document.getElementById('heroJoined').textContent = 'Joined ' + joined;
+
+  const rank = data.stats.rank;
+  const total = data.stats.totalPlayers;
+  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '🏅';
+  const suffix = rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th';
+  document.getElementById('rankPill').textContent = `${medal} ${rank}${suffix} of ${total}`;
+
+  const playedPreds = Object.keys(data.matchPoints || {}).length;
+  if (playedPreds > 0) {
+    const rate = Math.round(data.stats.correctResults / playedPreds * 100);
+    const pill = document.getElementById('successPill');
+    pill.textContent = `${rate}% success rate`;
+    pill.style.display = 'inline-flex';
+  }
+
+  const bioEl = document.getElementById('heroBio');
+  bioEl.textContent = data.bio || '';
+  bioEl.style.display = data.bio ? 'block' : 'none';
+
+  document.getElementById('fieldBio').value = data.bio || '';
+}
+
+function populateStats(data) {
+  const s = data.stats;
+  document.getElementById('statPoints').textContent = s.totalPoints;
+  document.getElementById('statRank').textContent   = '#' + s.rank;
+  document.getElementById('statRankSub').textContent = 'of ' + s.totalPlayers;
+  document.getElementById('statResults').textContent = s.correctResults;
+  document.getElementById('statScores').textContent  = s.correctScores;
+  document.getElementById('statPreds').textContent   = s.predictionsEntered;
+
+  const playedPreds = Object.keys(data.matchPoints || {}).length;
+  if (playedPreds > 0) {
+    const rate = Math.round(s.correctResults / playedPreds * 100);
+    document.getElementById('statSuccess').textContent = rate + '%';
+    document.getElementById('statSuccessSub').textContent = `${s.correctResults} of ${playedPreds} played`;
+  } else {
+    document.getElementById('statSuccess').textContent = '—';
+    document.getElementById('statSuccessSub').textContent = 'no results yet';
+  }
+}
+
+// ── Load predictions ───────────────────────────────────────────────────────────
+async function loadPredictions() {
+  const body = document.getElementById('predictionsBody');
+  try {
+    const [fixturesData, predData, resultsData] = await Promise.all([
+      API.fixtures(),
+      API.myPredictions(currentUserId),
+      API.results()
+    ]);
+
+    const matchPoints = (profileData && profileData.matchPoints) ? profileData.matchPoints : {};
+    const actualResults = resultsData.results || {};
+    const myPreds = predData.predictions || {};
+    const groups  = fixturesData.groups || {};
+
+    body.innerHTML = '';
+
+    for (const [groupKey, group] of Object.entries(groups)) {
+      const matches = group.matches || [];
+      const label   = group.name || ('Group ' + groupKey);
+
+      const accordion = document.createElement('div');
+      accordion.className = 'group-accordion';
+
+      // How many predictions entered for this group
+      const enteredCount = matches.filter(m => myPreds[m.id] !== undefined).length;
+      const ptsForGroup  = matches.reduce((sum, m) => sum + (matchPoints[m.id] || 0), 0);
+      const ptsBadge     = ptsForGroup > 0 ? `<span class="pts-badge pts-${ptsForGroup >= 5 ? 5 : ptsForGroup >= 3 ? 3 : 0}">${ptsForGroup} pts</span>` : '';
+
+      accordion.innerHTML = `
+        <button class="group-toggle" onclick="toggleGroup(this)">
+          <span>${label} &mdash; ${enteredCount}/${matches.length} entered ${ptsBadge}</span>
+          <span class="chevron">▾</span>
+        </button>
+        <div class="group-body">
+          <table class="pred-table">
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th class="center">My Pick</th>
+                <th class="center">Result</th>
+                <th class="center">Pts</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${matches.map(m => buildMatchRow(m, myPreds, matchPoints, actualResults)).join('')}
+            </tbody>
+          </table>
+        </div>`;
+
+      body.appendChild(accordion);
+    }
+  } catch (e) {
+    body.innerHTML = '<p class="section-desc">Could not load predictions.</p>';
+  }
+}
+
+function buildMatchRow(match, myPreds, matchPoints, actualResults) {
+  const pred   = myPreds[match.id];
+  const pts    = matchPoints[match.id];
+  const actual = actualResults[match.id];
+
+  const predCell = pred !== undefined
+    ? `<span style="font-family:'JetBrains Mono',monospace;font-weight:500;">${pred.home}–${pred.away}</span>`
+    : `<span style="color:var(--muted);">—</span>`;
+
+  let resultCell;
+  if (actual) {
+    const correct = pts > 0;
+    const colour  = correct ? 'var(--accent)' : 'var(--red)';
+    resultCell = `<span style="font-family:'JetBrains Mono',monospace;font-weight:500;color:${colour};">${actual.home}–${actual.away}</span>`;
+  } else {
+    resultCell = `<span style="color:var(--muted);font-size:11px;">TBD</span>`;
+  }
+
+  let ptsBadge = '<span style="color:var(--muted);">—</span>';
+  if (pts !== undefined) {
+    const cls = pts >= 5 ? 'pts-5' : pts >= 3 ? 'pts-3' : 'pts-0';
+    ptsBadge = `<span class="pts-badge ${cls}">${pts}</span>`;
+  }
+
+  const homeTeam = `${match.homeFlag || ''} ${match.home}`.trim();
+  const awayTeam = `${match.awayFlag || ''} ${match.away}`.trim();
+  const dateStr  = match.date ? fmtDate(match.date) : '';
+
+  return `<tr>
+    <td>
+      <div class="match-label">${homeTeam} vs ${awayTeam}</div>
+      ${dateStr ? `<div class="match-date">${dateStr}</div>` : ''}
+    </td>
+    <td class="center">${predCell}</td>
+    <td class="center">${resultCell}</td>
+    <td class="center">${ptsBadge}</td>
+  </tr>`;
+}
+
+function toggleGroup(btn) {
+  btn.classList.toggle('open');
+  const body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ── Save profile (display name + bio) ─────────────────────────────────────────
+async function saveProfile() {
+  const fb   = document.getElementById('displayNameFeedback');
+  const name = document.getElementById('fieldDisplayName').value.trim();
+  const bio  = document.getElementById('fieldBio').value.trim();
+  if (!name) { setFeedback(fb, 'Display name cannot be empty.', 'err'); return; }
+
+  pendingAction = { type: 'displayName', value: name, bio };
+  openConfirm(
+    'Save Profile',
+    `Save display name "${name}"? Enter your PIN to confirm.`,
+    true,
+    'Save'
+  );
+}
+
+// ── Change PIN ─────────────────────────────────────────────────────────────────
+async function changePin() {
+  const fb      = document.getElementById('pinFeedback');
+  const current = document.getElementById('currentPin').value.trim();
+  const nw      = document.getElementById('newPin').value.trim();
+  const confirm = document.getElementById('confirmPin').value.trim();
+
+  if (!current || !nw || !confirm) { setFeedback(fb, 'All three PIN fields are required.', 'err'); return; }
+  if (!/^\d{4}$/.test(nw))         { setFeedback(fb, 'New PIN must be exactly 4 digits.', 'err'); return; }
+  if (nw !== confirm)               { setFeedback(fb, 'New PIN and confirmation do not match.', 'err'); return; }
+
+  try {
+    await fetch(`/api/users/${currentUserId}/change-pin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPin: current, newPin: nw })
+    }).then(async r => {
+      if (!r.ok) { const d = await r.json(); throw new Error(d.error || 'Failed'); }
+    });
+    setFeedback(fb, 'PIN updated successfully.', 'ok');
+    document.getElementById('currentPin').value = '';
+    document.getElementById('newPin').value = '';
+    document.getElementById('confirmPin').value = '';
+  } catch (e) {
+    setFeedback(fb, e.message, 'err');
+  }
+}
+
+// ── Avatar upload ──────────────────────────────────────────────────────────────
+function triggerAvatarUpload() {
+  document.getElementById('avatarInput').click();
+}
+
+function handleAvatarFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const size = 150;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      pendingAction = { type: 'avatar', dataUrl };
+      openConfirm('Update Profile Photo', 'Enter your PIN to save your new photo.', true, 'Save Photo');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+// ── Email copy ─────────────────────────────────────────────────────────────────
+function copyEmail() {
+  const email = document.getElementById('feeEmail').textContent.trim();
+  navigator.clipboard.writeText(email).then(() => showToast('Email copied', 'ok')).catch(() => showToast('Copy failed', 'err'));
+}
+
+// ── Danger zone ────────────────────────────────────────────────────────────────
+function confirmReset() {
+  pendingAction = { type: 'reset' };
+  openConfirm(
+    'Reset All Predictions',
+    'This will clear every match prediction you have entered. This cannot be undone. Enter your PIN to confirm.',
+    true,
+    'Reset'
+  );
+}
+
+function confirmDelete() {
+  pendingAction = { type: 'delete' };
+  openConfirm(
+    'Delete Account',
+    'This will permanently remove your account and all your predictions from the league. Enter your PIN to confirm.',
+    true,
+    'Delete'
+  );
+}
+
+async function runConfirmedAction() {
+  const pin = document.getElementById('confirmPinInput').value.trim();
+  const err = document.getElementById('confirmError');
+  err.textContent = '';
+
+  if (!pendingAction) { closeConfirm(); return; }
+
+  if (pendingAction.type === 'displayName') {
+    if (!pin) { err.textContent = 'PIN required.'; return; }
+    try {
+      await fetch(`/api/profile/${currentUserId}/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, displayName: pendingAction.value, bio: pendingAction.bio })
+      }).then(async r => {
+        if (!r.ok) { const d = await r.json(); throw new Error(d.error || 'Failed'); }
+      });
+      setFeedback(document.getElementById('displayNameFeedback'), 'Profile saved.', 'ok');
+      document.getElementById('heroName').textContent = pendingAction.value;
+      document.getElementById('avatarCircle').textContent = pendingAction.value[0].toUpperCase();
+      const bioEl = document.getElementById('heroBio');
+      bioEl.textContent = pendingAction.bio || '';
+      bioEl.style.display = pendingAction.bio ? 'block' : 'none';
+      localStorage.setItem('wc2026_name', pendingAction.value);
+      const navLink = document.getElementById('navMemberLink');
+      if (navLink) navLink.textContent = '👤 ' + pendingAction.value;
+      showToast('Profile saved', 'ok');
+      closeConfirm();
+    } catch (e) {
+      err.textContent = e.message;
+    }
+    return;
+  }
+
+  if (pendingAction.type === 'avatar') {
+    if (!pin) { err.textContent = 'PIN required.'; return; }
+    try {
+      const r = await fetch(`/api/profile/${currentUserId}/avatar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, avatar: pendingAction.dataUrl })
+      });
+      if (!r.ok) { const d = await r.json(); throw new Error(d.error || 'Failed'); }
+      const img = document.getElementById('avatarImg');
+      img.src = pendingAction.dataUrl;
+      img.style.display = 'block';
+      document.getElementById('avatarCircle').style.display = 'none';
+      showToast('Photo updated', 'ok');
+      closeConfirm();
+    } catch (e) {
+      err.textContent = e.message;
+    }
+    return;
+  }
+
+  if (pendingAction.type === 'reset') {
+    if (!pin) { err.textContent = 'PIN required.'; return; }
+    // Verify pin by attempting a profile update with no-op, or just proceed to save empty predictions
+    // We can't verify PIN directly without a dedicated endpoint, so we pass it to a safe action
+    try {
+      // Use change-pin with same pin to verify, then reset
+      const verifyRes = await fetch(`/api/users/${currentUserId}/change-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPin: pin, newPin: pin })
+      });
+      if (!verifyRes.ok) { const d = await verifyRes.json(); err.textContent = d.error || 'Incorrect PIN'; return; }
+
+      await fetch(`/api/predictions/${currentUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ predictions: {} })
+      });
+      showToast('Predictions cleared', 'ok');
+      closeConfirm();
+      await loadProfile();
+      await loadPredictions();
+    } catch (e) {
+      err.textContent = e.message;
+    }
+    return;
+  }
+
+  if (pendingAction.type === 'delete') {
+    if (!pin) { err.textContent = 'PIN required.'; return; }
+    try {
+      const r = await fetch(`/api/users/${currentUserId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      if (!r.ok) { const d = await r.json(); err.textContent = d.error || 'Failed'; return; }
+      Session.clear();
+      window.location.href = 'index.html';
+    } catch (e) {
+      err.textContent = e.message;
+    }
+    return;
+  }
+}
+
+// ── Confirm modal helpers ──────────────────────────────────────────────────────
+function openConfirm(title, desc, requirePin, okLabel) {
+  document.getElementById('confirmTitle').textContent   = title;
+  document.getElementById('confirmDesc').textContent    = desc;
+  document.getElementById('confirmOkBtn').textContent   = okLabel || 'Confirm';
+  document.getElementById('confirmPinGroup').style.display = requirePin ? 'block' : 'none';
+  document.getElementById('confirmPinInput').value = '';
+  document.getElementById('confirmError').textContent = '';
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  pendingAction = null;
+}
+
+// ── Feedback / toast helpers ───────────────────────────────────────────────────
+function setFeedback(el, msg, type) {
+  el.textContent = msg;
+  el.className   = 'field-feedback ' + type;
+  if (type === 'ok') setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 4000);
+}
+
+let toastTimer = null;
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = 'show ' + (type === 'err' ? 'err' : 'ok');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+</script>
+</body>
+</html>

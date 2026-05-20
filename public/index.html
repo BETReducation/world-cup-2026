@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Cup 2026 · Prediction League</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">WC26 <span>Prediction League</span></a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="predictions.html">My Predictions</a>
+    <a href="results.html">Results</a>
+    <a href="knockout.html">Knockout</a>
+    <a href="member.html" id="navMemberLink" class="nav-member-link" style="display:none;"></a>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">⚽ USA · Canada · Mexico · June 2026</div>
+  <h1>Pick your scores.<br><span>Top the table.</span></h1>
+  <p>Enter predicted scores for all 72 group-stage matches. Your group tables update live as you type, and a full leaderboard tracks who's closest when the real results come in.</p>
+  <div class="hero-cta">
+    <a href="predictions.html" class="btn btn-primary">My Predictions →</a>
+    <a href="results.html" class="btn btn-outline">View Results</a>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+
+  <p class="section-label">How it works</p>
+  <h2 class="section-title">Simple rules, big bragging rights</h2>
+  <p class="section-desc">A private winner-takes-all prediction league across the entire group stage — 72 matches, 48 teams, 12 groups.</p>
+
+  <div class="info-grid">
+
+    <div class="info-tile">
+      <div class="tile-icon">🔒</div>
+      <h3>Group Stages</h3>
+      <p>All Round 1 picks must be in before the first kick-off. Same rule applies to Rounds 2 &amp; 3 — once the whistle blows, that round is locked.</p>
+    </div>
+
+    <div class="info-tile">
+      <div class="tile-icon">🎯</div>
+      <h3>Points System</h3>
+      <p><strong>3 pts</strong> for the correct result (win/draw/loss).<br><strong>+2 bonus pts</strong> for the exact scoreline. Nothing for a wrong result.</p>
+    </div>
+
+    <div class="info-tile">
+      <div class="tile-icon">💰</div>
+      <h3>Entry Fee</h3>
+      <p>£10 or đ350,000. Send to the organiser to get access to the prediction portal.</p>
+    </div>
+
+    <div class="info-tile">
+      <div class="tile-icon">📊</div>
+      <h3>Predicted Tables</h3>
+      <p>Your group-stage predictions automatically generate live league tables — see how your picks play out before a ball is kicked.</p>
+    </div>
+
+    <div class="info-tile">
+      <div class="tile-icon">👥</div>
+      <h3>Compare Predictions</h3>
+      <p>The Results page shows every player's prediction next to each actual score, with points earned per match.</p>
+    </div>
+
+    <div class="info-tile">
+      <div class="tile-icon">🏆</div>
+      <h3>Knockout Stage</h3>
+      <p>Group-stage predictions come first. Knockout picks open once the round of 32 draw is confirmed after the group stage ends.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<hr class="divider">
+
+<div class="section">
+
+  <p class="section-label">The tournament</p>
+  <h2 class="section-title">48 teams · 12 groups · 72 matches</h2>
+  <p class="section-desc">The biggest World Cup ever. Group stage runs 11 June – 30 June 2026 across the USA, Canada, and Mexico.</p>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <p class="metric-label">Teams</p>
+      <p class="metric-value">48</p>
+      <p class="metric-sub">from 6 confederations</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Group Matches</p>
+      <p class="metric-value">72</p>
+      <p class="metric-sub">across 3 rounds</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Max Points</p>
+      <p class="metric-value">360</p>
+      <p class="metric-sub">5 pts × 72 matches</p>
+    </div>
+  </div>
+
+  <div class="hero-cta">
+    <a href="predictions.html" class="btn btn-primary">Enter My Predictions</a>
+    <a href="results.html" class="btn btn-outline">Live Results &amp; Tables</a>
+  </div>
+
+</div>
+
+<footer>
+  <span>WC26 Prediction League</span>
+  <span>Built for friends · Winner takes all</span>
+</footer>
+
+<script>
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('wc26_theme') || 'dark';
+  html.dataset.theme = saved;
+  toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+  toggle.addEventListener('click', () => {
+    const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    html.dataset.theme = next;
+    localStorage.setItem('wc26_theme', next);
+    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+  });
+</script>
+<script src="js/auth.js"></script>
+
+</body>
+</html>
