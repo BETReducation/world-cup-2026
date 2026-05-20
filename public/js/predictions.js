@@ -73,14 +73,22 @@ async function loadAndRender() {
   $('loadingState').style.display = 'block';
   try {
     [fixtures, lockStatus] = await Promise.all([API.fixtures(), API.lockStatus()]);
-    if (userId) {
-      const saved = await API.myPredictions(userId);
-      userPredictions = saved.predictions || {};
-    }
   } catch {
     $('loadingState').innerHTML =
       '<p style="color:var(--red);">⚠️ Could not reach server. Make sure <code>node server.js</code> is running.</p>';
     return;
+  }
+
+  if (userId) {
+    try {
+      const saved = await API.myPredictions(userId);
+      userPredictions = saved.predictions || {};
+    } catch {
+      // User not found — session is stale (e.g. server redeployed). Clear and re-register.
+      Session.clear();
+      location.reload();
+      return;
+    }
   }
 
   $('loadingState').style.display = 'none';
