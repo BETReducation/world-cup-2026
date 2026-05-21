@@ -15,10 +15,10 @@
     "A": {
       "name": "Group A",
       "teams": [
-        { "id": "MEX", "name": "Mexico",         "flag": "🇲🇽" },
-        { "id": "RSA", "name": "South Africa",   "flag": "🇿🇦" },
-        { "id": "KOR", "name": "Korea Republic", "flag": "🇰🇷" },
-        { "id": "CZE", "name": "Czechia",        "flag": "🇨🇿" }
+        { "id": "MEX", "name": "Mexico",         "flag": "🇲🇽", "flagCode": "mx" },
+        { "id": "RSA", "name": "South Africa",   "flag": "🇿🇦", "flagCode": "za" },
+        { "id": "KOR", "name": "Korea Republic", "flag": "🇰🇷", "flagCode": "kr" },
+        { "id": "CZE", "name": "Czechia",        "flag": "🇨🇿", "flagCode": "cz" }
       ],
       "matches": [
         { "id": "A1", "home": "MEX", "away": "RSA", "round": 1, "date": "2026-06-11", "time": "15:00", "venue": "Mexico City" },
@@ -32,10 +32,10 @@
     "B": {
       "name": "Group B",
       "teams": [
-        { "id": "CAN", "name": "Canada",               "flag": "🇨🇦" },
-        { "id": "BIH", "name": "Bosnia & Herzegovina", "flag": "🇧🇦" },
-        { "id": "QAT", "name": "Qatar",                "flag": "🇶🇦" },
-        { "id": "SUI", "name": "Switzerland",          "flag": "🇨🇭" }
+        { "id": "CAN", "name": "Canada",               "flag": "🇨🇦", "flagCode": "ca" },
+        { "id": "BIH", "name": "Bosnia & Herzegovina", "flag": "🇧🇦", "flagCode": "ba" },
+        { "id": "QAT", "name": "Qatar",                "flag": "🇶🇦", "flagCode": "qa" },
+        { "id": "SUI", "name": "Switzerland",          "flag": "🇨🇭", "flagCode": "ch" }
       ],
       "matches": [
         { "id": "B1", "home": "CAN", "away": "BIH", "round": 1, "date": "2026-06-12", "time": "15:00", "venue": "Toronto" },
@@ -49,10 +49,10 @@
     "C": {
       "name": "Group C",
       "teams": [
-        { "id": "BRA", "name": "Brazil",   "flag": "🇧🇷" },
-        { "id": "MAR", "name": "Morocco",  "flag": "🇲🇦" },
-        { "id": "HAI", "name": "Haiti",    "flag": "🇭🇹" },
-        { "id": "SCO", "name": "Scotland", "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿" }
+        { "id": "BRA", "name": "Brazil",   "flag": "🇧🇷", "flagCode": "br" },
+        { "id": "MAR", "name": "Morocco",  "flag": "🇲🇦", "flagCode": "ma" },
+        { "id": "HAI", "name": "Haiti",    "flag": "🇭🇹", "flagCode": "ht" },
+        { "id": "SCO", "name": "Scotland", "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "flagCode": "gb-sct" }
       ],
       "matches": [
         { "id": "C1", "home": "HAI", "away": "SCO", "round": 1, "date": "2026-06-13", "time": "21:00", "venue": "Boston" },
@@ -66,10 +66,10 @@
     "D": {
       "name": "Group D",
       "teams": [
-        { "id": "USA", "name": "USA",       "flag": "🇺🇸" },
-        { "id": "PAR", "name": "Paraguay",  "flag": "🇵🇾" },
-        { "id": "AUS", "name": "Australia", "flag": "🇦🇺" },
-        { "id": "TUR", "name": "Türkiye",   "flag": "🇹🇷" }
+        { "id": "USA", "name": "USA",       "flag": "🇺🇸", "flagCode": "us" },
+        { "id": "PAR", "name": "Paraguay",  "flag": "🇵🇾", "flagCode": "py" },
+        { "id": "AUS", "name": "Australia", "flag": "🇦🇺", "flagCode": "au" },
+        { "id": "TUR", "name": "Türkiye",   "flag": "🇹🇷", "flagCode": "tr" }
       ],
       "matches": [
         { "id": "D1", "home": "USA", "away": "PAR", "round": 1, "date": "2026-06-12", "time": "21:00", "venue": "Los Angeles" },
@@ -83,10 +83,10 @@
     "E": {
       "name": "Group E",
       "teams": [
-        { "id": "GER", "name": "Germany",       "flag": "🇩🇪" },
-        { "id": "CUW", "name": "Curaçao",       "flag": "🇨🇼" },
-        { "id": "CIV", "name": "Côte d'Ivoire", "flag": "🇨🇮" },
-        { "id": "ECU", "name": "Ecuador",       "flag": "🇪🇨" }
+        { "id": "GER", "name": "Germany",       "flag": "🇩🇪", "flagCode": "de" },
+        { "id": "CUW", "name": "Curaçao",       "flag": "🇨🇼", "flagCode": "cw" },
+        { "id": "CIV", "name": "Côte d'Ivoire", "flag": "🇨🇮", "flagCode": "ci" },
+        { "id": "ECU", "name": "Ecuador",       "flag": "🇪🇨", "flagCode": "ec" }
       ],
       "matches": [
         { "id": "E1", "home": "CIV", "away": "ECU", "round": 1, "date": "2026-06-14", "time": "19:00", "venue": "Philadelphia" },
@@ -100,10 +100,10 @@
     "F": {
       "name": "Group F",
       "teams": [
-        { "id": "NED", "name": "Netherlands", "flag": "🇳🇱" },
-        { "id": "JPN", "name": "Japan",       "flag": "🇯🇵" },
-        { "id": "SWE", "name": "Sweden",      "flag": "🇸🇪" },
-        { "id": "TUN", "name": "Tunisia",     "flag": "🇹🇳" }
+        { "id": "NED", "name": "Netherlands", "flag": "🇳🇱", "flagCode": "nl" },
+        { "id": "JPN", "name": "Japan",       "flag": "🇯🇵", "flagCode": "jp" },
+        { "id": "SWE", "name": "Sweden",      "flag": "🇸🇪", "flagCode": "se" },
+        { "id": "TUN", "name": "Tunisia",     "flag": "🇹🇳", "flagCode": "tn" }
       ],
       "matches": [
         { "id": "F1", "home": "NED", "away": "JPN", "round": 1, "date": "2026-06-14", "time": "16:00", "venue": "Dallas" },
@@ -117,10 +117,10 @@
     "G": {
       "name": "Group G",
       "teams": [
-        { "id": "BEL", "name": "Belgium",     "flag": "🇧🇪" },
-        { "id": "EGY", "name": "Egypt",       "flag": "🇪🇬" },
-        { "id": "IRN", "name": "IR Iran",     "flag": "🇮🇷" },
-        { "id": "NZL", "name": "New Zealand", "flag": "🇳🇿" }
+        { "id": "BEL", "name": "Belgium",     "flag": "🇧🇪", "flagCode": "be" },
+        { "id": "EGY", "name": "Egypt",       "flag": "🇪🇬", "flagCode": "eg" },
+        { "id": "IRN", "name": "IR Iran",     "flag": "🇮🇷", "flagCode": "ir" },
+        { "id": "NZL", "name": "New Zealand", "flag": "🇳🇿", "flagCode": "nz" }
       ],
       "matches": [
         { "id": "G1", "home": "IRN", "away": "NZL", "round": 1, "date": "2026-06-15", "time": "21:00", "venue": "Los Angeles" },
@@ -134,10 +134,10 @@
     "H": {
       "name": "Group H",
       "teams": [
-        { "id": "ESP", "name": "Spain",        "flag": "🇪🇸" },
-        { "id": "CPV", "name": "Cabo Verde",   "flag": "🇨🇻" },
-        { "id": "KSA", "name": "Saudi Arabia", "flag": "🇸🇦" },
-        { "id": "URU", "name": "Uruguay",      "flag": "🇺🇾" }
+        { "id": "ESP", "name": "Spain",        "flag": "🇪🇸", "flagCode": "es" },
+        { "id": "CPV", "name": "Cabo Verde",   "flag": "🇨🇻", "flagCode": "cv" },
+        { "id": "KSA", "name": "Saudi Arabia", "flag": "🇸🇦", "flagCode": "sa" },
+        { "id": "URU", "name": "Uruguay",      "flag": "🇺🇾", "flagCode": "uy" }
       ],
       "matches": [
         { "id": "H1", "home": "KSA", "away": "URU", "round": 1, "date": "2026-06-15", "time": "18:00", "venue": "Miami" },
@@ -151,10 +151,10 @@
     "I": {
       "name": "Group I",
       "teams": [
-        { "id": "FRA", "name": "France",  "flag": "🇫🇷" },
-        { "id": "SEN", "name": "Senegal", "flag": "🇸🇳" },
-        { "id": "IRQ", "name": "Iraq",    "flag": "🇮🇶" },
-        { "id": "NOR", "name": "Norway",  "flag": "🇳🇴" }
+        { "id": "FRA", "name": "France",  "flag": "🇫🇷", "flagCode": "fr" },
+        { "id": "SEN", "name": "Senegal", "flag": "🇸🇳", "flagCode": "sn" },
+        { "id": "IRQ", "name": "Iraq",    "flag": "🇮🇶", "flagCode": "iq" },
+        { "id": "NOR", "name": "Norway",  "flag": "🇳🇴", "flagCode": "no" }
       ],
       "matches": [
         { "id": "I1", "home": "FRA", "away": "SEN", "round": 1, "date": "2026-06-16", "time": "15:00", "venue": "New York / New Jersey" },
@@ -168,10 +168,10 @@
     "J": {
       "name": "Group J",
       "teams": [
-        { "id": "ARG", "name": "Argentina", "flag": "🇦🇷" },
-        { "id": "ALG", "name": "Algeria",   "flag": "🇩🇿" },
-        { "id": "AUT", "name": "Austria",   "flag": "🇦🇹" },
-        { "id": "JOR", "name": "Jordan",    "flag": "🇯🇴" }
+        { "id": "ARG", "name": "Argentina", "flag": "🇦🇷", "flagCode": "ar" },
+        { "id": "ALG", "name": "Algeria",   "flag": "🇩🇿", "flagCode": "dz" },
+        { "id": "AUT", "name": "Austria",   "flag": "🇦🇹", "flagCode": "at" },
+        { "id": "JOR", "name": "Jordan",    "flag": "🇯🇴", "flagCode": "jo" }
       ],
       "matches": [
         { "id": "J1", "home": "ARG", "away": "ALG", "round": 1, "date": "2026-06-16", "time": "21:00", "venue": "Kansas City" },
@@ -185,10 +185,10 @@
     "K": {
       "name": "Group K",
       "teams": [
-        { "id": "POR", "name": "Portugal",   "flag": "🇵🇹" },
-        { "id": "COD", "name": "Congo DR",   "flag": "🇨🇩" },
-        { "id": "UZB", "name": "Uzbekistan", "flag": "🇺🇿" },
-        { "id": "COL", "name": "Colombia",   "flag": "🇨🇴" }
+        { "id": "POR", "name": "Portugal",   "flag": "🇵🇹", "flagCode": "pt" },
+        { "id": "COD", "name": "Congo DR",   "flag": "🇨🇩", "flagCode": "cd" },
+        { "id": "UZB", "name": "Uzbekistan", "flag": "🇺🇿", "flagCode": "uz" },
+        { "id": "COL", "name": "Colombia",   "flag": "🇨🇴", "flagCode": "co" }
       ],
       "matches": [
         { "id": "K1", "home": "POR", "away": "COD", "round": 1, "date": "2026-06-17", "time": "13:00", "venue": "Houston" },
@@ -202,10 +202,10 @@
     "L": {
       "name": "Group L",
       "teams": [
-        { "id": "ENG", "name": "England", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
-        { "id": "CRO", "name": "Croatia", "flag": "🇭🇷" },
-        { "id": "GHA", "name": "Ghana",   "flag": "🇬🇭" },
-        { "id": "PAN", "name": "Panama",  "flag": "🇵🇦" }
+        { "id": "ENG", "name": "England", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "flagCode": "gb-eng" },
+        { "id": "CRO", "name": "Croatia", "flag": "🇭🇷", "flagCode": "hr" },
+        { "id": "GHA", "name": "Ghana",   "flag": "🇬🇭", "flagCode": "gh" },
+        { "id": "PAN", "name": "Panama",  "flag": "🇵🇦", "flagCode": "pa" }
       ],
       "matches": [
         { "id": "L1", "home": "GHA", "away": "PAN", "round": 1, "date": "2026-06-17", "time": "19:00", "venue": "Toronto" },

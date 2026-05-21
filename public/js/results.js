@@ -134,9 +134,9 @@ function showGroup(groupKey) {
       html += `
         <div class="result-row ${played ? '' : 'not-played'}">
           <div class="match-meta">${fmtDate(m.date, m.time)}<br>${m.venue}</div>
-          <div class="team-name"><span class="flag">${home.flag}</span>${home.name}</div>
+          <div class="team-name"><span class="flag fi fi-${home.flagCode}"></span>${home.name}</div>
           <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
-          <div class="team-name right">${away.name}<span class="flag">${away.flag}</span></div>
+          <div class="team-name right">${away.name}<span class="flag fi fi-${away.flagCode}"></span></div>
         </div>`;
 
       if (played || isAdmin) {
@@ -185,7 +185,7 @@ function buildKoTeamsMap(fixtures) {
 
 function getKoTeam(id) {
   if (!id) return null;
-  return allTeams[id] || { id, name: id, flag: '' };
+  return allTeams[id] || { id, name: id, flag: '', flagCode: '' };
 }
 
 function fmtKoMatchDate(dateStr, timeStr) {
@@ -223,8 +223,8 @@ function showKoRound(roundKey) {
     const away       = m.away ? getKoTeam(m.away) : null;
     const homeName   = home ? home.name : (m.homeLabel || m.homeSlot || 'TBD');
     const awayName   = away ? away.name : (m.awayLabel || m.awaySlot || 'TBD');
-    const homeFlag   = home ? home.flag : '';
-    const awayFlag   = away ? away.flag : '';
+    const homeFlag   = home ? home.flagCode : '';
+    const awayFlag   = away ? away.flagCode : '';
     const teamsKnown = !!(m.home && m.away);
     const result     = results.results?.[m.id];
     const played     = result?.played;
@@ -233,11 +233,11 @@ function showKoRound(roundKey) {
       <div class="result-row ${played ? '' : 'not-played'}" id="row_${m.id}">
         <div class="match-meta">${fmtKoMatchDate(m.date, m.time)}<br>${m.venue || 'Venue TBD'}</div>
         <div class="team-name">
-          ${homeFlag ? `<span class="flag">${homeFlag}</span>` : ''}${homeName}
+          ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
         </div>
         <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
         <div class="team-name right">
-          ${awayName}${awayFlag ? `<span class="flag">${awayFlag}</span>` : ''}
+          ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
       </div>`;
 

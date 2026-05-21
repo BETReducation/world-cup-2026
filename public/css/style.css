@@ -451,7 +451,7 @@ nav.site-nav {
 }
 .team-name.right { justify-content: flex-end; text-align: right; }
 
-.flag { font-size: 1.1rem; line-height: 1; flex-shrink: 0; }
+.flag { font-size: 1.1rem; line-height: 1; flex-shrink: 0; border-radius: 2px; }
 
 .score-input {
   display: flex;

@@ -167,7 +167,7 @@ function showGroup(groupKey) {
         <div class="match-row ${cls}">
           <div class="match-meta">${fmtDate(m.date, m.time)}<br>${m.venue}</div>
           <div class="team-name">
-            <span class="flag">${home.flag}</span>${home.name}
+            <span class="flag fi fi-${home.flagCode}"></span>${home.name}
           </div>
           <div class="score-input">
             <input type="number" min="0" max="20" value="${pred.home}" ${dis}
@@ -179,7 +179,7 @@ function showGroup(groupKey) {
               inputmode="numeric" aria-label="${away.name} goals">
           </div>
           <div class="team-name right">
-            ${away.name}<span class="flag">${away.flag}</span>
+            ${away.name}<span class="flag fi fi-${away.flagCode}"></span>
           </div>
           ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
         </div>`;

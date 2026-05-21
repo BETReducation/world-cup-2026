@@ -58,7 +58,7 @@ function renderTable(container, rows, label = '') {
         ${rows.map((r, i) => `
           <tr class="${qualifiers.includes(i) ? 'qualifies' : ''}${i === 2 ? ' third-place' : ''}">
             <td class="pos">${i + 1}</td>
-            <td class="team-col"><span class="flag">${r.team.flag}</span>${r.team.name}</td>
+            <td class="team-col"><span class="flag fi fi-${r.team.flagCode}"></span>${r.team.name}</td>
             <td>${r.p}</td>
             <td>${r.w}</td>
             <td>${r.d}</td>

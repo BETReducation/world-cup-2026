@@ -23,7 +23,7 @@ function buildAllTeams(fixtures) {
 
 function getTeam(id) {
   if (!id) return null;
-  return allTeams[id] || { id, name: id, flag: '' };
+  return allTeams[id] || { id, name: id, flag: '', flagCode: '' };
 }
 
 function fmtKoDate(dateStr, timeStr) {
@@ -195,8 +195,8 @@ function showRound(roundKey) {
     const away       = m.away ? getTeam(m.away) : null;
     const homeName   = home ? home.name  : (m.homeLabel || m.homeSlot || 'TBD');
     const awayName   = away ? away.name  : (m.awayLabel || m.awaySlot || 'TBD');
-    const homeFlag   = home ? home.flag  : '';
-    const awayFlag   = away ? away.flag  : '';
+    const homeFlag   = home ? home.flagCode : '';
+    const awayFlag   = away ? away.flagCode : '';
     const teamsKnown = !!(m.home && m.away);
     const inputActive = teamsKnown && !locked && !browseMode && userId;
     const dis        = inputActive ? '' : 'disabled';
@@ -207,7 +207,7 @@ function showRound(roundKey) {
       <div class="match-row ${cls}" id="row_${m.id}">
         <div class="match-meta">${fmtKoDate(m.date, m.time)}<br>${m.venue || 'Venue TBD'}</div>
         <div class="team-name">
-          ${homeFlag ? `<span class="flag">${homeFlag}</span>` : ''}${homeName}
+          ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
         </div>
         <div class="score-input">
           <input type="number" min="0" max="20" value="${pred.home}" ${dis}
@@ -219,7 +219,7 @@ function showRound(roundKey) {
             inputmode="numeric" aria-label="${awayName} goals">
         </div>
         <div class="team-name right">
-          ${awayName}${awayFlag ? `<span class="flag">${awayFlag}</span>` : ''}
+          ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
         ${locked     ? '<span class="lock-badge">LOCKED</span>' : ''}
         ${!teamsKnown && !locked ? '<span class="tbd-badge">TEAMS TBD</span>' : ''}
