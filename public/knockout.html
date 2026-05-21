@@ -14,8 +14,8 @@
   <a href="index.html" class="nav-logo">WC26 <span>Prediction League</span></a>
   <div class="nav-links">
     <a href="index.html">Home</a>
-    <a href="predictions.html">My Predictions</a>
-    <a href="knockout.html" class="active">Knockout</a>
+    <a href="predictions.html">Group Predictions</a>
+    <a href="knockout.html" class="active">Knockout Predictions</a>
     <a href="results.html">Results</a>
     <a href="member.html" id="navMemberLink" class="nav-member-link" style="display:none;"></a>
     <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
@@ -41,23 +41,6 @@
   </div>
 </div>
 
-<!-- Admin modal -->
-<div class="modal-overlay" id="adminModal">
-  <div class="modal">
-    <h2>🔑 Admin Login</h2>
-    <p>Enter the admin password to record knockout results.</p>
-    <div id="adminError" class="error-msg hidden"></div>
-    <div class="form-group">
-      <label for="adminPwdInput">Password</label>
-      <input type="password" id="adminPwdInput" placeholder="Admin password">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" id="adminLoginBtn">Login</button>
-      <button class="btn btn-outline" id="adminCancelBtn">Cancel</button>
-    </div>
-  </div>
-</div>
-
 <!-- Loading -->
 <div class="loading-state" id="loadingState">
   <div class="spinner"></div>
@@ -74,12 +57,6 @@
   </div>
 
   <div class="section section--flush section--wide">
-
-    <!-- Admin bar -->
-    <div class="admin-bar" style="padding-top:16px;">
-      <span class="admin-label" id="adminLabel"></span>
-      <button class="btn btn-outline btn-sm" id="adminToggleBtn">🔑 Admin Mode</button>
-    </div>
 
     <!-- Round tabs -->
     <div class="tab-bar" id="roundTabs"></div>

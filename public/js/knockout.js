@@ -2,15 +2,11 @@
 
 let fixtures       = null;
 let lockStatus     = {};
-let allPredictions = [];
-let koPredictions  = {};   // userId's saved ko predictions (matchId → {home,away})
-let results        = {};
+let koPredictions  = {};
 let userId         = null;
 let browseMode     = false;
-let isAdmin        = false;
-let adminPassword  = null;
 let isSaved        = false;
-let allTeams       = {};   // teamId → team object
+let allTeams       = {};
 let activeRound    = 'R32';
 
 const ROUND_ORDER = ['R32', 'R16', 'QF', 'SF', '3P', 'F'];
@@ -69,7 +65,7 @@ $('registerBtn').addEventListener('click', async () => {
   if (!name) { showErr(err, 'Please enter your name.'); return; }
   if (!/^\d{4}$/.test(pin)) { showErr(err, 'PIN must be exactly 4 digits.'); return; }
 
-  $('registerBtn').disabled  = true;
+  $('registerBtn').disabled    = true;
   $('registerBtn').textContent = 'Signing in…';
   try {
     const result = await API.register(name, pin);
@@ -83,7 +79,7 @@ $('registerBtn').addEventListener('click', async () => {
       ? 'That name already exists with a different PIN.'
       : 'Could not connect to server. Is it running?';
     showErr(err, msg);
-    $('registerBtn').disabled  = false;
+    $('registerBtn').disabled    = false;
     $('registerBtn').textContent = 'Sign in →';
   }
 });
@@ -99,52 +95,13 @@ $('browseBtn').addEventListener('click', async () => {
 
 $('logoutBtn').addEventListener('click', () => { Session.clear(); location.reload(); });
 
-// ── Admin ─────────────────────────────────────────────────────────────────────
-
-$('adminToggleBtn').addEventListener('click', () => {
-  if (isAdmin) {
-    isAdmin = false; adminPassword = null;
-    $('adminLabel').textContent   = '';
-    $('adminToggleBtn').textContent = '🔑 Admin Mode';
-    showRound(activeRound);
-  } else {
-    $('adminModal').classList.add('open');
-    $('adminPwdInput').value = '';
-    setTimeout(() => $('adminPwdInput').focus(), 50);
-  }
-});
-
-$('adminLoginBtn').addEventListener('click', async () => {
-  const pwd = $('adminPwdInput').value.trim();
-  if (!pwd) return;
-  $('adminLoginBtn').disabled  = true;
-  $('adminLoginBtn').textContent = 'Checking…';
-  const ok = await API.verifyAdmin(pwd);
-  $('adminLoginBtn').disabled  = false;
-  $('adminLoginBtn').textContent = 'Login';
-  if (!ok) {
-    $('adminError').textContent = '✗ Incorrect password';
-    $('adminError').classList.remove('hidden');
-    return;
-  }
-  adminPassword = pwd; isAdmin = true;
-  $('adminError').classList.add('hidden');
-  $('adminModal').classList.remove('open');
-  $('adminLabel').textContent   = '✓ Admin active';
-  $('adminToggleBtn').textContent = 'Exit Admin';
-  showRound(activeRound);
-});
-
-$('adminCancelBtn').addEventListener('click', () => $('adminModal').classList.remove('open'));
-$('adminPwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('adminLoginBtn').click(); });
-
 // ── Load & render ─────────────────────────────────────────────────────────────
 
 async function loadAndRender() {
   $('loadingState').style.display = 'block';
   try {
-    [fixtures, lockStatus, allPredictions, results] = await Promise.all([
-      API.fixtures(), API.lockStatus(), API.allPredictions(), API.results()
+    [fixtures, lockStatus] = await Promise.all([
+      API.fixtures(), API.lockStatus()
     ]);
   } catch {
     $('loadingState').innerHTML =
@@ -234,17 +191,17 @@ function showRound(roundKey) {
   html += `<div class="match-list">`;
 
   for (const m of round.matches) {
-    const home        = m.home ? getTeam(m.home) : null;
-    const away        = m.away ? getTeam(m.away) : null;
-    const homeName    = home ? home.name  : (m.homeLabel || m.homeSlot || 'TBD');
-    const awayName    = away ? away.name  : (m.awayLabel || m.awaySlot || 'TBD');
-    const homeFlag    = home ? home.flag  : '';
-    const awayFlag    = away ? away.flag  : '';
-    const teamsKnown  = !!(m.home && m.away);
+    const home       = m.home ? getTeam(m.home) : null;
+    const away       = m.away ? getTeam(m.away) : null;
+    const homeName   = home ? home.name  : (m.homeLabel || m.homeSlot || 'TBD');
+    const awayName   = away ? away.name  : (m.awayLabel || m.awaySlot || 'TBD');
+    const homeFlag   = home ? home.flag  : '';
+    const awayFlag   = away ? away.flag  : '';
+    const teamsKnown = !!(m.home && m.away);
     const inputActive = teamsKnown && !locked && !browseMode && userId;
-    const dis         = inputActive ? '' : 'disabled';
-    const cls         = locked ? 'round-locked' : '';
-    const pred        = koPredictions[m.id] || { home: '', away: '' };
+    const dis        = inputActive ? '' : 'disabled';
+    const cls        = locked ? 'round-locked' : '';
+    const pred       = koPredictions[m.id] || { home: '', away: '' };
 
     html += `
       <div class="match-row ${cls}" id="row_${m.id}">
@@ -264,33 +221,9 @@ function showRound(roundKey) {
         <div class="team-name right">
           ${awayName}${awayFlag ? `<span class="flag">${awayFlag}</span>` : ''}
         </div>
-        ${locked    ? '<span class="lock-badge">LOCKED</span>' : ''}
+        ${locked     ? '<span class="lock-badge">LOCKED</span>' : ''}
         ${!teamsKnown && !locked ? '<span class="tbd-badge">TEAMS TBD</span>' : ''}
       </div>`;
-
-    // Show existing result if played
-    const result = results.results?.[m.id];
-    if (result?.played && teamsKnown) {
-      html += buildKoComparisonBlock(m, result, home, away);
-    }
-
-    // Admin result entry
-    if (isAdmin && teamsKnown) {
-      const h = result?.played ? result.home : '';
-      const a = result?.played ? result.away : '';
-      html += `
-        <div class="admin-panel">
-          <h4>${homeName} vs ${awayName} — record result (90 mins)</h4>
-          <div class="score-entry">
-            <input type="number" min="0" max="20" value="${h}" id="h_${m.id}" placeholder="0">
-            <span class="score-sep">–</span>
-            <input type="number" min="0" max="20" value="${a}" id="a_${m.id}" placeholder="0">
-            <button class="btn btn-primary btn-sm" onclick="saveResult('${m.id}')">Save</button>
-            ${result?.played ? `<button class="btn btn-danger btn-sm" onclick="deleteResult('${m.id}')">Clear</button>` : ''}
-            <span id="status_${m.id}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent);"></span>
-          </div>
-        </div>`;
-    }
   }
 
   html += `</div></div>`;
@@ -300,41 +233,6 @@ function showRound(roundKey) {
     input.addEventListener('input', onPredInput);
     if (isSaved) input.classList.add('saved');
   });
-}
-
-// ── Comparison block (same style as results.js) ───────────────────────────────
-
-function buildKoComparisonBlock(match, result, home, away) {
-  if (!allPredictions.length) return '';
-  const rows = allPredictions.map(user => {
-    const pred = user.predictions?.[match.id];
-    if (pred === undefined || pred === null)
-      return `<tr><td>${user.name}</td><td class="pred-score" colspan="2" style="color:var(--muted);">—</td></tr>`;
-    const predStr = `${pred.home} – ${pred.away}`;
-    const aSign = Math.sign(result.home - result.away);
-    const pSign = Math.sign(pred.home - pred.away);
-    let pts = 0;
-    if (aSign === pSign) {
-      pts = 3;
-      if (pred.home === result.home && pred.away === result.away) pts = 5;
-    }
-    const cls = pts === 5 ? 'pts-5' : pts === 3 ? 'pts-3' : 'pts-0';
-    return `<tr>
-      <td>${user.name}</td>
-      <td class="pred-score">${predStr}</td>
-      <td><span class="pts-badge ${cls}">${pts} pts</span></td>
-    </tr>`;
-  }).join('');
-
-  return `
-    <div class="comparison-panel">
-      <table>
-        <thead><tr>
-          <th>Player</th><th>Prediction</th><th>Points</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
 }
 
 // ── Input handler ─────────────────────────────────────────────────────────────
@@ -354,16 +252,16 @@ function onPredInput(e) {
 function enterSavedState() {
   isSaved = true;
   document.querySelectorAll('.ko-pred-input').forEach(el => el.classList.add('saved'));
-  $('editBtn').style.display = 'inline-flex';
-  $('saveBtn').style.display = 'none';
+  $('editBtn').style.display  = 'inline-flex';
+  $('saveBtn').style.display  = 'none';
   $('saveStatus').textContent = '';
 }
 
 function enterEditState() {
   isSaved = false;
   document.querySelectorAll('.ko-pred-input').forEach(el => el.classList.remove('saved'));
-  $('editBtn').style.display = 'none';
-  $('saveBtn').style.display = 'inline-flex';
+  $('editBtn').style.display  = 'none';
+  $('saveBtn').style.display  = 'inline-flex';
   $('saveStatus').textContent = '';
 }
 
@@ -373,7 +271,7 @@ $('editBtn').addEventListener('click', enterEditState);
 
 $('saveBtn').addEventListener('click', async () => {
   if (browseMode) { location.reload(); return; }
-  $('saveBtn').disabled  = true;
+  $('saveBtn').disabled    = true;
   $('saveBtn').textContent = 'Saving…';
   $('saveStatus').textContent = '';
 
@@ -386,44 +284,9 @@ $('saveBtn').addEventListener('click', async () => {
     $('saveStatus').textContent = '✗ Save failed';
     $('saveStatus').style.color = 'var(--red)';
   } finally {
-    $('saveBtn').disabled  = false;
+    $('saveBtn').disabled    = false;
     $('saveBtn').textContent = 'Save Predictions';
   }
 });
-
-// ── Admin: save / delete result ───────────────────────────────────────────────
-
-async function saveResult(matchId) {
-  const h = parseInt(document.getElementById(`h_${matchId}`).value);
-  const a = parseInt(document.getElementById(`a_${matchId}`).value);
-  const status = document.getElementById(`status_${matchId}`);
-  if (isNaN(h) || isNaN(a)) { status.textContent = '⚠ Enter both scores'; return; }
-  status.textContent = 'Saving…';
-  try {
-    await API.saveResult(matchId, h, a, adminPassword);
-    [fixtures, results, allPredictions] = await Promise.all([
-      API.fixtures(), API.results(), API.allPredictions()
-    ]);
-    allTeams = buildAllTeams(fixtures);
-    showRound(activeRound);
-  } catch (e) {
-    status.textContent = e.message.includes('401') ? '✗ Wrong password' : '✗ Error';
-    status.style.color = 'var(--red)';
-  }
-}
-
-async function deleteResult(matchId) {
-  if (!confirm('Clear this result?')) return;
-  try {
-    await API.deleteResult(matchId, adminPassword);
-    [fixtures, results, allPredictions] = await Promise.all([
-      API.fixtures(), API.results(), API.allPredictions()
-    ]);
-    allTeams = buildAllTeams(fixtures);
-    showRound(activeRound);
-  } catch {
-    document.getElementById(`status_${matchId}`).textContent = '✗ Error';
-  }
-}
 
 init();

@@ -1,16 +1,22 @@
-let fixtures = null;
+let fixtures       = null;
 let allPredictions = [];
-let results = {};
-let adminPassword = null;
-let isAdmin = false;
-let activeGroup = 'A';
+let results        = {};
+let adminPassword  = null;
+let isAdmin        = false;
+let activeGroup    = 'A';
+let allTeams       = {};
+let lockStatus     = {};
+let activeKoRound  = null;
 
 const $ = id => document.getElementById(id);
 
+const KO_ROUND_ORDER = ['R32', 'R16', 'QF', 'SF', '3P', 'F'];
+const KO_ROUND_NAMES = { R32: 'R32', R16: 'R16', QF: 'QF', SF: 'SF', '3P': '3P', F: 'Final' };
+
 async function init() {
   try {
-    [fixtures, allPredictions, results] = await Promise.all([
-      API.fixtures(), API.allPredictions(), API.results()
+    [fixtures, allPredictions, results, lockStatus] = await Promise.all([
+      API.fixtures(), API.allPredictions(), API.results(), API.lockStatus()
     ]);
   } catch {
     $('loadingState').innerHTML =
@@ -18,8 +24,10 @@ async function init() {
     return;
   }
 
+  allTeams = buildKoTeamsMap(fixtures);
+
   $('loadingState').style.display = 'none';
-  $('resultsApp').style.display = 'block';
+  $('resultsApp').style.display   = 'block';
 
   buildTabs();
   showGroup(activeGroup);
@@ -32,9 +40,9 @@ $('adminToggleBtn').addEventListener('click', () => {
   if (isAdmin) {
     isAdmin = false;
     adminPassword = null;
-    $('adminLabel').textContent = '';
+    $('adminLabel').textContent     = '';
     $('adminToggleBtn').textContent = '🔑 Admin Mode';
-    showGroup(activeGroup);
+    if (activeKoRound) showKoRound(activeKoRound); else showGroup(activeGroup);
   } else {
     $('adminModal').classList.add('open');
     $('adminPwdInput').value = '';
@@ -45,10 +53,10 @@ $('adminToggleBtn').addEventListener('click', () => {
 $('adminLoginBtn').addEventListener('click', async () => {
   const pwd = $('adminPwdInput').value.trim();
   if (!pwd) return;
-  $('adminLoginBtn').disabled = true;
+  $('adminLoginBtn').disabled    = true;
   $('adminLoginBtn').textContent = 'Checking…';
   const ok = await API.verifyAdmin(pwd);
-  $('adminLoginBtn').disabled = false;
+  $('adminLoginBtn').disabled    = false;
   $('adminLoginBtn').textContent = 'Login';
   if (!ok) {
     $('adminError').textContent = '✗ Incorrect password';
@@ -59,9 +67,9 @@ $('adminLoginBtn').addEventListener('click', async () => {
   isAdmin = true;
   $('adminError').classList.add('hidden');
   $('adminModal').classList.remove('open');
-  $('adminLabel').textContent = '✓ Admin active';
+  $('adminLabel').textContent     = '✓ Admin active';
   $('adminToggleBtn').textContent = 'Exit Admin';
-  showGroup(activeGroup);
+  if (activeKoRound) showKoRound(activeKoRound); else showGroup(activeGroup);
 });
 
 $('adminCancelBtn').addEventListener('click', () => $('adminModal').classList.remove('open'));
@@ -72,15 +80,31 @@ $('adminPwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('
 function buildTabs() {
   const bar = $('groupTabs');
   bar.innerHTML = '';
+
   Object.keys(fixtures.groups).forEach(key => {
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (key === activeGroup ? ' active' : '');
     btn.textContent = `Group ${key}`;
     btn.addEventListener('click', () => {
-      activeGroup = key;
+      activeGroup   = key;
+      activeKoRound = null;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       showGroup(key);
+    });
+    bar.appendChild(btn);
+  });
+
+  KO_ROUND_ORDER.forEach(key => {
+    if (!fixtures.knockout?.[key]) return;
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.textContent = KO_ROUND_NAMES[key] || key;
+    btn.addEventListener('click', () => {
+      activeKoRound = key;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showKoRound(key);
     });
     bar.appendChild(btn);
   });
@@ -97,7 +121,6 @@ function showGroup(groupKey) {
 
   let html = `<div class="card"><div class="group-layout">`;
 
-  // Left: results list
   html += `<div>`;
   Object.entries(rounds).forEach(([round, matches]) => {
     html += `<div class="round-heading">Round ${round}</div>`;
@@ -140,7 +163,6 @@ function showGroup(groupKey) {
   });
   html += `</div>`;
 
-  // Right: actual group table
   html += `
     <div>
       <p class="table-heading">Group ${groupKey} Table</p>
@@ -151,6 +173,98 @@ function showGroup(groupKey) {
   panels.innerHTML = html;
 
   renderActualTable(groupKey);
+}
+
+// ── Knockout panel ────────────────────────────────────────────────────────────
+
+function buildKoTeamsMap(fixtures) {
+  const map = {};
+  Object.values(fixtures.groups || {}).forEach(g => g.teams.forEach(t => { map[t.id] = t; }));
+  return map;
+}
+
+function getKoTeam(id) {
+  if (!id) return null;
+  return allTeams[id] || { id, name: id, flag: '' };
+}
+
+function fmtKoMatchDate(dateStr, timeStr) {
+  if (!dateStr || dateStr === 'TBD') return 'Date TBD';
+  try {
+    const d = new Date(`${dateStr}T00:00:00`);
+    const datePart = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    const timePart = (timeStr && timeStr !== 'TBD') ? ` · ${timeStr} ET` : ' · Time TBD';
+    return datePart + timePart;
+  } catch { return dateStr; }
+}
+
+function showKoRound(roundKey) {
+  const panels = $('resultsPanels');
+  const round  = fixtures.knockout?.[roundKey];
+  if (!round) { panels.innerHTML = ''; return; }
+
+  const lock      = lockStatus[roundKey];
+  const locked    = lock?.locked || false;
+  const lockLabel = locked
+    ? '🔒 Locked'
+    : lock?.lockTime
+      ? `Locks · ${fmtLockTimezones(lock.lockTime)}`
+      : '';
+
+  let html = `<div class="card">`;
+  html += `<div class="ko-round-header">
+    <span class="ko-round-title">${round.name || roundKey}</span>
+    ${lockLabel ? `<span class="ko-lock-info">${lockLabel}</span>` : ''}
+  </div>`;
+  html += `<div class="match-list">`;
+
+  for (const m of round.matches) {
+    const home       = m.home ? getKoTeam(m.home) : null;
+    const away       = m.away ? getKoTeam(m.away) : null;
+    const homeName   = home ? home.name : (m.homeLabel || m.homeSlot || 'TBD');
+    const awayName   = away ? away.name : (m.awayLabel || m.awaySlot || 'TBD');
+    const homeFlag   = home ? home.flag : '';
+    const awayFlag   = away ? away.flag : '';
+    const teamsKnown = !!(m.home && m.away);
+    const result     = results.results?.[m.id];
+    const played     = result?.played;
+
+    html += `
+      <div class="result-row ${played ? '' : 'not-played'}" id="row_${m.id}">
+        <div class="match-meta">${fmtKoMatchDate(m.date, m.time)}<br>${m.venue || 'Venue TBD'}</div>
+        <div class="team-name">
+          ${homeFlag ? `<span class="flag">${homeFlag}</span>` : ''}${homeName}
+        </div>
+        <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
+        <div class="team-name right">
+          ${awayName}${awayFlag ? `<span class="flag">${awayFlag}</span>` : ''}
+        </div>
+      </div>`;
+
+    if (played || isAdmin) {
+      html += buildComparisonBlock(m, result, played);
+    }
+
+    if (isAdmin && teamsKnown) {
+      const h = played ? result.home : '';
+      const a = played ? result.away : '';
+      html += `
+        <div class="admin-panel">
+          <h4>${homeName} vs ${awayName} — record result (90 mins)</h4>
+          <div class="score-entry">
+            <input type="number" min="0" max="20" value="${h}" id="h_${m.id}" placeholder="0">
+            <span class="score-sep">–</span>
+            <input type="number" min="0" max="20" value="${a}" id="a_${m.id}" placeholder="0">
+            <button class="btn btn-primary btn-sm" onclick="saveKoResult('${m.id}')">Save</button>
+            ${played ? `<button class="btn btn-danger btn-sm" onclick="deleteKoResult('${m.id}')">Clear</button>` : ''}
+            <span id="status_${m.id}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent);"></span>
+          </div>
+        </div>`;
+    }
+  }
+
+  html += `</div></div>`;
+  panels.innerHTML = html;
 }
 
 // ── Comparison block ──────────────────────────────────────────────────────────
@@ -196,7 +310,7 @@ function buildComparisonBlock(match, result, played) {
     </div>`;
 }
 
-// ── Actual table ──────────────────────────────────────────────────────────────
+// ── Actual group table ────────────────────────────────────────────────────────
 
 function renderActualTable(groupKey) {
   const el = document.getElementById(`actualTable_${groupKey}`);
@@ -220,7 +334,6 @@ async function renderLeaderboard() {
     return;
   }
 
-  // Build matchId → round lookup for group stage
   const matchRound  = {};
   const roundTotals = {};
   let totalGroupMatches = 0;
@@ -233,7 +346,6 @@ async function renderLeaderboard() {
   });
   const groupRounds = Object.keys(roundTotals).sort();
 
-  // Build knockout match ID set
   const koMatchIds = new Set();
   let totalKoMatches = 0;
   Object.values(fixtures.knockout || {}).forEach(r => {
@@ -242,7 +354,6 @@ async function renderLeaderboard() {
 
   const totalMatches = totalGroupMatches + totalKoMatches;
 
-  // Build userId → predictions lookup
   const predsByUser = {};
   allPredictions.forEach(u => { predsByUser[u.id] = u.predictions || {}; });
 
@@ -250,11 +361,9 @@ async function renderLeaderboard() {
   const rows = board.map((p, i) => {
     const preds = predsByUser[p.id] || {};
 
-    // Count group predictions per round
     const roundCounts = {};
     groupRounds.forEach(r => { roundCounts[r] = 0; });
 
-    // Count KO predictions and KO points
     let koPredCount = 0;
     let koPts = 0;
     Object.entries(preds).forEach(([matchId, pred]) => {
@@ -317,7 +426,7 @@ async function renderLeaderboard() {
     </table>`;
 }
 
-// ── Admin: save / delete ──────────────────────────────────────────────────────
+// ── Admin: save / delete (group stage) ───────────────────────────────────────
 
 async function saveResult(matchId) {
   const h = parseInt(document.getElementById(`h_${matchId}`).value);
@@ -345,6 +454,41 @@ async function deleteResult(matchId) {
     results = await API.results();
     await renderLeaderboard();
     showGroup(activeGroup);
+  } catch {
+    document.getElementById(`status_${matchId}`).textContent = '✗ Error';
+  }
+}
+
+// ── Admin: save / delete (knockout) ──────────────────────────────────────────
+
+async function saveKoResult(matchId) {
+  const h = parseInt(document.getElementById(`h_${matchId}`).value);
+  const a = parseInt(document.getElementById(`a_${matchId}`).value);
+  const status = document.getElementById(`status_${matchId}`);
+
+  if (isNaN(h) || isNaN(a)) { status.textContent = '⚠ Enter both scores'; return; }
+
+  status.textContent = 'Saving…';
+  try {
+    await API.saveResult(matchId, h, a, adminPassword);
+    [fixtures, results] = await Promise.all([API.fixtures(), API.results()]);
+    allTeams = buildKoTeamsMap(fixtures);
+    await renderLeaderboard();
+    showKoRound(activeKoRound);
+  } catch (e) {
+    status.textContent = e.message.includes('401') ? '✗ Wrong password' : '✗ Error';
+    status.style.color = 'var(--red)';
+  }
+}
+
+async function deleteKoResult(matchId) {
+  if (!confirm('Clear this result?')) return;
+  try {
+    await API.deleteResult(matchId, adminPassword);
+    [fixtures, results] = await Promise.all([API.fixtures(), API.results()]);
+    allTeams = buildKoTeamsMap(fixtures);
+    await renderLeaderboard();
+    showKoRound(activeKoRound);
   } catch {
     document.getElementById(`status_${matchId}`).textContent = '✗ Error';
   }
