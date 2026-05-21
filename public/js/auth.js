@@ -1,40 +1,91 @@
-// Shared auth helper — runs on every page
-// Injects a Sign in / Log out button into the nav and a login modal into the page.
+// Shared auth + mobile drawer — runs on every page
 
 document.addEventListener('DOMContentLoaded', () => {
   const userId = localStorage.getItem('wc2026_userId');
   const name   = localStorage.getItem('wc2026_name');
-  const link   = document.getElementById('navMemberLink');
+
+  // ── Mobile drawer ──────────────────────────────────────────────────────────
+  const hamburger     = document.getElementById('navHamburger');
+  const drawerOverlay = document.getElementById('navDrawerOverlay');
+  const drawer        = document.getElementById('navDrawer');
+  const drawerClose   = document.getElementById('navDrawerClose');
+
+  function openDrawer() {
+    drawerOverlay?.classList.add('open');
+    drawer?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    drawerOverlay?.classList.remove('open');
+    drawer?.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  hamburger?.addEventListener('click', openDrawer);
+  drawerOverlay?.addEventListener('click', closeDrawer);
+  drawerClose?.addEventListener('click', closeDrawer);
+
+  // Mark the active drawer link based on current page
+  if (drawer) {
+    const page = location.pathname.split('/').pop() || 'index.html';
+    drawer.querySelectorAll('a[href]').forEach(a => {
+      const href = a.getAttribute('href');
+      if (href === page || (page === '' && href === 'index.html')) {
+        a.classList.add('active');
+      }
+    });
+    // Close drawer when a real nav link is tapped
+    drawer.querySelectorAll('.nav-drawer-links a').forEach(a =>
+      a.addEventListener('click', closeDrawer)
+    );
+  }
+
+  // ── Desktop nav member link ────────────────────────────────────────────────
+  const link        = document.getElementById('navMemberLink');
+  const drawerFooter = document.getElementById('navDrawerUser');
+
   if (!link) return;
 
   if (userId && name) {
-    // ── Logged in: show name + Log out ──────────────────────────────────────
+    // ── Logged in ─────────────────────────────────────────────────────────────
     link.textContent   = '👤 ' + name;
     link.href          = 'member.html?id=' + userId;
     link.style.display = 'flex';
 
     const logoutBtn = document.createElement('button');
-    logoutBtn.textContent = 'Log out';
-    logoutBtn.className   = 'btn btn-outline btn-sm';
+    logoutBtn.textContent    = 'Log out';
+    logoutBtn.className      = 'btn btn-outline btn-sm';
     logoutBtn.style.marginLeft = '4px';
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('wc2026_userId');
-      localStorage.removeItem('wc2026_name');
-      location.reload();
-    });
+    logoutBtn.addEventListener('click', doLogout);
     link.insertAdjacentElement('afterend', logoutBtn);
 
+    // Drawer footer: profile link + logout
+    if (drawerFooter) {
+      const profileLink = document.createElement('a');
+      profileLink.textContent = '👤 ' + name;
+      profileLink.href        = 'member.html?id=' + userId;
+      profileLink.addEventListener('click', closeDrawer);
+
+      const drawerLogout = document.createElement('button');
+      drawerLogout.textContent = 'Log out';
+      drawerLogout.className   = 'btn btn-outline btn-sm btn-full';
+      drawerLogout.addEventListener('click', doLogout);
+
+      drawerFooter.appendChild(profileLink);
+      drawerFooter.appendChild(drawerLogout);
+    }
+
   } else {
-    // ── Logged out: show Sign in button ─────────────────────────────────────
+    // ── Logged out ────────────────────────────────────────────────────────────
     const signInBtn = document.createElement('button');
-    signInBtn.textContent = 'Sign in';
-    signInBtn.className   = 'btn btn-outline btn-sm';
+    signInBtn.textContent    = 'Sign in';
+    signInBtn.className      = 'btn btn-outline btn-sm';
     signInBtn.style.marginLeft = '4px';
     signInBtn.addEventListener('click', () => openAuthModal());
     link.insertAdjacentElement('afterend', signInBtn);
 
-    // ── Inject login modal ───────────────────────────────────────────────────
-    const modalHtml = `
+    // Inject auth modal
+    document.body.insertAdjacentHTML('beforeend', `
       <div class="modal-overlay" id="navAuthModal">
         <div class="modal">
           <h2>⚽ Sign in</h2>
@@ -52,15 +103,14 @@ document.addEventListener('DOMContentLoaded', () => {
           <button class="btn btn-primary btn-full" id="navAuthSubmit">Sign in →</button>
           <button class="btn btn-outline btn-full" id="navAuthCancel" style="margin-top:8px;">Cancel</button>
         </div>
-      </div>`;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+      </div>`);
 
-    const modal      = document.getElementById('navAuthModal');
-    const nameInput  = document.getElementById('navAuthName');
-    const pinInput   = document.getElementById('navAuthPin');
-    const submitBtn  = document.getElementById('navAuthSubmit');
-    const cancelBtn  = document.getElementById('navAuthCancel');
-    const errorEl    = document.getElementById('navAuthError');
+    const modal     = document.getElementById('navAuthModal');
+    const nameInput = document.getElementById('navAuthName');
+    const pinInput  = document.getElementById('navAuthPin');
+    const submitBtn = document.getElementById('navAuthSubmit');
+    const cancelBtn = document.getElementById('navAuthCancel');
+    const errorEl   = document.getElementById('navAuthError');
 
     function openAuthModal() {
       nameInput.value = '';
@@ -69,10 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.classList.add('open');
       setTimeout(() => nameInput.focus(), 50);
     }
-
-    function closeAuthModal() {
-      modal.classList.remove('open');
-    }
+    function closeAuthModal() { modal.classList.remove('open'); }
 
     cancelBtn.addEventListener('click', closeAuthModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeAuthModal(); });
@@ -80,25 +127,22 @@ document.addEventListener('DOMContentLoaded', () => {
     pinInput.addEventListener('keydown',  e => { if (e.key === 'Enter') submitBtn.click(); });
 
     submitBtn.addEventListener('click', async () => {
-      const name = nameInput.value.trim();
-      const pin  = pinInput.value.trim();
-
+      const n = nameInput.value.trim();
+      const p = pinInput.value.trim();
       errorEl.classList.add('hidden');
-      if (!name) { showNavErr('Please enter your name.'); return; }
-      if (!/^\d{4}$/.test(pin)) { showNavErr('PIN must be exactly 4 digits.'); return; }
+      if (!n) { showNavErr('Please enter your name.'); return; }
+      if (!/^\d{4}$/.test(p)) { showNavErr('PIN must be exactly 4 digits.'); return; }
 
-      submitBtn.disabled   = true;
+      submitBtn.disabled    = true;
       submitBtn.textContent = 'Signing in…';
-
       try {
-        const res = await fetch('/api/register', {
+        const res  = await fetch('/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, pin })
+          body: JSON.stringify({ name: n, pin: p })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error');
-
         localStorage.setItem('wc2026_userId', data.userId);
         localStorage.setItem('wc2026_name',   data.name);
         location.reload();
@@ -107,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ? 'That name exists with a different PIN.'
           : 'Could not reach server. Is it running?';
         showNavErr(msg);
-        submitBtn.disabled   = false;
+        submitBtn.disabled    = false;
         submitBtn.textContent = 'Sign in →';
       }
     });
@@ -116,5 +160,23 @@ document.addEventListener('DOMContentLoaded', () => {
       errorEl.textContent = msg;
       errorEl.classList.remove('hidden');
     }
+
+    // Drawer footer: sign-in button
+    if (drawerFooter) {
+      const drawerSignIn = document.createElement('button');
+      drawerSignIn.textContent = 'Sign in';
+      drawerSignIn.className   = 'btn btn-outline btn-sm btn-full';
+      drawerSignIn.addEventListener('click', () => {
+        closeDrawer();
+        openAuthModal();
+      });
+      drawerFooter.appendChild(drawerSignIn);
+    }
+  }
+
+  function doLogout() {
+    localStorage.removeItem('wc2026_userId');
+    localStorage.removeItem('wc2026_name');
+    location.reload();
   }
 });
