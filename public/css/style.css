@@ -405,21 +405,28 @@ nav.site-nav {
   color: var(--muted);
   margin: 20px 0 10px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
 }
-.round-label { flex-shrink: 0; padding-top: 1px; }
+.round-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.round-label { flex-shrink: 0; }
+/* Desktop: lock times shown inline with · separators */
 .round-lock-list {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0;
   font-size: 10px;
   letter-spacing: 0;
-  gap: 2px;
   text-transform: none;
 }
+.round-lock-list span + span::before { content: ' · '; }
 .round-lock-list span { white-space: nowrap; }
 
 /* ── Match row ───────────────────────────────────────────────────────────── */
@@ -1236,8 +1243,16 @@ footer span {
   .save-bar .user-info { flex: 1; margin-right: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .save-status { display: none; }
 
-  /* Round heading: tighten gap on small screens */
-  .round-heading { gap: 8px; }
+  /* Round heading: stack lock times vertically on mobile */
+  .round-heading { align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .round-heading::after { display: none; }
+  .round-lock-list {
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 2px;
+  }
+  .round-lock-list span + span::before { content: none; }
 
   /* Footer */
   footer { flex-direction: column; gap: 6px; text-align: center; padding: 20px 1rem; }
