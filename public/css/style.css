@@ -428,6 +428,8 @@ nav.site-nav {
 }
 .round-lock-list span + span::before { content: ' · '; }
 .round-lock-list span { white-space: nowrap; }
+.lock-list-label { opacity: 0.6; }
+.lock-list-label::after { content: ':'; margin-right: 4px; }
 
 /* ── Match row ───────────────────────────────────────────────────────────── */
 .match-list { display: flex; flex-direction: column; gap: 6px; }
@@ -1253,6 +1255,7 @@ footer span {
     gap: 2px;
   }
   .round-lock-list span + span::before { content: none; }
+  .lock-list-label::after { content: none; margin-right: 0; }
 
   /* Footer */
   footer { flex-direction: column; gap: 6px; text-align: center; padding: 20px 1rem; }

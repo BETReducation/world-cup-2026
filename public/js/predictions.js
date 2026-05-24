@@ -146,9 +146,9 @@ function showGroup(groupKey) {
     const lockTime = lockStatus[round]?.lockTime;
     let lockHtml = '';
     if (locked) {
-      lockHtml = '<span>🔒 Locked</span>';
+      lockHtml = '<span class="lock-list-label">Cut off times</span><span>🔒 Locked</span>';
     } else if (lockTime) {
-      lockHtml = fmtLockLines(lockTime).map(l => `<span>${l}</span>`).join('');
+      lockHtml = '<span class="lock-list-label">Cut off times</span>' + fmtLockLines(lockTime).map(l => `<span>${l}</span>`).join('');
     }
 
     html += `<div class="round-heading">
