@@ -486,6 +486,9 @@ nav.site-nav {
 
 .score-input input[type="text"] {
   width: 42px; height: 36px;
+  flex: 0 0 42px;
+  min-width: 0;
+  max-width: 42px;
   text-align: center;
   font-family: 'JetBrains Mono', monospace;
   font-size: 1rem;
@@ -1229,7 +1232,14 @@ footer span {
 
   /* Round heading: wrap lock-info on its own line, hide decorative rule */
   .round-heading { flex-wrap: wrap; gap: 2px; }
-  .round-heading .lock-info { width: 100%; white-space: normal; }
+  .round-heading .lock-info {
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    letter-spacing: 0;
+    font-size: 9px;
+  }
   .round-heading::after { display: none; }
 
   /* Footer */
@@ -1280,7 +1290,11 @@ footer span {
   .result-row .team-name.right       { order: 3; }
 
   /* Slightly larger touch targets for score inputs */
-  .score-input input[type="text"] { width: 48px; height: 42px; font-size: 1.1rem; }
+  .score-input input[type="text"] {
+    width: 44px; height: 44px;
+    flex: 0 0 44px; max-width: 44px;
+    font-size: 1.1rem;
+  }
 
   /* Single-column info grid on very small screens */
   .info-grid { grid-template-columns: 1fr; }
