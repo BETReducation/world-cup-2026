@@ -89,6 +89,21 @@ function fmtLockTimezones(isoStr) {
   return `${fmt('America/New_York')} ET · ${fmt('Europe/London')} UK · ${fmt('Asia/Ho_Chi_Minh')} VN`;
 }
 
+// Returns array of [ET, UK, VN] lock time strings (no weekday, for compact display)
+function fmtLockLines(isoStr) {
+  const d = new Date(isoStr);
+  const fmt = (tz, label) => {
+    const date = d.toLocaleDateString('en-GB', { timeZone: tz, day: 'numeric', month: 'short' });
+    const time = d.toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${date} ${time} ${label}`;
+  };
+  return [
+    fmt('America/New_York', 'ET'),
+    fmt('Europe/London',    'UK'),
+    fmt('Asia/Ho_Chi_Minh', 'VN')
+  ];
+}
+
 // Format a date + ET time string → date line + ET / UTC / VN time lines
 function fmtDate(dateStr, timeStr) {
   if (!dateStr) return 'Date TBD';

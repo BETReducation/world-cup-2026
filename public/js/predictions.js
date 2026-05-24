@@ -144,13 +144,17 @@ function showGroup(groupKey) {
   Object.entries(rounds).forEach(([round, matches]) => {
     const locked   = lockStatus[round]?.locked;
     const lockTime = lockStatus[round]?.lockTime;
-    const lockLabel = locked
-      ? '🔒 Locked'
-      : lockTime
-        ? `Locks · ${fmtLockTimezones(lockTime)}`
-        : '';
+    let lockHtml = '';
+    if (locked) {
+      lockHtml = '<span>🔒 Locked</span>';
+    } else if (lockTime) {
+      lockHtml = fmtLockLines(lockTime).map(l => `<span>${l}</span>`).join('');
+    }
 
-    html += `<div class="round-heading">Round ${round}<br><span class="lock-info">${lockLabel}</span></div>`;
+    html += `<div class="round-heading">
+      <span class="round-label">Round ${round}</span>
+      <div class="round-lock-list">${lockHtml}</div>
+    </div>`;
     html += `<div class="match-list">`;
 
     matches.forEach(m => {

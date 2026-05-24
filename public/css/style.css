@@ -405,16 +405,22 @@ nav.site-nav {
   color: var(--muted);
   margin: 20px 0 10px;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
-.round-heading::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+.round-label { flex-shrink: 0; padding-top: 1px; }
+.round-lock-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  font-size: 10px;
+  letter-spacing: 0;
+  gap: 2px;
+  text-transform: none;
 }
-.round-heading .lock-info { font-size: 10px; color: var(--muted); letter-spacing: 0; display: block; margin-top: 1px; }
+.round-lock-list span { white-space: nowrap; }
 
 /* ── Match row ───────────────────────────────────────────────────────────── */
 .match-list { display: flex; flex-direction: column; gap: 6px; }
@@ -1230,17 +1236,8 @@ footer span {
   .save-bar .user-info { flex: 1; margin-right: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .save-status { display: none; }
 
-  /* Round heading: wrap lock-info on its own line, hide decorative rule */
-  .round-heading { flex-wrap: wrap; gap: 2px; }
-  .round-heading .lock-info {
-    width: 100%;
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    letter-spacing: 0;
-    font-size: 9px;
-  }
-  .round-heading::after { display: none; }
+  /* Round heading: tighten gap on small screens */
+  .round-heading { gap: 8px; }
 
   /* Footer */
   footer { flex-direction: column; gap: 6px; text-align: center; padding: 20px 1rem; }
