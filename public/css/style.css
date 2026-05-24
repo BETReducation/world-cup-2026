@@ -484,7 +484,7 @@ nav.site-nav {
   margin-top: -2px;
 }
 
-.score-input input[type="number"] {
+.score-input input[type="text"] {
   width: 42px; height: 36px;
   text-align: center;
   font-family: 'JetBrains Mono', monospace;
@@ -495,26 +495,23 @@ nav.site-nav {
   background: var(--surface);
   color: var(--text);
   transition: border-color 0.15s;
-  -moz-appearance: textfield;
 }
-.score-input input[type="number"]::-webkit-inner-spin-button,
-.score-input input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
-.score-input input[type="number"]:focus {
+.score-input input[type="text"]:focus {
   outline: none;
   border-color: var(--accent);
 }
-.score-input input[type="number"]:disabled {
+.score-input input[type="text"]:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.score-input input[type="number"].saved {
+.score-input input[type="text"].saved {
   background: var(--accent-dim);
   border-color: rgba(77,201,122,0.35);
   color: var(--accent);
   cursor: default;
   pointer-events: none;
 }
-[data-theme="light"] .score-input input[type="number"].saved {
+[data-theme="light"] .score-input input[type="text"].saved {
   background: rgba(26,158,79,0.08);
   border-color: rgba(26,158,79,0.30);
 }
@@ -1278,7 +1275,7 @@ footer span {
   .result-row .team-name.right       { order: 3; }
 
   /* Slightly larger touch targets for score inputs */
-  .score-input input[type="number"] { width: 48px; height: 42px; font-size: 1.1rem; }
+  .score-input input[type="text"] { width: 48px; height: 42px; font-size: 1.1rem; }
 
   /* Single-column info grid on very small screens */
   .info-grid { grid-template-columns: 1fr; }
