@@ -559,7 +559,15 @@ nav.site-nav {
   gap: 20px;
   align-items: start;
 }
-@media (max-width: 900px) { .group-layout { grid-template-columns: 1fr; } }
+@media (max-width: 900px) {
+  .group-layout { grid-template-columns: 1fr; }
+  .table-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Subtle hint that content is scrollable */
+    border-radius: var(--radius-sm);
+  }
+}
 
 /* ── Standings table ─────────────────────────────────────────────────────── */
 .standings-table {

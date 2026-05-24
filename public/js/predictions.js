@@ -192,7 +192,7 @@ function showGroup(groupKey) {
 
   // Right: live predicted table
   html += `
-    <div>
+    <div class="table-scroll-wrap">
       <p class="table-heading">Predicted Standings</p>
       <div id="liveTable_${groupKey}"></div>
     </div>`;
