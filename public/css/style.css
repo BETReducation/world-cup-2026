@@ -1222,10 +1222,15 @@ footer span {
   /* Match meta */
   .match-meta { display: none; }
 
-  /* Save bar: 2-row layout */
-  .save-bar { flex-wrap: wrap; gap: 8px; padding: 12px; }
-  .save-bar .user-info { width: 100%; margin-right: 0; }
-  .save-status { width: 100%; text-align: left; min-width: 0; }
+  /* Save bar: single compact row */
+  .save-bar { flex-wrap: nowrap; gap: 8px; padding: 8px 12px; }
+  .save-bar .user-info { flex: 1; margin-right: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .save-status { display: none; }
+
+  /* Round heading: wrap lock-info on its own line, hide decorative rule */
+  .round-heading { flex-wrap: wrap; gap: 2px; }
+  .round-heading .lock-info { width: 100%; white-space: normal; }
+  .round-heading::after { display: none; }
 
   /* Footer */
   footer { flex-direction: column; gap: 6px; text-align: center; padding: 20px 1rem; }

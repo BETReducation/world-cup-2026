@@ -60,7 +60,6 @@ $('browseBtn').addEventListener('click', async () => {
   await loadAndRender();
 });
 
-$('logoutBtn').addEventListener('click', () => { Session.clear(); location.reload(); });
 
 function showErr(el, msg) {
   el.textContent = msg;
@@ -97,8 +96,6 @@ async function loadAndRender() {
 
   if (browseMode) {
     $('playerName').textContent = 'Guest';
-    $('logoutBtn').textContent = 'Sign in';
-    $('logoutBtn').onclick = () => location.reload();
     $('saveBtn').textContent = 'Sign in to Save';
     $('saveBtn').onclick = () => { location.reload(); };
   }
