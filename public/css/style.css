@@ -1251,7 +1251,7 @@ footer span {
     text-align: center;
   }
   .match-row .team-name:not(.right) { order: 1; }
-  .match-row .score-input           { order: 2; }
+  .match-row .score-input           { order: 2; flex: none; }
   .match-row .team-name.right       { order: 3; }
   .match-row .lock-badge,
   .match-row .tbd-badge             { order: 4; }
