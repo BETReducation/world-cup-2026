@@ -433,11 +433,23 @@ nav.site-nav {
 .match-row.round-locked { opacity: 0.5; }
 
 .match-meta {
-  flex: 0 0 130px;
+  flex: 0 0 110px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.6;
+}
+.match-meta sup {
+  font-size: 8px;
+  color: var(--accent);
+}
+.match-num {
+  display: block;
+  font-size: 9px;
+  color: var(--accent);
+  opacity: 0.7;
+  margin-bottom: 2px;
+  letter-spacing: 0.05em;
 }
 
 .team-name {
@@ -456,8 +468,20 @@ nav.site-nav {
 .score-input {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
   flex-shrink: 0;
+}
+.slot-hint {
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  opacity: 0.55;
+  letter-spacing: 0.04em;
+  margin-top: -2px;
 }
 
 .score-input input[type="number"] {
@@ -866,6 +890,19 @@ nav.site-nav {
   color: var(--accent);
   letter-spacing: 0.04em;
 }
+.admin-backup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-danger {
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+}
+.btn-danger:hover {
+  background: var(--red) !important;
+  color: #fff !important;
+}
 
 /* ── Coming soon ─────────────────────────────────────────────────────────── */
 .coming-soon {
@@ -1007,7 +1044,7 @@ footer span {
 /* ── Knockout round label ────────────────────────────────────────────────── */
 .ko-round-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -1021,6 +1058,7 @@ footer span {
   font-size: 10px;
   color: var(--muted);
   letter-spacing: 0.04em;
+  line-height: 1.7;
 }
 .tbd-badge {
   font-family: 'JetBrains Mono', monospace;

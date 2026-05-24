@@ -8,6 +8,7 @@ let browseMode     = false;
 let isSaved        = false;
 let allTeams       = {};
 let activeRound    = 'R32';
+let matchNumMap    = {};  // matchId → FIFA match number
 
 const ROUND_ORDER = ['R32', 'R16', 'QF', 'SF', '3P', 'F'];
 
@@ -21,19 +22,37 @@ function buildAllTeams(fixtures) {
   return map;
 }
 
+function buildMatchNumMap(fixtures) {
+  const map = {};
+  Object.values(fixtures.knockout || {}).forEach(round => {
+    (round.matches || []).forEach(m => { if (m.num) map[m.id] = m.num; });
+  });
+  return map;
+}
+
 function getTeam(id) {
   if (!id) return null;
   return allTeams[id] || { id, name: id, flag: '', flagCode: '' };
 }
 
 function fmtKoDate(dateStr, timeStr) {
-  if (!dateStr || dateStr === 'TBD') return 'Date TBD';
-  try {
-    const d = new Date(`${dateStr}T00:00:00`);
-    const datePart = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-    const timePart = (timeStr && timeStr !== 'TBD') ? ` · ${timeStr} ET` : ' · Time TBD';
-    return datePart + timePart;
-  } catch { return dateStr; }
+  return fmtDate(dateStr || 'TBD', timeStr || 'TBD');
+}
+
+function fmtSlot(slot) {
+  if (!slot) return '?';
+  // 3rd-place group slot
+  const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
+  if (m3rd) return `3rd(${m3rd[1]})`;
+  // Group position: "1A", "2B" etc.
+  if (/^[12][A-L]$/.test(slot)) return slot;
+  // Winner/Loser of another match — use FIFA match number
+  const mWL = slot.match(/^([WL]):(.+)$/);
+  if (mWL) {
+    const num = matchNumMap[mWL[2]];
+    return num ? `${mWL[1]}${num}` : `${mWL[1]} ${mWL[2].replace('_', '-')}`;
+  }
+  return slot;
 }
 
 function showErr(el, msg) {
@@ -109,7 +128,8 @@ async function loadAndRender() {
     return;
   }
 
-  allTeams = buildAllTeams(fixtures);
+  allTeams     = buildAllTeams(fixtures);
+  matchNumMap  = buildMatchNumMap(fixtures);
 
   if (userId) {
     try {
@@ -177,11 +197,12 @@ function showRound(roundKey) {
 
   const lock      = lockStatus[roundKey];
   const locked    = lock?.locked || false;
-  const lockLabel = locked
-    ? '🔒 Locked'
-    : lock?.lockTime
-      ? `Locks · ${fmtLockTimezones(lock.lockTime)}`
-      : '';
+  let lockLabel = '';
+  if (locked) {
+    lockLabel = '🔒 Locked';
+  } else if (lock?.lockTime) {
+    lockLabel = `🔒 Closes · ${fmtLockTimezones(lock.lockTime)}`;
+  }
 
   let html = `<div class="card">`;
   html += `<div class="ko-round-header">
@@ -190,7 +211,8 @@ function showRound(roundKey) {
   </div>`;
   html += `<div class="match-list">`;
 
-  for (const m of round.matches) {
+  const sortedMatches = [...round.matches].sort((a, b) => (a.num || 0) - (b.num || 0));
+  for (const m of sortedMatches) {
     const home       = m.home ? getTeam(m.home) : null;
     const away       = m.away ? getTeam(m.away) : null;
     const homeName   = home ? home.name  : (m.homeLabel || m.homeSlot || 'TBD');
@@ -205,7 +227,7 @@ function showRound(roundKey) {
 
     html += `
       <div class="match-row ${cls}" id="row_${m.id}">
-        <div class="match-meta">${fmtKoDate(m.date, m.time)}<br>${m.venue || 'Venue TBD'}</div>
+        <div class="match-meta">${m.num ? `<span class="match-num">#${m.num}</span>` : ''}${fmtKoDate(m.date, m.time)}</div>
         <div class="team-name">
           ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
         </div>
@@ -217,12 +239,12 @@ function showRound(roundKey) {
           <input type="number" min="0" max="20" value="${pred.away}" ${dis}
             data-match="${m.id}" data-side="away" class="ko-pred-input"
             inputmode="numeric" aria-label="${awayName} goals">
+          <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>
         </div>
         <div class="team-name right">
           ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
-        ${locked     ? '<span class="lock-badge">LOCKED</span>' : ''}
-        ${!teamsKnown && !locked ? '<span class="tbd-badge">TEAMS TBD</span>' : ''}
+        ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
       </div>`;
   }
 

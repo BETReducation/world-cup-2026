@@ -42,7 +42,7 @@
 <div class="hero">
   <div class="hero-tag">⚽ USA · Canada · Mexico · June 2026</div>
   <h1>Pick your scores.<br><span>Top the table.</span></h1>
-  <p>Enter predicted scores for all 72 group-stage matches. Your group tables update live as you type, and a full leaderboard tracks who's closest when the real results come in.</p>
+  <p>Enter predicted scores for all 72 group-stage matches. Your group tables update live as you type, and a full leaderboard tracks who's closest when the real results come in. The knockout stages open up when the teams have been decided for each fixture.</p>
   <div class="hero-cta">
     <a href="predictions.html" class="btn btn-primary">My Predictions →</a>
     <a href="results.html" class="btn btn-outline">View Results</a>
@@ -74,7 +74,7 @@
     <div class="info-tile">
       <div class="tile-icon">💰</div>
       <h3>Entry Fee</h3>
-      <p>£10 or đ350,000. Send to the organiser to get access to the prediction portal.</p>
+      <p>£5 or đ200,000. Send to the organiser to get access to the prediction portal.</p>
     </div>
 
     <div class="info-tile">
@@ -92,7 +92,7 @@
     <div class="info-tile">
       <div class="tile-icon">🏆</div>
       <h3>Knockout Stage</h3>
-      <p>Group-stage predictions come first. Knockout picks open once the round of 32 draw is confirmed after the group stage ends.</p>
+      <p>Group-stage predictions come first. Knockout picks open once the fixtures have both teams decided.</p>
     </div>
 
   </div>
@@ -175,12 +175,13 @@
   const DEADLINES = [
     { stage: 'Group Stage — Round 1', iso: '2026-06-11T19:00:00Z', note: 'Before Mexico vs South Africa' },
     { stage: 'Group Stage — Round 2', iso: '2026-06-18T16:00:00Z', note: 'Before Czechia vs South Africa' },
-    { stage: 'Group Stage — Round 3', iso: '2026-06-25T01:00:00Z', note: 'Before Czechia vs Mexico' },
+    { stage: 'Group Stage — Round 3', iso: '2026-06-24T19:00:00Z', note: 'Before Switzerland vs Canada' },
     { stage: 'Round of 32',           iso: '2026-06-28T19:00:00Z', note: 'Before first Last-32 match' },
     { stage: 'Round of 16',           iso: '2026-07-04T17:00:00Z', note: 'Before first Last-16 match' },
     { stage: 'Quarter-finals',        iso: '2026-07-09T20:00:00Z', note: 'Before first quarter-final' },
     { stage: 'Semi-finals',           iso: '2026-07-14T19:00:00Z', note: 'Before first semi-final' },
-    { stage: '3rd Place &amp; Final', iso: '2026-07-18T21:00:00Z', note: 'Bronze Final + Final (Sun 19 Jul)' },
+    { stage: 'Third-place Play-off',  iso: '2026-07-18T21:00:00Z', note: 'Before match #103' },
+    { stage: 'Final',                 iso: '2026-07-19T19:00:00Z', note: 'Before match #104' },
   ];
   function fmtTz(iso, tz) {
     const d = new Date(iso);

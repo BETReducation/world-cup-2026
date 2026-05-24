@@ -8,9 +8,20 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin2026';
 
 const DATA_DIR = path.join(__dirname, 'data');
-const FIXTURES_FILE = path.join(DATA_DIR, 'fixtures.json');
-const PREDICTIONS_FILE = path.join(DATA_DIR, 'predictions.json');
-const RESULTS_FILE = path.join(DATA_DIR, 'results.json');
+
+// Mutable user data lives in a separate persistent directory.
+// In production (Railway) set PERSISTENT_DATA_DIR to a mounted volume path
+// so predictions and results survive redeployments.
+// Locally it falls back to ./data — no config needed.
+const PERSISTENT_DIR = process.env.PERSISTENT_DATA_DIR
+  ? path.resolve(process.env.PERSISTENT_DATA_DIR)
+  : DATA_DIR;
+
+if (!fs.existsSync(PERSISTENT_DIR)) fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
+
+const FIXTURES_FILE    = path.join(DATA_DIR,       'fixtures.json');
+const PREDICTIONS_FILE = path.join(PERSISTENT_DIR, 'predictions.json');
+const RESULTS_FILE     = path.join(PERSISTENT_DIR, 'results.json');
 
 app.use(cors());
 app.use(express.json());
@@ -100,30 +111,76 @@ function resolveSlot(slot, slotMap, resolvedMatches, results) {
   return null;
 }
 
+function formatSlotLabel(slot) {
+  if (!slot) return 'TBD';
+  // "3rd_ABCDF" → "Best 3rd (A/B/C/D/F)"
+  const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
+  if (m3rd) return `Best 3rd (${m3rd[1].split('').join('/')})`;
+  // "1A" → "1st Group A", "2B" → "2nd Group B"
+  const mPos = slot.match(/^([12])([A-L])$/);
+  if (mPos) return `${mPos[1] === '1' ? '1st' : '2nd'} Group ${mPos[2]}`;
+  // "W:R32_1" → "Winner R32-1", "L:SF_1" → "Loser SF-1"
+  const mWL = slot.match(/^([WL]):(.+)$/);
+  if (mWL) return `${mWL[1] === 'W' ? 'Winner' : 'Loser'} ${mWL[2].replace('_', '-')}`;
+  return 'TBD';
+}
+
 function resolveKnockoutFixtures(fixtures, results) {
   if (!fixtures.knockout) return fixtures;
 
-  // Build slot map from group standings: "1A" → teamId, "2B" → teamId, "3rd_N" → teamId
+  // Build slot map from group standings: "1A" → teamId, "2B" → teamId
   const slotMap = {};
   const thirdPlaceTeams = [];
 
   for (const [groupKey, group] of Object.entries(fixtures.groups || {})) {
+    // Only resolve knockout slots once ALL group matches have been played
+    const groupComplete = group.matches.every(m => results[m.id]?.played);
+    if (!groupComplete) continue;
     const rows = calcGroupStandings(group.teams, group.matches, results);
     if (rows[0]) slotMap[`1${groupKey}`] = rows[0].team.id;
     if (rows[1]) slotMap[`2${groupKey}`] = rows[1].team.id;
     if (rows[2]) thirdPlaceTeams.push({
       team: rows[2].team, pts: rows[2].pts,
-      gd: rows[2].gf - rows[2].ga, gf: rows[2].gf
+      gd: rows[2].gf - rows[2].ga, gf: rows[2].gf,
+      groupKey
     });
   }
 
-  // Rank best 8 third-place teams
+  // Sort all 3rd-place teams by performance
   thirdPlaceTeams.sort((a, b) =>
     b.pts !== a.pts ? b.pts - a.pts :
     b.gd  !== a.gd  ? b.gd  - a.gd  :
     b.gf  - a.gf
   );
-  thirdPlaceTeams.slice(0, 8).forEach((t, i) => { slotMap[`3rd_${i + 1}`] = t.team.id; });
+
+  // Resolve group-specific "3rd_ABCDF" slots in bracket order
+  // Each 3rd-place team can only fill one slot
+  // ALL groups in the slot must be complete before we resolve it
+  const usedIn3rd = new Set();
+  for (const roundKey of ['R32', 'R16', 'QF', 'SF', '3P', 'F']) {
+    const round = fixtures.knockout[roundKey];
+    if (!round) continue;
+    for (const match of round.matches) {
+      for (const slot of [match.homeSlot, match.awaySlot]) {
+        if (!slot || slotMap[slot] !== undefined) continue;
+        const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
+        if (!m3rd) continue;
+        const groupLetters = m3rd[1];
+        // Only resolve once every group in this slot has finished all its matches
+        const allComplete = groupLetters.split('').every(
+          g => fixtures.groups[g]?.matches.every(m => results[m.id]?.played)
+        );
+        if (!allComplete) continue;
+        const eligible = thirdPlaceTeams.filter(
+          t => groupLetters.includes(t.groupKey) && !usedIn3rd.has(t.team.id)
+        );
+        if (eligible.length > 0) {
+          slotMap[slot] = eligible[0].team.id;
+          usedIn3rd.add(eligible[0].team.id);
+        }
+      }
+    }
+  }
 
   // Resolve each round in bracket order
   const resolvedMatches = {};
@@ -138,8 +195,8 @@ function resolveKnockoutFixtures(fixtures, results) {
       match.away = awayId || null;
       const ht = homeId ? findTeamById(fixtures, homeId) : null;
       const at = awayId ? findTeamById(fixtures, awayId) : null;
-      match.homeLabel = ht ? `${ht.flag} ${ht.name}` : (match.homeSlot || 'TBD');
-      match.awayLabel = at ? `${at.flag} ${at.name}` : (match.awaySlot || 'TBD');
+      match.homeLabel = ht ? `${ht.flag} ${ht.name}` : formatSlotLabel(match.homeSlot);
+      match.awayLabel = at ? `${at.flag} ${at.name}` : formatSlotLabel(match.awaySlot);
     }
   }
   return fixtures;
@@ -150,6 +207,38 @@ function resolveKnockoutFixtures(fixtures, results) {
 app.get('/api/admin/verify', (req, res) => {
   if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
     return res.status(401).json({ error: 'Unauthorized' });
+  res.json({ ok: true });
+});
+
+app.get('/api/admin/backup', (req, res) => {
+  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
+    return res.status(401).json({ error: 'Unauthorized' });
+  const backup = {
+    exportedAt: new Date().toISOString(),
+    predictions: readJSON(PREDICTIONS_FILE, { users: [] }),
+    results:     readJSON(RESULTS_FILE,     { results: {} })
+  };
+  const date = new Date().toISOString().slice(0, 10);
+  res.setHeader('Content-Disposition', `attachment; filename="wc2026-backup-${date}.json"`);
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(backup, null, 2));
+});
+
+app.post('/api/admin/restore', (req, res) => {
+  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
+    return res.status(401).json({ error: 'Unauthorized' });
+  const { predictions, results } = req.body;
+  if (!predictions || !results)
+    return res.status(400).json({ error: 'Invalid backup — must contain predictions and results' });
+  writeJSON(PREDICTIONS_FILE, predictions);
+  writeJSON(RESULTS_FILE, results);
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/clear-results', (req, res) => {
+  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
+    return res.status(401).json({ error: 'Unauthorized' });
+  writeJSON(RESULTS_FILE, { results: {} });
   res.json({ ok: true });
 });
 
@@ -165,9 +254,11 @@ app.get('/api/fixtures', (req, res) => {
 
 app.get('/api/lock-status', (req, res) => {
   const fixtures = readJSON(FIXTURES_FILE, { lockDates: {} });
+  const now = new Date();
   const status = {};
   for (const [round, lockTime] of Object.entries(fixtures.lockDates || {})) {
-    status[round] = { locked: new Date() >= new Date(lockTime), lockTime };
+    const locked = !!(lockTime && now >= new Date(lockTime));
+    status[round] = { locked, lockTime };
   }
   res.json(status);
 });

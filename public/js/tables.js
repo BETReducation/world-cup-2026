@@ -89,9 +89,18 @@ function fmtLockTimezones(isoStr) {
   return `${fmt('America/New_York')} ET · ${fmt('Europe/London')} UK · ${fmt('Asia/Ho_Chi_Minh')} VN`;
 }
 
-// Format a date + time string nicely
+// Format a date + ET time string → date line + ET / UTC / VN time lines
 function fmtDate(dateStr, timeStr) {
-  const d = new Date(`${dateStr}T${timeStr}:00`);
-  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-    + ' · ' + timeStr;
+  if (!dateStr) return 'Date TBD';
+  const d = new Date(`${dateStr}T00:00:00`);
+  const datePart = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  if (!timeStr || timeStr === 'TBD') return `${datePart}<br>Time TBD`;
+  const [h, m] = timeStr.split(':').map(Number);
+  const pad = n => String(n).padStart(2, '0');
+  const fmtT = (mins) => {
+    const nextDay = mins >= 1440 ? '<sup>+1</sup>' : '';
+    return `${pad(Math.floor(mins / 60) % 24)}:${pad(mins % 60)}${nextDay}`;
+  };
+  const base = h * 60 + m;
+  return `${datePart}<br>${timeStr} ET<br>${fmtT(base + 240)} UTC<br>${fmtT(base + 660)} VN`;
 }

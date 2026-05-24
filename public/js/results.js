@@ -42,6 +42,7 @@ $('adminToggleBtn').addEventListener('click', () => {
     adminPassword = null;
     $('adminLabel').textContent     = '';
     $('adminToggleBtn').textContent = '🔑 Admin Mode';
+    $('adminBackup').classList.add('hidden');
     if (activeKoRound) showKoRound(activeKoRound); else showGroup(activeGroup);
   } else {
     $('adminModal').classList.add('open');
@@ -69,11 +70,74 @@ $('adminLoginBtn').addEventListener('click', async () => {
   $('adminModal').classList.remove('open');
   $('adminLabel').textContent     = '✓ Admin active';
   $('adminToggleBtn').textContent = 'Exit Admin';
+  $('adminBackup').classList.remove('hidden');
   if (activeKoRound) showKoRound(activeKoRound); else showGroup(activeGroup);
 });
 
 $('adminCancelBtn').addEventListener('click', () => $('adminModal').classList.remove('open'));
 $('adminPwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('adminLoginBtn').click(); });
+
+// ── Backup / Restore ──────────────────────────────────────────────────────────
+
+$('backupBtn').addEventListener('click', async () => {
+  const res = await fetch('/api/admin/backup', {
+    headers: { 'x-admin-password': adminPassword }
+  });
+  if (!res.ok) { alert('Backup failed'); return; }
+  const blob = await res.blob();
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href     = url;
+  a.download = `wc2026-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+$('clearResultsBtn').addEventListener('click', async () => {
+  if (!confirm('Clear ALL results? This cannot be undone.')) return;
+  const status = $('restoreStatus');
+  status.textContent = 'Clearing…';
+  status.style.color = 'var(--text-muted)';
+  try {
+    const res = await fetch('/api/admin/clear-results', {
+      method:  'POST',
+      headers: { 'x-admin-password': adminPassword }
+    });
+    if (!res.ok) throw new Error();
+    status.textContent = '✓ Results cleared — reloading…';
+    status.style.color = 'var(--accent)';
+    setTimeout(() => location.reload(), 1000);
+  } catch {
+    status.textContent = '✗ Failed to clear results';
+    status.style.color = 'var(--red)';
+  }
+});
+
+$('restoreInput').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const status = $('restoreStatus');
+  status.textContent = 'Restoring…';
+  status.style.color = 'var(--text-muted)';
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const res  = await fetch('/api/admin/restore', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+      body:    JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error('Server error');
+    status.textContent = '✓ Restored — reloading…';
+    status.style.color = 'var(--accent)';
+    setTimeout(() => location.reload(), 1200);
+  } catch {
+    status.textContent = '✗ Restore failed — invalid file?';
+    status.style.color = 'var(--red)';
+  }
+  e.target.value = ''; // reset file input
+});
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 
@@ -133,7 +197,7 @@ function showGroup(groupKey) {
 
       html += `
         <div class="result-row ${played ? '' : 'not-played'}">
-          <div class="match-meta">${fmtDate(m.date, m.time)}<br>${m.venue}</div>
+          <div class="match-meta">${fmtDate(m.date, m.time)}</div>
           <div class="team-name"><span class="flag fi fi-${home.flagCode}"></span>${home.name}</div>
           <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
           <div class="team-name right">${away.name}<span class="flag fi fi-${away.flagCode}"></span></div>
@@ -189,13 +253,7 @@ function getKoTeam(id) {
 }
 
 function fmtKoMatchDate(dateStr, timeStr) {
-  if (!dateStr || dateStr === 'TBD') return 'Date TBD';
-  try {
-    const d = new Date(`${dateStr}T00:00:00`);
-    const datePart = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-    const timePart = (timeStr && timeStr !== 'TBD') ? ` · ${timeStr} ET` : ' · Time TBD';
-    return datePart + timePart;
-  } catch { return dateStr; }
+  return fmtDate(dateStr || 'TBD', timeStr || 'TBD');
 }
 
 function showKoRound(roundKey) {
@@ -231,7 +289,7 @@ function showKoRound(roundKey) {
 
     html += `
       <div class="result-row ${played ? '' : 'not-played'}" id="row_${m.id}">
-        <div class="match-meta">${fmtKoMatchDate(m.date, m.time)}<br>${m.venue || 'Venue TBD'}</div>
+        <div class="match-meta">${fmtKoMatchDate(m.date, m.time)}</div>
         <div class="team-name">
           ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
         </div>

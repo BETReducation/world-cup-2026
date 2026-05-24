@@ -3,13 +3,13 @@
   "lockDates": {
     "1":   "2026-06-11T19:00:00Z",
     "2":   "2026-06-18T16:00:00Z",
-    "3":   "2026-06-25T01:00:00Z",
+    "3":   "2026-06-24T19:00:00Z",
     "R32": "2026-06-28T19:00:00Z",
     "R16": "2026-07-04T17:00:00Z",
     "QF":  "2026-07-09T20:00:00Z",
     "SF":  "2026-07-14T19:00:00Z",
     "3P":  "2026-07-18T21:00:00Z",
-    "F":   "2026-07-18T21:00:00Z"
+    "F":   "2026-07-19T19:00:00Z"
   },
   "groups": {
     "A": {
@@ -25,8 +25,8 @@
         { "id": "A2", "home": "KOR", "away": "CZE", "round": 1, "date": "2026-06-11", "time": "22:00", "venue": "Guadalajara" },
         { "id": "A3", "home": "CZE", "away": "RSA", "round": 2, "date": "2026-06-18", "time": "12:00", "venue": "Atlanta" },
         { "id": "A4", "home": "MEX", "away": "KOR", "round": 2, "date": "2026-06-18", "time": "21:00", "venue": "Guadalajara" },
-        { "id": "A5", "home": "CZE", "away": "MEX", "round": 3, "date": "2026-06-27", "time": "21:00", "venue": "Mexico City" },
-        { "id": "A6", "home": "RSA", "away": "KOR", "round": 3, "date": "2026-06-27", "time": "21:00", "venue": "Monterrey" }
+        { "id": "A5", "home": "CZE", "away": "MEX", "round": 3, "date": "2026-06-24", "time": "21:00", "venue": "Mexico City" },
+        { "id": "A6", "home": "RSA", "away": "KOR", "round": 3, "date": "2026-06-24", "time": "21:00", "venue": "Monterrey" }
       ]
     },
     "B": {
@@ -42,8 +42,8 @@
         { "id": "B2", "home": "QAT", "away": "SUI", "round": 1, "date": "2026-06-13", "time": "15:00", "venue": "San Francisco Bay Area" },
         { "id": "B3", "home": "SUI", "away": "BIH", "round": 2, "date": "2026-06-18", "time": "15:00", "venue": "Los Angeles" },
         { "id": "B4", "home": "CAN", "away": "QAT", "round": 2, "date": "2026-06-18", "time": "18:00", "venue": "Vancouver" },
-        { "id": "B5", "home": "SUI", "away": "CAN", "round": 3, "date": "2026-06-27", "time": "15:00", "venue": "Vancouver" },
-        { "id": "B6", "home": "BIH", "away": "QAT", "round": 3, "date": "2026-06-27", "time": "15:00", "venue": "Seattle" }
+        { "id": "B5", "home": "SUI", "away": "CAN", "round": 3, "date": "2026-06-24", "time": "15:00", "venue": "Vancouver" },
+        { "id": "B6", "home": "BIH", "away": "QAT", "round": 3, "date": "2026-06-24", "time": "15:00", "venue": "Seattle" }
       ]
     },
     "C": {
@@ -59,8 +59,8 @@
         { "id": "C2", "home": "BRA", "away": "MAR", "round": 1, "date": "2026-06-13", "time": "18:00", "venue": "New York / New Jersey" },
         { "id": "C3", "home": "BRA", "away": "HAI", "round": 2, "date": "2026-06-19", "time": "20:30", "venue": "Philadelphia" },
         { "id": "C4", "home": "SCO", "away": "MAR", "round": 2, "date": "2026-06-19", "time": "18:00", "venue": "Boston" },
-        { "id": "C5", "home": "SCO", "away": "BRA", "round": 3, "date": "2026-06-27", "time": "18:00", "venue": "Miami" },
-        { "id": "C6", "home": "MAR", "away": "HAI", "round": 3, "date": "2026-06-27", "time": "18:00", "venue": "Atlanta" }
+        { "id": "C5", "home": "SCO", "away": "BRA", "round": 3, "date": "2026-06-24", "time": "18:00", "venue": "Miami" },
+        { "id": "C6", "home": "MAR", "away": "HAI", "round": 3, "date": "2026-06-24", "time": "18:00", "venue": "Atlanta" }
       ]
     },
     "D": {
@@ -76,8 +76,8 @@
         { "id": "D2", "home": "AUS", "away": "TUR", "round": 1, "date": "2026-06-13", "time": "00:00", "venue": "Vancouver" },
         { "id": "D3", "home": "TUR", "away": "PAR", "round": 2, "date": "2026-06-19", "time": "23:00", "venue": "San Francisco Bay Area" },
         { "id": "D4", "home": "USA", "away": "AUS", "round": 2, "date": "2026-06-19", "time": "15:00", "venue": "Seattle" },
-        { "id": "D5", "home": "TUR", "away": "USA", "round": 3, "date": "2026-06-28", "time": "22:00", "venue": "Los Angeles" },
-        { "id": "D6", "home": "PAR", "away": "AUS", "round": 3, "date": "2026-06-28", "time": "22:00", "venue": "San Francisco Bay Area" }
+        { "id": "D5", "home": "TUR", "away": "USA", "round": 3, "date": "2026-06-25", "time": "22:00", "venue": "Los Angeles" },
+        { "id": "D6", "home": "PAR", "away": "AUS", "round": 3, "date": "2026-06-25", "time": "22:00", "venue": "San Francisco Bay Area" }
       ]
     },
     "E": {
@@ -93,8 +93,8 @@
         { "id": "E2", "home": "GER", "away": "CUW", "round": 1, "date": "2026-06-14", "time": "13:00", "venue": "Houston" },
         { "id": "E3", "home": "GER", "away": "CIV", "round": 2, "date": "2026-06-20", "time": "16:00", "venue": "Toronto" },
         { "id": "E4", "home": "ECU", "away": "CUW", "round": 2, "date": "2026-06-20", "time": "20:00", "venue": "Kansas City" },
-        { "id": "E5", "home": "CUW", "away": "CIV", "round": 3, "date": "2026-06-28", "time": "16:00", "venue": "Philadelphia" },
-        { "id": "E6", "home": "ECU", "away": "GER", "round": 3, "date": "2026-06-28", "time": "16:00", "venue": "New York / New Jersey" }
+        { "id": "E5", "home": "CUW", "away": "CIV", "round": 3, "date": "2026-06-25", "time": "16:00", "venue": "Philadelphia" },
+        { "id": "E6", "home": "ECU", "away": "GER", "round": 3, "date": "2026-06-25", "time": "16:00", "venue": "New York / New Jersey" }
       ]
     },
     "F": {
@@ -110,8 +110,8 @@
         { "id": "F2", "home": "SWE", "away": "TUN", "round": 1, "date": "2026-06-14", "time": "22:00", "venue": "Monterrey" },
         { "id": "F3", "home": "NED", "away": "SWE", "round": 2, "date": "2026-06-20", "time": "13:00", "venue": "Houston" },
         { "id": "F4", "home": "TUN", "away": "JPN", "round": 2, "date": "2026-06-20", "time": "00:00", "venue": "Monterrey" },
-        { "id": "F5", "home": "JPN", "away": "SWE", "round": 3, "date": "2026-06-28", "time": "19:00", "venue": "Dallas" },
-        { "id": "F6", "home": "TUN", "away": "NED", "round": 3, "date": "2026-06-28", "time": "19:00", "venue": "Kansas City" }
+        { "id": "F5", "home": "JPN", "away": "SWE", "round": 3, "date": "2026-06-25", "time": "19:00", "venue": "Dallas" },
+        { "id": "F6", "home": "TUN", "away": "NED", "round": 3, "date": "2026-06-25", "time": "19:00", "venue": "Kansas City" }
       ]
     },
     "G": {
@@ -127,8 +127,8 @@
         { "id": "G2", "home": "BEL", "away": "EGY", "round": 1, "date": "2026-06-15", "time": "15:00", "venue": "Seattle" },
         { "id": "G3", "home": "BEL", "away": "IRN", "round": 2, "date": "2026-06-21", "time": "15:00", "venue": "Los Angeles" },
         { "id": "G4", "home": "NZL", "away": "EGY", "round": 2, "date": "2026-06-21", "time": "21:00", "venue": "Vancouver" },
-        { "id": "G5", "home": "EGY", "away": "IRN", "round": 3, "date": "2026-06-29", "time": "23:00", "venue": "Seattle" },
-        { "id": "G6", "home": "NZL", "away": "BEL", "round": 3, "date": "2026-06-29", "time": "23:00", "venue": "Vancouver" }
+        { "id": "G5", "home": "EGY", "away": "IRN", "round": 3, "date": "2026-06-26", "time": "23:00", "venue": "Seattle" },
+        { "id": "G6", "home": "NZL", "away": "BEL", "round": 3, "date": "2026-06-26", "time": "23:00", "venue": "Vancouver" }
       ]
     },
     "H": {
@@ -144,8 +144,8 @@
         { "id": "H2", "home": "ESP", "away": "CPV", "round": 1, "date": "2026-06-15", "time": "12:00", "venue": "Atlanta" },
         { "id": "H3", "home": "URU", "away": "CPV", "round": 2, "date": "2026-06-21", "time": "18:00", "venue": "Miami" },
         { "id": "H4", "home": "ESP", "away": "KSA", "round": 2, "date": "2026-06-21", "time": "12:00", "venue": "Atlanta" },
-        { "id": "H5", "home": "CPV", "away": "KSA", "round": 3, "date": "2026-06-29", "time": "20:00", "venue": "Houston" },
-        { "id": "H6", "home": "URU", "away": "ESP", "round": 3, "date": "2026-06-29", "time": "20:00", "venue": "Guadalajara" }
+        { "id": "H5", "home": "CPV", "away": "KSA", "round": 3, "date": "2026-06-26", "time": "20:00", "venue": "Houston" },
+        { "id": "H6", "home": "URU", "away": "ESP", "round": 3, "date": "2026-06-26", "time": "20:00", "venue": "Guadalajara" }
       ]
     },
     "I": {
@@ -161,8 +161,8 @@
         { "id": "I2", "home": "IRQ", "away": "NOR", "round": 1, "date": "2026-06-16", "time": "18:00", "venue": "Boston" },
         { "id": "I3", "home": "NOR", "away": "SEN", "round": 2, "date": "2026-06-22", "time": "20:00", "venue": "New York / New Jersey" },
         { "id": "I4", "home": "FRA", "away": "IRQ", "round": 2, "date": "2026-06-22", "time": "17:00", "venue": "Philadelphia" },
-        { "id": "I5", "home": "NOR", "away": "FRA", "round": 3, "date": "2026-06-29", "time": "15:00", "venue": "Boston" },
-        { "id": "I6", "home": "SEN", "away": "IRQ", "round": 3, "date": "2026-06-29", "time": "15:00", "venue": "Toronto" }
+        { "id": "I5", "home": "NOR", "away": "FRA", "round": 3, "date": "2026-06-26", "time": "15:00", "venue": "Boston" },
+        { "id": "I6", "home": "SEN", "away": "IRQ", "round": 3, "date": "2026-06-26", "time": "15:00", "venue": "Toronto" }
       ]
     },
     "J": {
@@ -178,8 +178,8 @@
         { "id": "J2", "home": "AUT", "away": "JOR", "round": 1, "date": "2026-06-16", "time": "00:00", "venue": "San Francisco Bay Area" },
         { "id": "J3", "home": "ARG", "away": "AUT", "round": 2, "date": "2026-06-22", "time": "13:00", "venue": "Dallas" },
         { "id": "J4", "home": "JOR", "away": "ALG", "round": 2, "date": "2026-06-22", "time": "23:00", "venue": "San Francisco Bay Area" },
-        { "id": "J5", "home": "ALG", "away": "AUT", "round": 3, "date": "2026-06-30", "time": "22:00", "venue": "Kansas City" },
-        { "id": "J6", "home": "JOR", "away": "ARG", "round": 3, "date": "2026-06-30", "time": "22:00", "venue": "Dallas" }
+        { "id": "J5", "home": "ALG", "away": "AUT", "round": 3, "date": "2026-06-27", "time": "22:00", "venue": "Kansas City" },
+        { "id": "J6", "home": "JOR", "away": "ARG", "round": 3, "date": "2026-06-27", "time": "22:00", "venue": "Dallas" }
       ]
     },
     "K": {
@@ -195,8 +195,8 @@
         { "id": "K2", "home": "UZB", "away": "COL", "round": 1, "date": "2026-06-17", "time": "22:00", "venue": "Mexico City" },
         { "id": "K3", "home": "POR", "away": "UZB", "round": 2, "date": "2026-06-23", "time": "13:00", "venue": "Houston" },
         { "id": "K4", "home": "COL", "away": "COD", "round": 2, "date": "2026-06-23", "time": "22:00", "venue": "Guadalajara" },
-        { "id": "K5", "home": "COL", "away": "POR", "round": 3, "date": "2026-06-30", "time": "19:30", "venue": "Miami" },
-        { "id": "K6", "home": "COD", "away": "UZB", "round": 3, "date": "2026-06-30", "time": "19:30", "venue": "Atlanta" }
+        { "id": "K5", "home": "COL", "away": "POR", "round": 3, "date": "2026-06-27", "time": "19:30", "venue": "Miami" },
+        { "id": "K6", "home": "COD", "away": "UZB", "round": 3, "date": "2026-06-27", "time": "19:30", "venue": "Atlanta" }
       ]
     },
     "L": {
@@ -212,8 +212,8 @@
         { "id": "L2", "home": "ENG", "away": "CRO", "round": 1, "date": "2026-06-17", "time": "16:00", "venue": "Dallas" },
         { "id": "L3", "home": "ENG", "away": "GHA", "round": 2, "date": "2026-06-23", "time": "16:00", "venue": "Boston" },
         { "id": "L4", "home": "PAN", "away": "CRO", "round": 2, "date": "2026-06-23", "time": "19:00", "venue": "Toronto" },
-        { "id": "L5", "home": "PAN", "away": "ENG", "round": 3, "date": "2026-06-30", "time": "17:00", "venue": "New York / New Jersey" },
-        { "id": "L6", "home": "CRO", "away": "GHA", "round": 3, "date": "2026-06-30", "time": "17:00", "venue": "Philadelphia" }
+        { "id": "L5", "home": "PAN", "away": "ENG", "round": 3, "date": "2026-06-27", "time": "17:00", "venue": "New York / New Jersey" },
+        { "id": "L6", "home": "CRO", "away": "GHA", "round": 3, "date": "2026-06-27", "time": "17:00", "venue": "Philadelphia" }
       ]
     }
   },
@@ -222,63 +222,63 @@
     "R32": {
       "name": "Round of 32",
       "matches": [
-        { "id": "R32_1",  "round": "R32", "homeSlot": "1A",  "awaySlot": "2B",     "date": "2026-07-01", "time": "12:00", "venue": "TBD" },
-        { "id": "R32_2",  "round": "R32", "homeSlot": "1B",  "awaySlot": "2A",     "date": "2026-07-01", "time": "12:00", "venue": "TBD" },
-        { "id": "R32_3",  "round": "R32", "homeSlot": "1C",  "awaySlot": "2D",     "date": "2026-07-01", "time": "16:00", "venue": "TBD" },
-        { "id": "R32_4",  "round": "R32", "homeSlot": "1D",  "awaySlot": "2C",     "date": "2026-07-01", "time": "16:00", "venue": "TBD" },
-        { "id": "R32_5",  "round": "R32", "homeSlot": "1E",  "awaySlot": "2F",     "date": "2026-07-02", "time": "12:00", "venue": "TBD" },
-        { "id": "R32_6",  "round": "R32", "homeSlot": "1F",  "awaySlot": "2E",     "date": "2026-07-02", "time": "12:00", "venue": "TBD" },
-        { "id": "R32_7",  "round": "R32", "homeSlot": "1G",  "awaySlot": "2H",     "date": "2026-07-02", "time": "16:00", "venue": "TBD" },
-        { "id": "R32_8",  "round": "R32", "homeSlot": "1H",  "awaySlot": "2G",     "date": "2026-07-02", "time": "16:00", "venue": "TBD" },
-        { "id": "R32_9",  "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_1",  "date": "2026-07-02", "time": "20:00", "venue": "TBD" },
-        { "id": "R32_10", "round": "R32", "homeSlot": "1J",  "awaySlot": "3rd_2",  "date": "2026-07-02", "time": "20:00", "venue": "TBD" },
-        { "id": "R32_11", "round": "R32", "homeSlot": "1K",  "awaySlot": "3rd_3",  "date": "2026-07-03", "time": "12:00", "venue": "TBD" },
-        { "id": "R32_12", "round": "R32", "homeSlot": "1L",  "awaySlot": "3rd_4",  "date": "2026-07-03", "time": "12:00", "venue": "TBD" },
-        { "id": "R32_13", "round": "R32", "homeSlot": "2I",  "awaySlot": "3rd_5",  "date": "2026-07-03", "time": "16:00", "venue": "TBD" },
-        { "id": "R32_14", "round": "R32", "homeSlot": "2J",  "awaySlot": "3rd_6",  "date": "2026-07-03", "time": "16:00", "venue": "TBD" },
-        { "id": "R32_15", "round": "R32", "homeSlot": "2K",  "awaySlot": "3rd_7",  "date": "2026-07-03", "time": "20:00", "venue": "TBD" },
-        { "id": "R32_16", "round": "R32", "homeSlot": "2L",  "awaySlot": "3rd_8",  "date": "2026-07-03", "time": "20:00", "venue": "TBD" }
+        { "id": "R32_1",  "num": 73, "round": "R32", "homeSlot": "2A",  "awaySlot": "2B",        "date": "2026-06-28", "time": "15:00", "venue": "TBD" },
+        { "id": "R32_2",  "num": 76, "round": "R32", "homeSlot": "1C",  "awaySlot": "2F",        "date": "2026-06-29", "time": "13:00", "venue": "TBD" },
+        { "id": "R32_3",  "num": 74, "round": "R32", "homeSlot": "1E",  "awaySlot": "3rd_ABCDF", "date": "2026-06-29", "time": "18:30", "venue": "TBD" },
+        { "id": "R32_4",  "num": 75, "round": "R32", "homeSlot": "1F",  "awaySlot": "2C",        "date": "2026-06-29", "time": "21:00", "venue": "TBD" },
+        { "id": "R32_5",  "num": 78, "round": "R32", "homeSlot": "2E",  "awaySlot": "2I",        "date": "2026-06-30", "time": "13:00", "venue": "TBD" },
+        { "id": "R32_6",  "num": 77, "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_CDFGH", "date": "2026-06-30", "time": "17:00", "venue": "TBD" },
+        { "id": "R32_7",  "num": 79, "round": "R32", "homeSlot": "1A",  "awaySlot": "3rd_CEFHI", "date": "2026-06-30", "time": "21:00", "venue": "TBD" },
+        { "id": "R32_8",  "num": 80, "round": "R32", "homeSlot": "1L",  "awaySlot": "3rd_EHIJK", "date": "2026-07-01", "time": "12:00", "venue": "TBD" },
+        { "id": "R32_9",  "num": 82, "round": "R32", "homeSlot": "1G",  "awaySlot": "3rd_AEHIJ", "date": "2026-07-01", "time": "16:00", "venue": "TBD" },
+        { "id": "R32_10", "num": 81, "round": "R32", "homeSlot": "1D",  "awaySlot": "3rd_BEFIJ", "date": "2026-07-01", "time": "20:00", "venue": "TBD" },
+        { "id": "R32_11", "num": 85, "round": "R32", "homeSlot": "1B",  "awaySlot": "3rd_EFGIJ", "date": "2026-07-02", "time": "23:00", "venue": "TBD" },
+        { "id": "R32_12", "num": 84, "round": "R32", "homeSlot": "1H",  "awaySlot": "2J",        "date": "2026-07-02", "time": "15:00", "venue": "TBD" },
+        { "id": "R32_13", "num": 83, "round": "R32", "homeSlot": "2K",  "awaySlot": "2L",        "date": "2026-07-02", "time": "19:00", "venue": "TBD" },
+        { "id": "R32_14", "num": 88, "round": "R32", "homeSlot": "2D",  "awaySlot": "2G",        "date": "2026-07-03", "time": "14:00", "venue": "TBD" },
+        { "id": "R32_15", "num": 86, "round": "R32", "homeSlot": "1J",  "awaySlot": "2H",        "date": "2026-07-03", "time": "18:00", "venue": "TBD" },
+        { "id": "R32_16", "num": 87, "round": "R32", "homeSlot": "1K",  "awaySlot": "3rd_DEIJL", "date": "2026-07-03", "time": "21:30", "venue": "TBD" }
       ]
     },
     "R16": {
       "name": "Round of 16",
       "matches": [
-        { "id": "R16_1", "round": "R16", "homeSlot": "W:R32_1",  "awaySlot": "W:R32_9",  "date": "2026-07-05", "time": "12:00", "venue": "TBD" },
-        { "id": "R16_2", "round": "R16", "homeSlot": "W:R32_2",  "awaySlot": "W:R32_10", "date": "2026-07-05", "time": "16:00", "venue": "TBD" },
-        { "id": "R16_3", "round": "R16", "homeSlot": "W:R32_3",  "awaySlot": "W:R32_11", "date": "2026-07-05", "time": "20:00", "venue": "TBD" },
-        { "id": "R16_4", "round": "R16", "homeSlot": "W:R32_4",  "awaySlot": "W:R32_12", "date": "2026-07-06", "time": "12:00", "venue": "TBD" },
-        { "id": "R16_5", "round": "R16", "homeSlot": "W:R32_5",  "awaySlot": "W:R32_13", "date": "2026-07-06", "time": "16:00", "venue": "TBD" },
-        { "id": "R16_6", "round": "R16", "homeSlot": "W:R32_6",  "awaySlot": "W:R32_14", "date": "2026-07-06", "time": "20:00", "venue": "TBD" },
-        { "id": "R16_7", "round": "R16", "homeSlot": "W:R32_7",  "awaySlot": "W:R32_15", "date": "2026-07-07", "time": "12:00", "venue": "TBD" },
-        { "id": "R16_8", "round": "R16", "homeSlot": "W:R32_8",  "awaySlot": "W:R32_16", "date": "2026-07-07", "time": "16:00", "venue": "TBD" }
+        { "id": "R16_1", "num": 89, "round": "R16", "homeSlot": "W:R32_1",  "awaySlot": "W:R32_9",  "date": "2026-07-04", "time": "17:00", "venue": "TBD" },
+        { "id": "R16_2", "num": 90, "round": "R16", "homeSlot": "W:R32_2",  "awaySlot": "W:R32_10", "date": "2026-07-04", "time": "13:00", "venue": "TBD" },
+        { "id": "R16_3", "num": 91, "round": "R16", "homeSlot": "W:R32_3",  "awaySlot": "W:R32_11", "date": "2026-07-05", "time": "16:00", "venue": "TBD" },
+        { "id": "R16_4", "num": 92, "round": "R16", "homeSlot": "W:R32_4",  "awaySlot": "W:R32_12", "date": "2026-07-05", "time": "20:00", "venue": "TBD" },
+        { "id": "R16_5", "num": 93, "round": "R16", "homeSlot": "W:R32_5",  "awaySlot": "W:R32_13", "date": "2026-07-06", "time": "15:00", "venue": "TBD" },
+        { "id": "R16_6", "num": 94, "round": "R16", "homeSlot": "W:R32_6",  "awaySlot": "W:R32_14", "date": "2026-07-06", "time": "20:00", "venue": "TBD" },
+        { "id": "R16_7", "num": 95, "round": "R16", "homeSlot": "W:R32_7",  "awaySlot": "W:R32_15", "date": "2026-07-07", "time": "12:00", "venue": "TBD" },
+        { "id": "R16_8", "num": 96, "round": "R16", "homeSlot": "W:R32_8",  "awaySlot": "W:R32_16", "date": "2026-07-07", "time": "16:00", "venue": "TBD" }
       ]
     },
     "QF": {
       "name": "Quarter-finals",
       "matches": [
-        { "id": "QF_1", "round": "QF", "homeSlot": "W:R16_1", "awaySlot": "W:R16_2", "date": "2026-07-10", "time": "16:00", "venue": "TBD" },
-        { "id": "QF_2", "round": "QF", "homeSlot": "W:R16_3", "awaySlot": "W:R16_4", "date": "2026-07-10", "time": "20:00", "venue": "TBD" },
-        { "id": "QF_3", "round": "QF", "homeSlot": "W:R16_5", "awaySlot": "W:R16_6", "date": "2026-07-11", "time": "16:00", "venue": "TBD" },
-        { "id": "QF_4", "round": "QF", "homeSlot": "W:R16_7", "awaySlot": "W:R16_8", "date": "2026-07-11", "time": "20:00", "venue": "TBD" }
+        { "id": "QF_1", "num":  97, "round": "QF", "homeSlot": "W:R16_1", "awaySlot": "W:R16_2", "date": "2026-07-09", "time": "16:00", "venue": "TBD" },
+        { "id": "QF_2", "num":  98, "round": "QF", "homeSlot": "W:R16_3", "awaySlot": "W:R16_4", "date": "2026-07-10", "time": "15:00", "venue": "TBD" },
+        { "id": "QF_3", "num":  99, "round": "QF", "homeSlot": "W:R16_5", "awaySlot": "W:R16_6", "date": "2026-07-11", "time": "17:00", "venue": "TBD" },
+        { "id": "QF_4", "num": 100, "round": "QF", "homeSlot": "W:R16_7", "awaySlot": "W:R16_8", "date": "2026-07-11", "time": "21:00", "venue": "TBD" }
       ]
     },
     "SF": {
       "name": "Semi-finals",
       "matches": [
-        { "id": "SF_1", "round": "SF", "homeSlot": "W:QF_1", "awaySlot": "W:QF_2", "date": "2026-07-14", "time": "20:00", "venue": "TBD" },
-        { "id": "SF_2", "round": "SF", "homeSlot": "W:QF_3", "awaySlot": "W:QF_4", "date": "2026-07-15", "time": "20:00", "venue": "TBD" }
+        { "id": "SF_1", "num": 101, "round": "SF", "homeSlot": "W:QF_1", "awaySlot": "W:QF_2", "date": "2026-07-14", "time": "15:00", "venue": "TBD" },
+        { "id": "SF_2", "num": 102, "round": "SF", "homeSlot": "W:QF_3", "awaySlot": "W:QF_4", "date": "2026-07-15", "time": "15:00", "venue": "TBD" }
       ]
     },
     "3P": {
       "name": "Third-place Play-off",
       "matches": [
-        { "id": "3P_1", "round": "3P", "homeSlot": "L:SF_1", "awaySlot": "L:SF_2", "date": "2026-07-18", "time": "15:00", "venue": "TBD" }
+        { "id": "3P_1", "num": 103, "round": "3P", "homeSlot": "L:SF_1", "awaySlot": "L:SF_2", "date": "2026-07-18", "time": "17:00", "venue": "TBD" }
       ]
     },
     "F": {
       "name": "Final",
       "matches": [
-        { "id": "F_1", "round": "F", "homeSlot": "W:SF_1", "awaySlot": "W:SF_2", "date": "2026-07-19", "time": "15:00", "venue": "New York / New Jersey" }
+        { "id": "F_1", "num": 104, "round": "F", "homeSlot": "W:SF_1", "awaySlot": "W:SF_2", "date": "2026-07-19", "time": "15:00", "venue": "New York / New Jersey" }
       ]
     }
   }
