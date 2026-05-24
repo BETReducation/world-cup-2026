@@ -170,13 +170,13 @@ function showGroup(groupKey) {
             <span class="flag fi fi-${home.flagCode}"></span>${home.name}
           </div>
           <div class="score-input">
-            <input type="number" min="0" max="20" value="${pred.home}" ${dis}
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.home}" ${dis}
               data-match="${m.id}" data-side="home" class="pred-input"
-              inputmode="numeric" aria-label="${home.name} goals">
+              autocomplete="off" aria-label="${home.name} goals">
             <span class="score-sep">–</span>
-            <input type="number" min="0" max="20" value="${pred.away}" ${dis}
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.away}" ${dis}
               data-match="${m.id}" data-side="away" class="pred-input"
-              inputmode="numeric" aria-label="${away.name} goals">
+              autocomplete="off" aria-label="${away.name} goals">
           </div>
           <div class="team-name right">
             ${away.name}<span class="flag fi fi-${away.flagCode}"></span>
@@ -210,6 +210,7 @@ function showGroup(groupKey) {
 // ── Input handler ─────────────────────────────────────────────────────────────
 
 function onPredInput(e) {
+  e.target.value = e.target.value.replace(/[^0-9]/g, '');
   const { match, side } = e.target.dataset;
   let val = e.target.value === '' ? '' : Math.max(0, Math.min(20, parseInt(e.target.value) || 0));
   if (e.target.value !== '' && val !== parseInt(e.target.value)) e.target.value = val;

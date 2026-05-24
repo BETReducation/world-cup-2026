@@ -232,13 +232,13 @@ function showRound(roundKey) {
           ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
         </div>
         <div class="score-input">
-          <input type="number" min="0" max="20" value="${pred.home}" ${dis}
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.home}" ${dis}
             data-match="${m.id}" data-side="home" class="ko-pred-input"
-            inputmode="numeric" aria-label="${homeName} goals">
+            autocomplete="off" aria-label="${homeName} goals">
           <span class="score-sep">–</span>
-          <input type="number" min="0" max="20" value="${pred.away}" ${dis}
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.away}" ${dis}
             data-match="${m.id}" data-side="away" class="ko-pred-input"
-            inputmode="numeric" aria-label="${awayName} goals">
+            autocomplete="off" aria-label="${awayName} goals">
           <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>
         </div>
         <div class="team-name right">
@@ -260,6 +260,7 @@ function showRound(roundKey) {
 // ── Input handler ─────────────────────────────────────────────────────────────
 
 function onPredInput(e) {
+  e.target.value = e.target.value.replace(/[^0-9]/g, '');
   const { match, side } = e.target.dataset;
   let val = e.target.value === '' ? '' : Math.max(0, Math.min(20, parseInt(e.target.value) || 0));
   if (e.target.value !== '' && val !== parseInt(e.target.value)) e.target.value = val;
