@@ -1257,8 +1257,8 @@ footer span {
   .save-bar .user-info { flex: 1; margin-right: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .save-status { display: none; }
 
-  /* Round heading: stack lock times vertically on mobile */
-  .round-heading { align-items: flex-start; justify-content: space-between; gap: 8px; }
+  /* Round heading: stack lock times vertically on mobile, centre label vertically */
+  .round-heading { align-items: center; justify-content: space-between; gap: 8px; }
   .round-heading::after { display: none; }
   .round-lock-list {
     flex-direction: column;
