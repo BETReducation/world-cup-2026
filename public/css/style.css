@@ -50,6 +50,9 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
+/* ── Font Awesome baseline fix ───────────────────────────────────────────── */
+i.fa-solid, i.fa-regular, i.fa-brands { vertical-align: -0.125em; }
+
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
 nav.site-nav {
   position: sticky;
