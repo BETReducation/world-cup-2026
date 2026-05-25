@@ -1331,3 +1331,11 @@ footer span {
   /* Single-column info grid on very small screens */
   .info-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Group tabs: keep all 12 on one row on wide screens ──────────────────── */
+/* At ≥1024px the section inner width is 960px+. Reducing horizontal padding  */
+/* from 14px→10px and gap from 6px→4px brings 12 buttons to ~949px total.    */
+@media (min-width: 1024px) {
+  #groupTabs { flex-wrap: nowrap; gap: 4px; }
+  #groupTabs .tab-btn { padding: 6px 10px; }
+}
