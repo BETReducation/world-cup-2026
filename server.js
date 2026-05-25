@@ -317,7 +317,16 @@ app.post('/api/predictions/:userId', (req, res) => {
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  const updated = { ...user.predictions };
+  // Build from scratch:
+  // 1. Always keep existing locked predictions (client cannot change or delete them)
+  const updated = {};
+  for (const [matchId, score] of Object.entries(user.predictions)) {
+    const round = getMatchRound(matchId, fixtures);
+    if (!round || isRoundLocked(round, fixtures)) {
+      updated[matchId] = score;
+    }
+  }
+  // 2. Write unlocked predictions from the request (absent = deleted, enabling reset)
   for (const [matchId, score] of Object.entries(predictions)) {
     const round = getMatchRound(matchId, fixtures);
     if (round && !isRoundLocked(round, fixtures)) {
