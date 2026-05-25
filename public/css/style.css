@@ -875,12 +875,9 @@ nav.site-nav {
   margin-top: 20px;
   z-index: 100;
 }
-.save-bar .user-info {
-  font-size: 12px;
-  color: var(--muted);
+.save-bar #clearBtn {
   margin-right: auto;
 }
-.save-bar .user-info strong { color: var(--accent); font-family: 'JetBrains Mono', monospace; }
 .save-status {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
@@ -1257,9 +1254,9 @@ footer span {
   /* Match meta */
   .match-meta { display: none; }
 
-  /* Save bar: single compact row */
-  .save-bar { flex-wrap: nowrap; gap: 8px; padding: 8px 12px; }
-  .save-bar .user-info { flex: 1; margin-right: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Save bar: clear button on top row, actions on bottom row */
+  .save-bar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .save-bar #clearBtn { width: 100%; margin-right: 0; justify-content: center; }
   .save-status { display: none; }
 
   /* Round heading: stack lock times vertically on mobile, centre label vertically */

@@ -98,6 +98,8 @@ async function loadAndRender() {
     $('playerName').textContent = 'Guest';
     $('saveBtn').textContent = 'Sign in to Save';
     $('saveBtn').onclick = () => { location.reload(); };
+  } else if (userId) {
+    $('clearBtn').style.display = 'inline-flex';
   }
 
   buildTabs();
@@ -286,6 +288,35 @@ $('saveBtn').addEventListener('click', async () => {
   } finally {
     $('saveBtn').disabled = false;
     $('saveBtn').textContent = 'Save Predictions';
+  }
+});
+
+// ── Clear all group stage predictions ────────────────────────────────────────
+
+$('clearBtn').addEventListener('click', async () => {
+  if (!fixtures) return;
+  if (!confirm('Remove all your Group Stage predictions? This cannot be undone.')) return;
+
+  // Delete only group stage match IDs, preserving any knockout predictions
+  Object.values(fixtures.groups).forEach(g =>
+    g.matches.forEach(m => delete userPredictions[m.id])
+  );
+
+  $('clearBtn').disabled = true;
+  $('clearBtn').textContent = 'Clearing…';
+  try {
+    await API.savePredictions(userId, userPredictions);
+    showGroup(activeGroup);
+    renderAllTables();
+    enterEditState();
+    $('saveStatus').textContent = '✓ Predictions cleared';
+    $('saveStatus').style.color = 'var(--red)';
+  } catch {
+    $('saveStatus').textContent = '✗ Clear failed';
+    $('saveStatus').style.color = 'var(--red)';
+  } finally {
+    $('clearBtn').disabled = false;
+    $('clearBtn').textContent = '🗑 Remove all Group Stage predictions';
   }
 });
 

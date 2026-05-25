@@ -112,7 +112,6 @@ $('browseBtn').addEventListener('click', async () => {
   await loadAndRender();
 });
 
-$('logoutBtn').addEventListener('click', () => { Session.clear(); location.reload(); });
 
 // ── Load & render ─────────────────────────────────────────────────────────────
 
@@ -145,10 +144,10 @@ async function loadAndRender() {
 
   if (browseMode) {
     $('playerName').textContent = 'Guest';
-    $('logoutBtn').textContent  = 'Sign in';
-    $('logoutBtn').onclick = () => location.reload();
     $('saveBtn').textContent  = 'Sign in to Save';
     $('saveBtn').onclick = () => location.reload();
+  } else if (userId) {
+    $('clearBtn').style.display = 'inline-flex';
   }
 
   buildTabs();
@@ -310,6 +309,34 @@ $('saveBtn').addEventListener('click', async () => {
   } finally {
     $('saveBtn').disabled    = false;
     $('saveBtn').textContent = 'Save Predictions';
+  }
+});
+
+// ── Clear all knockout predictions ───────────────────────────────────────────
+
+$('clearBtn').addEventListener('click', async () => {
+  if (!fixtures) return;
+  if (!confirm('Remove all your Knockout Stage predictions? This cannot be undone.')) return;
+
+  // Delete only knockout match IDs, preserving any group stage predictions
+  Object.values(fixtures.knockout || {}).forEach(round =>
+    (round.matches || []).forEach(m => delete koPredictions[m.id])
+  );
+
+  $('clearBtn').disabled = true;
+  $('clearBtn').textContent = 'Clearing…';
+  try {
+    await API.savePredictions(userId, koPredictions);
+    showRound(activeRound);
+    enterEditState();
+    $('saveStatus').textContent = '✓ Predictions cleared';
+    $('saveStatus').style.color = 'var(--red)';
+  } catch {
+    $('saveStatus').textContent = '✗ Clear failed';
+    $('saveStatus').style.color = 'var(--red)';
+  } finally {
+    $('clearBtn').disabled = false;
+    $('clearBtn').textContent = '🗑 Remove all Knockout Stage predictions';
   }
 });
 
