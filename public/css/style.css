@@ -989,7 +989,10 @@ nav.site-nav {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
 }
+.deadlines-table th:first-child,
+.deadlines-table td:first-child { width: 36%; word-break: break-word; }
 .deadlines-table th {
   text-align: left;
   padding: 8px 12px;
@@ -1005,8 +1008,8 @@ nav.site-nav {
   vertical-align: top;
 }
 .deadlines-table tr:last-child td { border-bottom: none; }
-.deadline-date { display: block; font-weight: 500; }
-.deadline-time { display: block; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent); margin-top: 1px; }
+.deadline-date { display: block; font-weight: 500; white-space: nowrap; }
+.deadline-time { display: block; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent); margin-top: 1px; white-space: nowrap; }
 .deadline-note { font-size: 11px; color: var(--muted); }
 .deadline-past td { opacity: 0.45; }
 .deadline-past td:first-child::after { content: ' · 🔒'; }
