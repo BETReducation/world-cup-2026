@@ -459,6 +459,9 @@ nav.site-nav {
   font-size: 8px;
   color: var(--accent);
 }
+/* On desktop, date and times stack as two block lines inside the meta column */
+.match-date { display: block; }
+.match-times { display: block; }
 .match-num {
   display: block;
   font-size: 9px;
@@ -1006,9 +1009,9 @@ nav.site-nav {
   vertical-align: top;
 }
 .deadlines-table tr:last-child td { border-bottom: none; }
-.deadline-day   { display: block; font-weight: 500; }
-.deadline-month { display: block; font-weight: 400; }
-.deadline-time  { display: block; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent); margin-top: 2px; }
+.deadline-day   { display: block; font-weight: 500; white-space: nowrap; }
+.deadline-month { display: block; font-weight: 400; white-space: nowrap; }
+.deadline-time  { display: block; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); margin-top: 2px; white-space: nowrap; }
 .deadline-note { font-size: 11px; color: var(--muted); }
 .deadline-past td { opacity: 0.45; }
 .deadline-past td:first-child::after { content: ' · 🔒'; }
@@ -1297,6 +1300,20 @@ footer span {
     justify-content: center;
     text-align: center;
   }
+  .match-row .match-meta {
+    order: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex: none;
+    width: 100%;
+    font-size: 9px;
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid var(--border);
+  }
+  .match-row .match-meta .match-times { text-align: right; display: block; }
   .match-row .team-name:not(.right) { order: 1; }
   .match-row .score-input           { order: 2; flex: none; }
   .match-row .team-name.right       { order: 3; }

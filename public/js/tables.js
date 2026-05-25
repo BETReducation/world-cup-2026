@@ -104,12 +104,15 @@ function fmtLockLines(isoStr) {
   ];
 }
 
-// Format a date + ET time string → date line + ET / UTC / VN time lines
+// Format a date + ET time string → two spans: match-date and match-times
+// On desktop these stack as blocks; on mobile (≤480px) they sit side-by-side via flex.
 function fmtDate(dateStr, timeStr) {
-  if (!dateStr) return 'Date TBD';
+  if (!dateStr) return '<span class="match-date">Date TBD</span><span class="match-times"></span>';
   const d = new Date(`${dateStr}T00:00:00`);
   const datePart = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-  if (!timeStr || timeStr === 'TBD') return `${datePart}<br>Time TBD`;
+  if (!timeStr || timeStr === 'TBD') {
+    return `<span class="match-date">${datePart}</span><span class="match-times">Time TBD</span>`;
+  }
   const [h, m] = timeStr.split(':').map(Number);
   const pad = n => String(n).padStart(2, '0');
   const fmtT = (mins) => {
@@ -117,5 +120,5 @@ function fmtDate(dateStr, timeStr) {
     return `${pad(Math.floor(mins / 60) % 24)}:${pad(mins % 60)}${nextDay}`;
   };
   const base = h * 60 + m;
-  return `${datePart}<br>${timeStr} ET<br>${fmtT(base + 240)} UTC<br>${fmtT(base + 660)} VN`;
+  return `<span class="match-date">${datePart}</span><span class="match-times">${timeStr} ET<br>${fmtT(base + 240)} UTC<br>${fmtT(base + 660)} VN</span>`;
 }
