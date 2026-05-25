@@ -120,5 +120,5 @@ function fmtDate(dateStr, timeStr) {
     return `${pad(Math.floor(mins / 60) % 24)}:${pad(mins % 60)}${nextDay}`;
   };
   const base = h * 60 + m;
-  return `<span class="match-date">${datePart}</span><span class="match-times">${timeStr} ET<br>${fmtT(base + 240)} UTC<br>${fmtT(base + 660)} VN</span>`;
+  return `<span class="match-date">${datePart}</span><span class="match-times"><span class="match-tz">${timeStr} ET</span><span class="match-tz">${fmtT(base + 240)} UTC</span><span class="match-tz">${fmtT(base + 660)} VN</span></span>`;
 }

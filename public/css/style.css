@@ -461,6 +461,8 @@ nav.site-nav {
   font-size: 8px;
   color: var(--accent);
 }
+/* Desktop: each timezone on its own line inside the 110px meta column */
+.match-tz { display: block; }
 .match-num {
   display: block;
   font-size: 9px;
@@ -1302,18 +1304,22 @@ footer span {
   .match-row .match-meta {
     order: 0;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
     flex: none;
     width: 100%;
     font-size: 9px;
+    gap: 2px;
     padding-bottom: 6px;
     margin-bottom: 2px;
     border-bottom: 1px solid var(--border);
   }
   .match-row .match-meta .match-num  { display: none; }
-  .match-row .match-meta .match-times { text-align: right; }
+  .match-row .match-meta .match-times {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .match-row .match-meta .match-tz { display: inline; }
   .match-row .team-name:not(.right) { order: 1; }
   .match-row .score-input           { order: 2; flex: none; }
   .match-row .team-name.right       { order: 3; }
