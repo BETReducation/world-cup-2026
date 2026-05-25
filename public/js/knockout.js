@@ -195,19 +195,20 @@ function showRound(roundKey) {
   const round  = fixtures.knockout?.[roundKey];
   if (!round) { panels.innerHTML = ''; return; }
 
-  const lock      = lockStatus[roundKey];
-  const locked    = lock?.locked || false;
-  let lockLabel = '';
+  const lock   = lockStatus[roundKey];
+  const locked = lock?.locked || false;
+  let lockHtml = '';
   if (locked) {
-    lockLabel = '🔒 Locked';
+    lockHtml = '<span class="lock-list-label">🔒 Predictions locked on:</span><span>🔒 Locked</span>';
   } else if (lock?.lockTime) {
-    lockLabel = `🔒 Closes · ${fmtLockTimezones(lock.lockTime)}`;
+    lockHtml = '<span class="lock-list-label">🔒 Predictions locked on:</span>' +
+      fmtLockLines(lock.lockTime).map(l => `<span>${l}</span>`).join('');
   }
 
   let html = `<div class="card">`;
   html += `<div class="ko-round-header">
     <span class="ko-round-title">${round.name || roundKey}</span>
-    ${lockLabel ? `<span class="ko-lock-info">${lockLabel}</span>` : ''}
+    ${lockHtml ? `<div class="ko-lock-info">${lockHtml}</div>` : ''}
   </div>`;
   html += `<div class="match-list">`;
 
