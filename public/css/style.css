@@ -450,6 +450,8 @@ nav.site-nav {
 
 .match-meta {
   flex: 0 0 110px;
+  display: flex;
+  flex-direction: column;
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   color: var(--muted);
@@ -459,9 +461,6 @@ nav.site-nav {
   font-size: 8px;
   color: var(--accent);
 }
-/* On desktop, date and times stack as two block lines inside the meta column */
-.match-date { display: block; }
-.match-times { display: block; }
 .match-num {
   display: block;
   font-size: 9px;
@@ -1302,7 +1301,6 @@ footer span {
   }
   .match-row .match-meta {
     order: 0;
-    display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
@@ -1313,7 +1311,8 @@ footer span {
     margin-bottom: 2px;
     border-bottom: 1px solid var(--border);
   }
-  .match-row .match-meta .match-times { text-align: right; display: block; }
+  .match-row .match-meta .match-num  { display: none; }
+  .match-row .match-meta .match-times { text-align: right; }
   .match-row .team-name:not(.right) { order: 1; }
   .match-row .score-input           { order: 2; flex: none; }
   .match-row .team-name.right       { order: 3; }
