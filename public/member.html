@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
   <style>
     /* ── Page layout ──────────────────────────────────────────────────────── */
     .member-page {
@@ -420,7 +421,7 @@
     <a href="knockout.html">Knockout Predictions</a>
     <a href="results.html">Results</a>
     <a href="member.html" id="navMemberLink" class="nav-member-link active" style="display:none;"></a>
-    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">☰</button>
   </div>
 </nav>
@@ -443,7 +444,7 @@
 
 <!-- Not logged in -->
 <div id="notLoggedIn">
-  <div class="not-auth-icon">🔒</div>
+  <div class="not-auth-icon"><i class="fa-solid fa-lock"></i></div>
   <div class="not-auth-title">Sign In to View Your Profile</div>
   <div class="not-auth-sub">You need to register or sign in to access your member area.</div>
   <a href="predictions.html" class="btn btn-primary" style="margin-top: 8px;">Go to Predictions →</a>
@@ -613,12 +614,12 @@
   const html = document.documentElement;
   const saved = localStorage.getItem('wc26_theme') || 'dark';
   html.dataset.theme = saved;
-  toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+  toggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   toggle.addEventListener('click', () => {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next;
     localStorage.setItem('wc26_theme', next);
-    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+    toggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   });
 </script>
 <script src="js/auth.js"></script>
@@ -643,7 +644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Show nav member link immediately
   const navLink = document.getElementById('navMemberLink');
   if (navLink) {
-    navLink.textContent = '👤 ' + session.name;
+    navLink.innerHTML = '<i class="fa-solid fa-user"></i> ' + session.name;
     navLink.style.display = 'flex';
   }
 
@@ -683,9 +684,12 @@ function populateHero(data) {
 
   const rank = data.stats.rank;
   const total = data.stats.totalPlayers;
-  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '🏅';
+  const medalIcon = rank === 1 ? '<i class="fa-solid fa-medal" style="color:var(--gold)"></i>'
+                  : rank === 2 ? '<i class="fa-solid fa-medal" style="color:#a0a5b0"></i>'
+                  : rank === 3 ? '<i class="fa-solid fa-medal" style="color:#c77d2e"></i>'
+                  : '<i class="fa-solid fa-medal" style="color:var(--muted)"></i>';
   const suffix = rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th';
-  document.getElementById('rankPill').textContent = `${medal} ${rank}${suffix} of ${total}`;
+  document.getElementById('rankPill').innerHTML = `${medalIcon} ${rank}${suffix} of ${total}`;
 
   const playedPreds = Object.keys(data.matchPoints || {}).length;
   if (playedPreds > 0) {
@@ -944,7 +948,7 @@ async function runConfirmedAction() {
       bioEl.style.display = pendingAction.bio ? 'block' : 'none';
       localStorage.setItem('wc2026_name', pendingAction.value);
       const navLink = document.getElementById('navMemberLink');
-      if (navLink) navLink.textContent = '👤 ' + pendingAction.value;
+      if (navLink) navLink.innerHTML = '<i class="fa-solid fa-user"></i> ' + pendingAction.value;
       showToast('Profile saved', 'ok');
       closeConfirm();
     } catch (e) {

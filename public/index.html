@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
 </head>
 <body>
 
@@ -19,7 +20,7 @@
     <a href="knockout.html">Knockout Predictions</a>
     <a href="results.html">Results</a>
     <a href="member.html" id="navMemberLink" class="nav-member-link" style="display:none;"></a>
-    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">☰</button>
   </div>
 </nav>
@@ -41,7 +42,7 @@
 </nav>
 
 <div class="hero">
-  <div class="hero-tag">⚽ USA · Canada · Mexico · June 2026</div>
+  <div class="hero-tag"><i class="fa-regular fa-futbol"></i> USA · Canada · Mexico · June 2026</div>
   <h1>Pick your scores.<br><span>Top the table.</span></h1>
   <p>Enter predicted scores for all 72 group-stage matches. Your group tables update live as you type, and a full leaderboard tracks who's closest when the real results come in. The knockout stages open up when the teams have been decided for each fixture.</p>
   <div class="hero-cta">
@@ -61,37 +62,37 @@
   <div class="info-grid">
 
     <div class="info-tile">
-      <div class="tile-icon">🔒</div>
+      <div class="tile-icon"><i class="fa-solid fa-lock"></i></div>
       <h3>Group Stages</h3>
       <p>All Round 1 picks must be in before the first kick-off. Same rule applies to Rounds 2 &amp; 3 — once the whistle blows, that round is locked.</p>
     </div>
 
     <div class="info-tile">
-      <div class="tile-icon">🎯</div>
+      <div class="tile-icon"><i class="fa-solid fa-bullseye"></i></div>
       <h3>Points System</h3>
       <p><strong>3 pts</strong> for the correct result (win/draw/loss).<br><strong>+2 bonus pts</strong> for the exact scoreline. Nothing for a wrong result.</p>
     </div>
 
     <div class="info-tile">
-      <div class="tile-icon">💰</div>
+      <div class="tile-icon"><i class="fa-solid fa-circle-check"></i></div>
       <h3>Entry Submission</h3>
       <p>Contact Gary for more info.</p>
     </div>
 
     <div class="info-tile">
-      <div class="tile-icon">📊</div>
+      <div class="tile-icon"><i class="fa-solid fa-table-columns"></i></div>
       <h3>Predicted Tables</h3>
       <p>Your group-stage predictions automatically generate live league tables — see how your picks play out before a ball is kicked.</p>
     </div>
 
     <div class="info-tile">
-      <div class="tile-icon">👥</div>
+      <div class="tile-icon"><i class="fa-solid fa-users"></i></div>
       <h3>Compare Predictions</h3>
       <p>The Results page shows every player's prediction next to each actual score, with points earned per match.</p>
     </div>
 
     <div class="info-tile">
-      <div class="tile-icon">🏆</div>
+      <div class="tile-icon"><i class="fa-solid fa-trophy"></i></div>
       <h3>Knockout Stage</h3>
       <p>Group-stage predictions come first. Knockout picks open once the fixtures have both teams decided.</p>
     </div>
@@ -164,12 +165,12 @@
   const html = document.documentElement;
   const saved = localStorage.getItem('wc26_theme') || 'dark';
   html.dataset.theme = saved;
-  toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+  toggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   toggle.addEventListener('click', () => {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next;
     localStorage.setItem('wc26_theme', next);
-    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+    toggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   });
 </script>
 <script>

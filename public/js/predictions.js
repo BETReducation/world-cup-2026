@@ -148,9 +148,9 @@ function showGroup(groupKey) {
     const lockTime = lockStatus[round]?.lockTime;
     let lockHtml = '';
     if (locked) {
-      lockHtml = '<span class="lock-list-label">🔒 Predictions locked on:</span><span>🔒 Locked</span>';
+      lockHtml = '<span class="lock-list-label"><i class="fa-solid fa-lock"></i> Predictions locked on:</span><span><i class="fa-solid fa-lock"></i> Locked</span>';
     } else if (lockTime) {
-      lockHtml = '<span class="lock-list-label">🔒 Predictions locked on:</span>' + fmtLockLines(lockTime).map(l => `<span>${l}</span>`).join('');
+      lockHtml = '<span class="lock-list-label"><i class="fa-solid fa-lock"></i> Predictions locked on:</span>' + fmtLockLines(lockTime).map(l => `<span>${l}</span>`).join('');
     }
 
     html += `<div class="round-heading">

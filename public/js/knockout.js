@@ -198,9 +198,9 @@ function showRound(roundKey) {
   const locked = lock?.locked || false;
   let lockHtml = '';
   if (locked) {
-    lockHtml = '<span class="lock-list-label">🔒 Predictions locked on:</span><span>🔒 Locked</span>';
+    lockHtml = '<span class="lock-list-label"><i class="fa-solid fa-lock"></i> Predictions locked on:</span><span><i class="fa-solid fa-lock"></i> Locked</span>';
   } else if (lock?.lockTime) {
-    lockHtml = '<span class="lock-list-label">🔒 Predictions locked on:</span>' +
+    lockHtml = '<span class="lock-list-label"><i class="fa-solid fa-lock"></i> Predictions locked on:</span>' +
       fmtLockLines(lock.lockTime).map(l => `<span>${l}</span>`).join('');
   }
 

@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (userId && name) {
     // ── Logged in ─────────────────────────────────────────────────────────────
-    link.textContent   = '👤 ' + name;
+    link.innerHTML     = '<i class="fa-solid fa-user"></i> ' + name;
     link.href          = 'member.html?id=' + userId;
     link.style.display = 'flex';
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Drawer footer: profile link + logout
     if (drawerFooter) {
       const profileLink = document.createElement('a');
-      profileLink.textContent = '👤 ' + name;
+      profileLink.innerHTML = '<i class="fa-solid fa-user"></i> ' + name;
       profileLink.href        = 'member.html?id=' + userId;
       profileLink.addEventListener('click', closeDrawer);
 
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.insertAdjacentHTML('beforeend', `
       <div class="modal-overlay" id="navAuthModal">
         <div class="modal">
-          <h2>⚽ Sign in</h2>
+          <h2><i class="fa-regular fa-futbol"></i> Sign in</h2>
           <p>Enter your name and 4-digit PIN. New here? A new account will be created automatically.</p>
           <div id="navAuthError" class="error-msg hidden"></div>
           <div class="form-group">

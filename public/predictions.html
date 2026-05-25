@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
 </head>
 <body>
@@ -20,7 +21,7 @@
     <a href="knockout.html">Knockout Predictions</a>
     <a href="results.html">Results</a>
     <a href="member.html" id="navMemberLink" class="nav-member-link" style="display:none;"></a>
-    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">☰</button>
   </div>
 </nav>
@@ -44,7 +45,7 @@
 <!-- Registration modal -->
 <div class="modal-overlay" id="registerModal">
   <div class="modal">
-    <h2>⚽ Join the League</h2>
+    <h2><i class="fa-regular fa-futbol"></i> Join the League</h2>
     <p>Enter your name and a 4-digit PIN. Use the same name and PIN each time you return to edit your predictions.</p>
     <div id="registerError" class="error-msg hidden"></div>
     <div class="form-group">
@@ -84,7 +85,7 @@
       <span id="playerName" style="display:none;"></span>
       <button class="btn btn-danger btn-sm" id="clearBtn" style="display:none;">Reset Predictions</button>
       <span class="save-status" id="saveStatus"></span>
-      <button class="btn btn-outline" id="editBtn" style="display:none;">✏️ Edit Predictions</button>
+      <button class="btn btn-outline" id="editBtn" style="display:none;"><i class="fa-solid fa-pencil"></i> Edit Predictions</button>
       <button class="btn btn-primary" id="saveBtn">Save Predictions</button>
     </div>
   </div>
@@ -110,12 +111,12 @@
   const html = document.documentElement;
   const saved = localStorage.getItem('wc26_theme') || 'dark';
   html.dataset.theme = saved;
-  toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+  toggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   toggle.addEventListener('click', () => {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next;
     localStorage.setItem('wc26_theme', next);
-    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+    toggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   });
 </script>
 <script src="js/auth.js"></script>

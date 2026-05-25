@@ -310,6 +310,7 @@ nav.site-nav {
   font-size: 16px;
   margin-bottom: 12px;
 }
+.info-tile .tile-icon i { color: var(--accent); }
 
 .info-tile h3 {
   font-family: 'Outfit', sans-serif;

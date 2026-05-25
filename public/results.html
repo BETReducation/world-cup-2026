@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
 </head>
 <body>
@@ -20,7 +21,7 @@
     <a href="knockout.html">Knockout Predictions</a>
     <a href="results.html" class="active">Results</a>
     <a href="member.html" id="navMemberLink" class="nav-member-link" style="display:none;"></a>
-    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">☰</button>
   </div>
 </nav>
@@ -44,7 +45,7 @@
 <!-- Admin login modal -->
 <div class="modal-overlay" id="adminModal">
   <div class="modal">
-    <h2>🔑 Admin Login</h2>
+    <h2><i class="fa-solid fa-key"></i> Admin Login</h2>
     <p>Enter the admin password to record or edit match results.</p>
     <div id="adminError" class="error-msg hidden"></div>
     <div class="form-group">
@@ -82,15 +83,15 @@
         <button class="btn btn-outline btn-sm" id="backupBtn">⬇ Backup</button>
         <label class="btn btn-outline btn-sm" for="restoreInput">⬆ Restore</label>
         <input type="file" id="restoreInput" accept=".json" style="display:none">
-        <button class="btn btn-outline btn-sm btn-danger" id="clearResultsBtn">🗑 Clear Results</button>
+        <button class="btn btn-outline btn-sm btn-danger" id="clearResultsBtn"><i class="fa-solid fa-trash"></i> Clear Results</button>
         <span id="restoreStatus" style="font-size:0.8rem;"></span>
       </div>
-      <button class="btn btn-outline btn-sm" id="adminToggleBtn">🔑 Admin Mode</button>
+      <button class="btn btn-outline btn-sm" id="adminToggleBtn"><i class="fa-solid fa-key"></i> Admin Mode</button>
     </div>
 
     <!-- Leaderboard -->
     <div class="card" id="leaderboardCard">
-      <h2>🏆 Prediction Leaderboard</h2>
+      <h2><i class="fa-solid fa-trophy"></i> Prediction Leaderboard</h2>
       <p class="card-desc">Points update automatically as results are recorded.</p>
       <div id="leaderboardContent">
         <p class="card-desc">No results recorded yet.</p>
@@ -117,12 +118,12 @@
   const html = document.documentElement;
   const saved = localStorage.getItem('wc26_theme') || 'dark';
   html.dataset.theme = saved;
-  toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+  toggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   toggle.addEventListener('click', () => {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next;
     localStorage.setItem('wc26_theme', next);
-    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+    toggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
   });
 </script>
 <script src="js/auth.js"></script>

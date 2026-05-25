@@ -41,7 +41,7 @@ $('adminToggleBtn').addEventListener('click', () => {
     isAdmin = false;
     adminPassword = null;
     $('adminLabel').textContent     = '';
-    $('adminToggleBtn').textContent = '🔑 Admin Mode';
+    $('adminToggleBtn').innerHTML = '<i class="fa-solid fa-key"></i> Admin Mode';
     $('adminBackup').classList.add('hidden');
     if (activeKoRound) showKoRound(activeKoRound); else showGroup(activeGroup);
   } else {
@@ -264,7 +264,7 @@ function showKoRound(roundKey) {
   const lock      = lockStatus[roundKey];
   const locked    = lock?.locked || false;
   const lockLabel = locked
-    ? '🔒 Locked'
+    ? '<i class="fa-solid fa-lock"></i> Locked'
     : lock?.lockTime
       ? `Locks · ${fmtLockTimezones(lock.lockTime)}`
       : '';
@@ -415,7 +415,11 @@ async function renderLeaderboard() {
   const predsByUser = {};
   allPredictions.forEach(u => { predsByUser[u.id] = u.predictions || {}; });
 
-  const medals = ['🥇', '🥈', '🥉'];
+  const medals = [
+    '<i class="fa-solid fa-medal" style="color:var(--gold)"></i>',
+    '<i class="fa-solid fa-medal" style="color:#a0a5b0"></i>',
+    '<i class="fa-solid fa-medal" style="color:#c77d2e"></i>'
+  ];
   const rows = board.map((p, i) => {
     const preds = predsByUser[p.id] || {};
 
