@@ -1008,8 +1008,9 @@ nav.site-nav {
   vertical-align: top;
 }
 .deadlines-table tr:last-child td { border-bottom: none; }
-.deadline-date { display: block; font-weight: 500; }
-.deadline-time { display: block; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent); margin-top: 1px; }
+.deadline-day   { display: block; font-weight: 500; }
+.deadline-month { display: block; font-weight: 400; }
+.deadline-time  { display: block; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent); margin-top: 2px; }
 .deadline-note { font-size: 11px; color: var(--muted); }
 .deadline-past td { opacity: 0.45; }
 .deadline-past td:first-child::after { content: ' · 🔒'; }
