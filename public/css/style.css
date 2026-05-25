@@ -1265,6 +1265,16 @@ footer span {
   .round-lock-list span + span::before { content: none; }
   .lock-list-label::after { content: none; margin-right: 0; }
 
+  /* Round heading: tighten top margin on mobile */
+  .round-heading { margin-top: 12px; }
+
+  /* Comparison panel: scrollable on mobile instead of clipping */
+  .comparison-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .comparison-panel table { min-width: 260px; }
+
+  /* Deadline times: slightly smaller on mobile to prevent wrapping */
+  .deadline-time { font-size: 11px; }
+
   /* Footer */
   footer { flex-direction: column; gap: 6px; text-align: center; padding: 20px 1rem; }
 

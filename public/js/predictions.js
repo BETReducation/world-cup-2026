@@ -152,7 +152,7 @@ function showGroup(groupKey) {
     }
 
     html += `<div class="round-heading">
-      <span class="round-label">Round ${round}</span>
+      <span class="round-label">Round ${round} – Predictions</span>
       <div class="round-lock-list">${lockHtml}</div>
     </div>`;
     html += `<div class="match-list">`;

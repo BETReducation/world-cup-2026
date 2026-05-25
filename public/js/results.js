@@ -228,7 +228,7 @@ function showGroup(groupKey) {
   html += `</div>`;
 
   html += `
-    <div>
+    <div class="table-scroll-wrap">
       <p class="table-heading">Group ${groupKey} Table</p>
       <div id="actualTable_${groupKey}"></div>
     </div>`;
