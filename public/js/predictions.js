@@ -291,32 +291,47 @@ $('saveBtn').addEventListener('click', async () => {
   }
 });
 
-// ── Clear all group stage predictions ────────────────────────────────────────
+// ── Reset unlocked group stage predictions ───────────────────────────────────
 
 $('clearBtn').addEventListener('click', async () => {
   if (!fixtures) return;
-  if (!confirm('Remove all your Group Stage predictions? This cannot be undone.')) return;
 
-  // Delete only group stage match IDs, preserving any knockout predictions
-  Object.values(fixtures.groups).forEach(g =>
-    g.matches.forEach(m => delete userPredictions[m.id])
-  );
+  // Collect match IDs whose round is not yet locked
+  const toDelete = [];
+  Object.values(fixtures.groups).forEach(g => {
+    const byRound = {};
+    g.matches.forEach(m => (byRound[m.round] = byRound[m.round] || []).push(m));
+    Object.entries(byRound).forEach(([round, matches]) => {
+      if (!lockStatus[round]?.locked) {
+        matches.forEach(m => toDelete.push(m.id));
+      }
+    });
+  });
+
+  if (toDelete.length === 0) {
+    alert('All rounds are locked — there are no predictions to reset.');
+    return;
+  }
+
+  if (!confirm(`Reset predictions for ${toDelete.length} unlocked match${toDelete.length === 1 ? '' : 'es'}? Locked rounds will not be affected.`)) return;
+
+  toDelete.forEach(id => delete userPredictions[id]);
 
   $('clearBtn').disabled = true;
-  $('clearBtn').textContent = 'Clearing…';
+  $('clearBtn').textContent = 'Resetting…';
   try {
     await API.savePredictions(userId, userPredictions);
     showGroup(activeGroup);
     renderAllTables();
     enterEditState();
-    $('saveStatus').textContent = '✓ Predictions cleared';
-    $('saveStatus').style.color = 'var(--red)';
+    $('saveStatus').textContent = '✓ Predictions reset';
+    $('saveStatus').style.color = 'var(--accent)';
   } catch {
-    $('saveStatus').textContent = '✗ Clear failed';
+    $('saveStatus').textContent = '✗ Reset failed';
     $('saveStatus').style.color = 'var(--red)';
   } finally {
     $('clearBtn').disabled = false;
-    $('clearBtn').textContent = '🗑 Remove all Group Stage predictions';
+    $('clearBtn').textContent = 'Reset Predictions';
   }
 });
 

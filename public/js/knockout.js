@@ -312,31 +312,42 @@ $('saveBtn').addEventListener('click', async () => {
   }
 });
 
-// ── Clear all knockout predictions ───────────────────────────────────────────
+// ── Reset unlocked knockout predictions ──────────────────────────────────────
 
 $('clearBtn').addEventListener('click', async () => {
   if (!fixtures) return;
-  if (!confirm('Remove all your Knockout Stage predictions? This cannot be undone.')) return;
 
-  // Delete only knockout match IDs, preserving any group stage predictions
-  Object.values(fixtures.knockout || {}).forEach(round =>
-    (round.matches || []).forEach(m => delete koPredictions[m.id])
-  );
+  // Collect match IDs whose round is not yet locked
+  const toDelete = [];
+  Object.entries(fixtures.knockout || {}).forEach(([roundKey, round]) => {
+    if (!lockStatus[roundKey]?.locked) {
+      (round.matches || []).forEach(m => toDelete.push(m.id));
+    }
+  });
+
+  if (toDelete.length === 0) {
+    alert('All rounds are locked — there are no predictions to reset.');
+    return;
+  }
+
+  if (!confirm(`Reset predictions for ${toDelete.length} unlocked match${toDelete.length === 1 ? '' : 'es'}? Locked rounds will not be affected.`)) return;
+
+  toDelete.forEach(id => delete koPredictions[id]);
 
   $('clearBtn').disabled = true;
-  $('clearBtn').textContent = 'Clearing…';
+  $('clearBtn').textContent = 'Resetting…';
   try {
     await API.savePredictions(userId, koPredictions);
     showRound(activeRound);
     enterEditState();
-    $('saveStatus').textContent = '✓ Predictions cleared';
-    $('saveStatus').style.color = 'var(--red)';
+    $('saveStatus').textContent = '✓ Predictions reset';
+    $('saveStatus').style.color = 'var(--accent)';
   } catch {
-    $('saveStatus').textContent = '✗ Clear failed';
+    $('saveStatus').textContent = '✗ Reset failed';
     $('saveStatus').style.color = 'var(--red)';
   } finally {
     $('clearBtn').disabled = false;
-    $('clearBtn').textContent = '🗑 Remove all Knockout Stage predictions';
+    $('clearBtn').textContent = 'Reset Predictions';
   }
 });
 
