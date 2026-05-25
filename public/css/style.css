@@ -413,8 +413,9 @@ nav.site-nav {
   flex: 1;
   height: 1px;
   background: var(--border);
+  order: 1;   /* sit between label (0) and lock-list (2) */
 }
-.round-label { flex-shrink: 0; }
+.round-label { flex-shrink: 0; /* default order: 0 */ }
 /* Lock times: stacked column, right-aligned (desktop and mobile) */
 .round-lock-list {
   display: flex;
@@ -426,6 +427,7 @@ nav.site-nav {
   font-size: 10px;
   letter-spacing: 0;
   text-transform: none;
+  order: 2;   /* pushed to right edge by the flex:1 ::after before it */
 }
 .round-lock-list span { white-space: nowrap; }
 .lock-list-label { opacity: 0.6; }
