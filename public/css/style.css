@@ -415,18 +415,18 @@ nav.site-nav {
   background: var(--border);
 }
 .round-label { flex-shrink: 0; }
-/* Desktop: lock times shown inline with · separators */
+/* Lock times: stacked column, right-aligned (desktop and mobile) */
 .round-lock-list {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
   flex-shrink: 0;
-  gap: 0;
+  gap: 2px;
   font-size: 10px;
   letter-spacing: 0;
   text-transform: none;
 }
-.round-lock-list span + span::before { content: ' · '; }
 .round-lock-list span { white-space: nowrap; }
 .lock-list-label { opacity: 0.6; }
 
@@ -1256,19 +1256,11 @@ footer span {
 
   /* Save bar: clear button on top row, actions on bottom row */
   .save-bar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
-  .save-bar #clearBtn { width: 100%; margin-right: 0; justify-content: center; }
   .save-status { display: none; }
 
-  /* Round heading: stack lock times vertically on mobile, centre label vertically */
+  /* Round heading on mobile: centre label vertically, hide the ::after line */
   .round-heading { align-items: center; justify-content: space-between; gap: 8px; }
   .round-heading::after { display: none; }
-  .round-lock-list {
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-    gap: 2px;
-  }
-  .round-lock-list span + span::before { content: none; }
 
   /* Round heading: tighten top margin on mobile */
   .round-heading { margin-top: 12px; }
