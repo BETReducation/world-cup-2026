@@ -90,6 +90,10 @@ const API = {
     const { token } = Session.load();
     return API.post('/api/admin/reset-all-users', {}, null, token);
   },
+  reinstateCode(code) {
+    const { token } = Session.load();
+    return API.post('/api/access-codes/reinstate', { code }, null, token);
+  },
   adminBackup(pwd = null) {
     const { token } = Session.load();
     const headers = {};

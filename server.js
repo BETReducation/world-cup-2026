@@ -473,6 +473,21 @@ app.get('/api/access-codes', requireAdmin, (req, res) => {
   res.json(readJSON(ACCESS_CODES_FILE, { codes: [] }).codes);
 });
 
+// Reinstate (un-use) a specific access code (admin only)
+app.post('/api/access-codes/reinstate', requireAdmin, (req, res) => {
+  const code = sanitise(req.body.code || '', 100);
+  if (!code) return res.status(400).json({ error: 'Code required.' });
+  const codesData = readJSON(ACCESS_CODES_FILE, { codes: [] });
+  const codesArr  = Array.isArray(codesData.codes) ? codesData.codes : [];
+  const entry     = codesArr.find(c => c.code.toLowerCase() === code.toLowerCase());
+  if (!entry) return res.status(404).json({ error: 'Code not found.' });
+  entry.used   = false;
+  entry.usedBy = null;
+  entry.usedAt = null;
+  writeJSON(ACCESS_CODES_FILE, codesData);
+  res.json({ ok: true });
+});
+
 // ── Fixtures ───────────────────────────────────────────────────────────────────
 
 app.get('/api/fixtures', (req, res) => {

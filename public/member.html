@@ -1109,30 +1109,47 @@ async function loadAccessCodes() {
     if (!codes || !codes.length) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;">No codes found.</p>'; return; }
     const available = codes.filter(c => !c.used).length;
     el.innerHTML = `
-      <p class="codes-summary">${available} of ${codes.length} codes available</p>
-      <table class="code-table">
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Status</th>
-            <th>Copy</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${codes.map(c => `
-            <tr>
-              <td><span class="code-name${c.used ? ' used' : ''}">${c.code}</span></td>
-              <td>${c.used
-                ? '<span class="code-used-label">Used</span>'
-                : '<span class="code-available">Available</span>'}</td>
-              <td>${!c.used
-                ? `<button class="btn-copy" onclick="copyCode('${c.code.replace(/'/g, "\\'")}')"><i class="fa-regular fa-copy"></i> Copy</button>`
-                : ''}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
+      <div class="group-accordion" style="border-radius:var(--radius-sm);">
+        <button class="group-toggle" onclick="toggleGroup(this)">
+          <span>${available} of ${codes.length} codes available</span>
+          <span class="chevron">▾</span>
+        </button>
+        <div class="group-body">
+          <table class="code-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${codes.map(c => `
+                <tr>
+                  <td><span class="code-name${c.used ? ' used' : ''}">${c.code}</span></td>
+                  <td>${c.used
+                    ? '<span class="code-used-label">Used</span>'
+                    : '<span class="code-available">Available</span>'}</td>
+                  <td>${c.used
+                    ? `<button class="btn-copy" onclick="reinstateCode('${c.code.replace(/'/g, "\\'")}')"><i class="fa-solid fa-rotate-left"></i> Reinstate</button>`
+                    : `<button class="btn-copy" onclick="copyCode('${c.code.replace(/'/g, "\\'")}')"><i class="fa-regular fa-copy"></i> Copy</button>`}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
   } catch (e) {
     el.innerHTML = '<p style="color:var(--red);font-size:13px;">Could not load access codes.</p>';
+  }
+}
+
+async function reinstateCode(code) {
+  try {
+    await API.reinstateCode(code);
+    showToast(`✓ "${code}" reinstated`, 'ok');
+    await loadAccessCodes();
+  } catch {
+    showToast('Failed to reinstate code', 'err');
   }
 }
 
