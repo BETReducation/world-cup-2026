@@ -34,8 +34,8 @@ async function init() {
     const me = await API.me();
     if (me.isAdmin) {
       isAdmin = true;
-      $('adminLabel').textContent   = '✓ Admin active';
-      $('adminToggleBtn').innerHTML = 'Exit Admin';
+      $('adminLabel').textContent    = '✓ Admin active';
+      $('adminToggleBtn').style.display = 'none';
       $('adminBackup').classList.remove('hidden');
     }
   } catch {}
@@ -98,22 +98,7 @@ $('adminLoginBtn').addEventListener('click', async () => {
 $('adminCancelBtn').addEventListener('click', () => $('adminModal').classList.remove('open'));
 $('adminPwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('adminLoginBtn').click(); });
 
-// ── Backup / Restore ──────────────────────────────────────────────────────────
-
-$('backupBtn').addEventListener('click', async () => {
-  try {
-    const res = await API.adminBackup(adminPassword);
-    if (!res.ok) { alert('Backup failed'); return; }
-    const blob = await res.blob();
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    const date = new Date().toISOString().slice(0, 10);
-    a.href     = url;
-    a.download = `wc2026-backup-${date}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  } catch { alert('Backup failed'); }
-});
+// ── Clear Results ─────────────────────────────────────────────────────────────
 
 $('clearResultsBtn').addEventListener('click', async () => {
   if (!confirm('Clear ALL results? This cannot be undone.')) return;
@@ -129,26 +114,6 @@ $('clearResultsBtn').addEventListener('click', async () => {
     status.textContent = '✗ Failed to clear results';
     status.style.color = 'var(--red)';
   }
-});
-
-$('restoreInput').addEventListener('change', async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const status = $('restoreStatus');
-  status.textContent = 'Restoring…';
-  status.style.color = 'var(--text-muted)';
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    await API.adminRestore(data, adminPassword);
-    status.textContent = '✓ Restored — reloading…';
-    status.style.color = 'var(--accent)';
-    setTimeout(() => location.reload(), 1200);
-  } catch {
-    status.textContent = '✗ Restore failed — invalid file?';
-    status.style.color = 'var(--red)';
-  }
-  e.target.value = '';
 });
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────

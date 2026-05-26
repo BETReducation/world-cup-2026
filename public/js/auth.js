@@ -44,6 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!link) return;
 
   if (userId && name) {
+    // ── Logout helpers (defined before first use) ─────────────────────────
+    const performLogout = async () => {
+      try { await API.logout(); } catch {}
+      Session.clear();
+      location.reload();
+    };
+
+    const doLogout = () => {
+      const modal = document.getElementById('logoutModal');
+      if (modal) modal.classList.add('open');
+      else performLogout();
+    };
+
     // ── Logged in ────────────────────────────────────────────────────────────
     link.innerHTML     = '<i class="fa-solid fa-user"></i> ' + name;
     link.href          = 'member.html?id=' + userId;
@@ -269,15 +282,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function doLogout() {
-    const modal = document.getElementById('logoutModal');
-    if (modal) modal.classList.add('open');
-    else performLogout();
-  }
-
-  async function performLogout() {
-    await API.logout();
-    Session.clear();
-    location.reload();
-  }
 });
