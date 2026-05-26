@@ -115,12 +115,16 @@ if (process.env.RESEND_API_KEY) {
     host: 'smtp.resend.com',
     port: 465,
     secure: true,
-    auth: { user: 'resend', pass: process.env.RESEND_API_KEY }
+    auth: { user: 'resend', pass: process.env.RESEND_API_KEY },
+    connectionTimeout: 10000,
+    socketTimeout:     10000
   });
 } else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
   mailer = nodemailer.createTransport({
     service: 'gmail',
-    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD }
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+    connectionTimeout: 10000,
+    socketTimeout:     10000
   });
 }
 
@@ -681,8 +685,7 @@ app.post('/api/forgot-password', async (req, res) => {
     await sendPasswordResetEmail(user.email, user.displayName || user.name, resetLink);
   } catch (err) {
     console.error('Password reset email failed:', err.message);
-    if (!emailEnabled)
-      return res.status(503).json({ error: 'Email is not configured on this server. Please contact the admin.' });
+    return res.status(503).json({ error: 'Could not send the reset email — please try again in a moment, or contact the admin.' });
   }
 
   res.json({ ok: true });
