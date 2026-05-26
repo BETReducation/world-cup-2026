@@ -103,24 +103,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Email ──────────────────────────────────────────────────────────────────────
 // Provider priority (first one configured wins):
-//   1. Resend  — set RESEND_API_KEY  (recommended; free at resend.com)
+//   1. Resend  — set RESEND_API_KEY  (uses HTTPS API, not SMTP — works on Railway)
 //   2. Gmail   — set GMAIL_USER + GMAIL_APP_PASSWORD  (requires App Password)
 // Also set APP_URL to your public URL so reset links work.
+// Set MAIL_FROM to override the sender address (e.g. "WC26 <admin@wc26.win>").
 
 const emailEnabled = !!(process.env.RESEND_API_KEY || (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD));
 
-let mailer = null;
-if (process.env.RESEND_API_KEY) {
-  mailer = nodemailer.createTransport({
-    host: 'smtp.resend.com',
-    port: 465,
-    secure: true,
-    auth: { user: 'resend', pass: process.env.RESEND_API_KEY },
-    connectionTimeout: 10000,
-    socketTimeout:     10000
-  });
-} else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-  mailer = nodemailer.createTransport({
+// Gmail fallback only — Resend uses its HTTP API directly (no SMTP needed)
+let gmailMailer = null;
+if (!process.env.RESEND_API_KEY && process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+  gmailMailer = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
     connectionTimeout: 10000,
@@ -128,7 +121,6 @@ if (process.env.RESEND_API_KEY) {
   });
 }
 
-// Sender address: use MAIL_FROM env var, or auto-pick a sensible default
 function getFromAddress() {
   if (process.env.MAIL_FROM) return process.env.MAIL_FROM;
   if (process.env.RESEND_API_KEY) return '"WC26 Prediction League" <onboarding@resend.dev>';
@@ -136,23 +128,57 @@ function getFromAddress() {
   return '"WC26 Prediction League" <noreply@example.com>';
 }
 
+const EMAIL_TEXT = (name, resetLink) =>
+  `Hi ${name},\n\nWe received a request to reset your WC26 Prediction League password.\n\nClick the link below to set a new password. This link expires in 1 hour.\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email.\n\n— WC26 Prediction League`;
+
+const EMAIL_HTML = (name, resetLink) => `
+  <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#0b0f1a;color:#e2e8f4;border-radius:12px;">
+    <h2 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#4dc97a;">WC26 Prediction League</h2>
+    <p style="margin:0 0 20px;color:#6b7a99;font-size:14px;">Password reset request</p>
+    <p style="margin:0 0 16px;">Hi <strong>${name}</strong>,</p>
+    <p style="margin:0 0 24px;color:#a0aec0;">We received a request to reset your password. Click the button below — the link expires in <strong>1 hour</strong>.</p>
+    <a href="${resetLink}" style="display:inline-block;padding:12px 28px;background:#4dc97a;color:#0b0f1a;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Reset my password →</a>
+    <p style="margin:24px 0 0;font-size:12px;color:#6b7a99;">If you didn't request this, you can safely ignore this email. Your password won't change.</p>
+  </div>`;
+
 async function sendPasswordResetEmail(to, name, resetLink) {
-  if (!mailer) throw new Error('Email is not configured on this server.');
-  await mailer.sendMail({
-    from: getFromAddress(),
-    to,
-    subject: 'WC26 — Reset your password',
-    text: `Hi ${name},\n\nWe received a request to reset your WC26 Prediction League password.\n\nClick the link below to set a new password. This link expires in 1 hour.\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email.\n\n— WC26 Prediction League`,
-    html: `
-      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#0b0f1a;color:#e2e8f4;border-radius:12px;">
-        <h2 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#4dc97a;">WC26 Prediction League</h2>
-        <p style="margin:0 0 20px;color:#6b7a99;font-size:14px;">Password reset request</p>
-        <p style="margin:0 0 16px;">Hi <strong>${name}</strong>,</p>
-        <p style="margin:0 0 24px;color:#a0aec0;">We received a request to reset your password. Click the button below — the link expires in <strong>1 hour</strong>.</p>
-        <a href="${resetLink}" style="display:inline-block;padding:12px 28px;background:#4dc97a;color:#0b0f1a;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Reset my password →</a>
-        <p style="margin:24px 0 0;font-size:12px;color:#6b7a99;">If you didn't request this, you can safely ignore this email. Your password won't change.</p>
-      </div>`
-  });
+  if (!emailEnabled) throw new Error('Email is not configured on this server.');
+
+  // ── Resend HTTP API (bypasses SMTP — works on Railway) ───────────────────
+  if (process.env.RESEND_API_KEY) {
+    const r = await fetch('https://api.resend.com/emails', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+      },
+      body: JSON.stringify({
+        from:    getFromAddress(),
+        to:      [to],
+        subject: 'WC26 — Reset your password',
+        text:    EMAIL_TEXT(name, resetLink),
+        html:    EMAIL_HTML(name, resetLink)
+      })
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.message || `Resend API error ${r.status}`);
+    }
+    return;
+  }
+
+  // ── Gmail fallback (nodemailer) ───────────────────────────────────────────
+  if (gmailMailer) {
+    await gmailMailer.sendMail({
+      from: getFromAddress(), to,
+      subject: 'WC26 — Reset your password',
+      text:    EMAIL_TEXT(name, resetLink),
+      html:    EMAIL_HTML(name, resetLink)
+    });
+    return;
+  }
+
+  throw new Error('No email provider configured.');
 }
 
 // ── JSON helpers ───────────────────────────────────────────────────────────────
