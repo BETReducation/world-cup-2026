@@ -1,60 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <radialGradient id="globe" cx="42%" cy="36%" r="62%">
-      <stop offset="0%"   stop-color="#ffe566"/>
-      <stop offset="55%"  stop-color="#d4920c"/>
-      <stop offset="100%" stop-color="#7a5200"/>
-    </radialGradient>
-    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#9a6a00"/>
-      <stop offset="28%"  stop-color="#ffd700"/>
-      <stop offset="55%"  stop-color="#e8ac10"/>
-      <stop offset="100%" stop-color="#8b6000"/>
-    </linearGradient>
-    <linearGradient id="base" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#9a6a00"/>
-      <stop offset="40%"  stop-color="#ffd700"/>
-      <stop offset="100%" stop-color="#8b6000"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="64" height="64" rx="10" fill="#111827"/>
-
-  <!-- Globe (sphere on top) -->
-  <circle cx="32" cy="13" r="11" fill="url(#globe)"/>
-  <!-- Globe specular highlight -->
-  <ellipse cx="27.5" cy="9" rx="4.5" ry="3" fill="rgba(255,245,160,0.5)" transform="rotate(-20 27.5 9)"/>
-
-  <!-- Trophy body — wide under globe, pinches at waist, flares to base -->
-  <!-- Silhouette of the two figure column -->
-  <path d="
-    M18 23
-    C 13 27, 14 33, 16 38
-    C 18 43, 20 46, 22 49
-    L 42 49
-    C 44 46, 46 43, 48 38
-    C 50 33, 51 27, 46 23
-    C 42 20, 37 22, 32 22
-    C 27 22, 22 20, 18 23 Z
-  " fill="url(#body)"/>
-
-  <!-- Waist shadow to suggest narrow middle -->
-  <ellipse cx="32" cy="35" rx="8" ry="6" fill="rgba(0,0,0,0.28)"/>
-
-  <!-- Left body highlight -->
-  <path d="M20 25 C17 30 18 37 20 43 L23 43 C21 37 20 30 22 26 Z" fill="rgba(255,230,80,0.28)"/>
-
-  <!-- Narrow stem connecting body to base -->
-  <rect x="26" y="48" width="12" height="5" rx="1" fill="#c9900a"/>
-
-  <!-- Green malachite band (the real trophy's distinctive green ring) -->
-  <rect x="13" y="53" width="38" height="5" rx="1.5" fill="#1a6b40"/>
-  <rect x="13" y="53" width="38" height="2.5" rx="1.5" fill="#2aaa66"/>
-  <rect x="17" y="54"  width="7"  height="1"   rx="0.5" fill="rgba(255,255,255,0.35)"/>
-  <rect x="36" y="54.5" width="5" height="0.8" rx="0.5" fill="rgba(255,255,255,0.28)"/>
-
-  <!-- Base plate -->
-  <rect x="11" y="58" width="42" height="5" rx="2" fill="url(#base)"/>
-  <!-- Base top sheen -->
-  <rect x="15" y="58.5" width="16" height="1.2" rx="0.6" fill="rgba(255,245,160,0.35)"/>
+  <rect width="64" height="64" rx="10" fill="#ffffff"/>
+  <text x="32" y="46"
+        font-family="'Outfit', system-ui, sans-serif"
+        font-weight="800"
+        font-size="36"
+        fill="#1a9e4f"
+        text-anchor="middle">26</text>
 </svg>
