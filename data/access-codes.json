@@ -1,0 +1,304 @@
+{
+  "codes": [
+    {
+      "code": "Cristiano Maldini",
+      "used": true,
+      "usedBy": "user_b3cdbc92e165453a",
+      "usedAt": "2026-05-26T03:20:50.615Z"
+    },
+    {
+      "code": "Lionel Ronaldo",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Zinedine Lampard",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Thierry Ibrahimovic",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Didier Pirlo",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Frank Torres",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Steven Zidane",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Wayne Iniesta",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Fernando Gerrard",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Andres Rooney",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Cesc Buffon",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Zlatan Fabregas",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Arjen Henry",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Samuel Beckham",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Pavel Drogba",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Michael Totti",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Patrick Bale",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Hidetoshi Messi",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "David Nedved",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Dimitar Ribery",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Sergio Robben",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Iker Hazard",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Gianluigi Suarez",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Andrea Salah",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Gareth Seedorf",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Eden Cannavaro",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Luis Vieira",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Virgil van Ballack",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Mohamed Scholes",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Sadio Nesta",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Luka Del Piero",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Toni van Nistelrooy",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Thomas Essien",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Franck Bergkamp",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Alessandro Aguero",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Paolo Modric",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Francesco Berbatov",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Ruud Gattuso",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Juan Makelele",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Diego Sneijder",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Kaka Terry",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Roberto Ferdinand",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Ronaldinho Neville",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Xavi Muller",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Petr Mane",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Rio Casillas",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Raul van Persie",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Robbie Nakata",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "John Eto",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    },
+    {
+      "code": "Dennis Gerrard",
+      "used": false,
+      "usedBy": null,
+      "usedAt": null
+    }
+  ]
+}
