@@ -711,7 +711,9 @@ app.post('/api/forgot-password', async (req, res) => {
     await sendPasswordResetEmail(user.email, user.displayName || user.name, resetLink);
   } catch (err) {
     console.error('Password reset email failed:', err.message);
-    return res.status(503).json({ error: 'Could not send the reset email — please try again in a moment, or contact the admin.' });
+    // Use 422 (not 503) — Railway intercepts 5xx responses and returns HTML,
+    // which breaks the frontend JSON error parsing.
+    return res.status(422).json({ error: err.message || 'Could not send the reset email.' });
   }
 
   res.json({ ok: true });
