@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showForgot()     { signinView.style.display = 'none'; forgotView.style.display = ''; setTimeout(() => document.getElementById('navForgotEmail').focus(), 50); }
 
     cancelBtn.addEventListener('click', closeAuthModal);
-    modal.addEventListener('click', e => { if (e.target === modal) closeAuthModal(); });
     document.getElementById('navForgotLink').addEventListener('click', e => { e.preventDefault(); showForgot(); });
     document.getElementById('navForgotBack').addEventListener('click', e => { e.preventDefault(); showSignin(); });
 
