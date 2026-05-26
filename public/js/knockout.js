@@ -130,11 +130,8 @@ $('registerBtn').addEventListener('click', async () => {
   $('registerBtn').textContent = 'Signing in…';
   try {
     const result = await API.register(name, em, pw, lp || null, ac || null);
-    userId = result.userId;
     Session.save(result.userId, result.name, result.token);
-    $('playerName').textContent = result.name;
-    $('registerModal').classList.remove('open');
-    await loadAndRender();
+    location.reload();
   } catch (e) {
     let msg = 'Could not connect to server. Is it running?';
     try { const d = JSON.parse(e.message); msg = d.error || msg; } catch {}
