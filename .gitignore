@@ -1,6 +1,7 @@
 node_modules/
 data/predictions.json
 data/results.json
+data/access-codes.json
 *.pdf
 .DS_Store
 *.docx

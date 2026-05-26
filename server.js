@@ -84,7 +84,12 @@ function seedAdminAccount() {
 }
 
 function seedAccessCodes() {
-  if (fs.existsSync(ACCESS_CODES_FILE)) return;
+  // Seed if file is missing OR exists but has a broken/non-array codes field
+  if (fs.existsSync(ACCESS_CODES_FILE)) {
+    const existing = readJSON(ACCESS_CODES_FILE, null);
+    if (existing && Array.isArray(existing.codes)) return; // looks healthy, skip
+    console.warn('⚠️   access-codes.json exists but has unexpected structure — re-seeding');
+  }
   writeJSON(ACCESS_CODES_FILE, {
     codes: INITIAL_ACCESS_CODES.map(code => ({ code, used: false, usedBy: null, usedAt: null }))
   });
@@ -554,7 +559,8 @@ app.post('/api/register', (req, res) => {
   // Validate invite code
   const accessCode = sanitise(req.body.accessCode || '', 100);
   const codesData  = readJSON(ACCESS_CODES_FILE, { codes: [] });
-  const codeEntry  = codesData.codes.find(
+  const codesArr   = Array.isArray(codesData.codes) ? codesData.codes : [];
+  const codeEntry  = codesArr.find(
     c => c.code.toLowerCase() === accessCode.toLowerCase()
   );
   if (!codeEntry)
@@ -573,13 +579,18 @@ app.post('/api/register', (req, res) => {
     predictions:  {},
     registeredAt: new Date().toISOString()
   });
-  writeJSON(PREDICTIONS_FILE, data);
 
-  // Mark code as used
-  codeEntry.used   = true;
-  codeEntry.usedBy = userId;
-  codeEntry.usedAt = new Date().toISOString();
-  writeJSON(ACCESS_CODES_FILE, codesData);
+  try {
+    writeJSON(PREDICTIONS_FILE, data);
+    // Mark code as used
+    codeEntry.used   = true;
+    codeEntry.usedBy = userId;
+    codeEntry.usedAt = new Date().toISOString();
+    writeJSON(ACCESS_CODES_FILE, codesData);
+  } catch (err) {
+    console.error('Registration write error:', err);
+    return res.status(500).json({ error: 'Server error saving your account. Please try again.' });
+  }
 
   const token = createSession(userId);
   res.json({ userId, name, token });
@@ -865,6 +876,14 @@ app.delete('/api/users/:userId', (req, res) => {
   data.users.splice(idx, 1);
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
+});
+
+// ── Global error handler (returns JSON for all unhandled route errors) ─────────
+
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error('Unhandled server error:', err);
+  res.status(500).json({ error: 'An unexpected server error occurred. Please try again.' });
 });
 
 // ── Start ──────────────────────────────────────────────────────────────────────
