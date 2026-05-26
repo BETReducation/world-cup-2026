@@ -25,6 +25,7 @@ const FIXTURES_FILE    = path.join(DATA_DIR,       'fixtures.json');
 const PREDICTIONS_FILE = path.join(PERSISTENT_DIR, 'predictions.json');
 const RESULTS_FILE     = path.join(PERSISTENT_DIR, 'results.json');
 const ACCESS_CODES_FILE = path.join(PERSISTENT_DIR, 'access-codes.json');
+const SESSIONS_FILE     = path.join(PERSISTENT_DIR, 'sessions.json');
 
 const ADMIN_EMAIL = 'gbyatt@gmail.com';
 
@@ -230,14 +231,32 @@ function recordFailure(req) {
 
 function clearFailures(req) { loginAttempts.delete(getIP(req)); }
 
-// ── Session tokens (in-memory, 30-day TTL) ────────────────────────────────────
+// ── Session tokens (persisted to disk, 30-day TTL) ────────────────────────────
 
 const sessions = new Map();
 const SESSION_TTL = 30 * 24 * 60 * 60 * 1000;
 
+function saveSessions() {
+  try {
+    const obj = {};
+    for (const [token, s] of sessions) obj[token] = s;
+    writeJSON(SESSIONS_FILE, obj);
+  } catch {}
+}
+
+function loadSessions() {
+  const saved = readJSON(SESSIONS_FILE, {});
+  const now   = Date.now();
+  for (const [token, s] of Object.entries(saved)) {
+    if (s.expiresAt > now) sessions.set(token, s);   // skip expired
+  }
+  if (sessions.size > 0) console.log(`✅  Restored ${sessions.size} session(s) from disk`);
+}
+
 function createSession(userId) {
   const token = crypto.randomBytes(32).toString('hex');
   sessions.set(token, { userId, expiresAt: Date.now() + SESSION_TTL });
+  saveSessions();
   return token;
 }
 
@@ -245,20 +264,25 @@ function validateSession(token, userId) {
   if (!token) return false;
   const s = sessions.get(token);
   if (!s) return false;
-  if (Date.now() > s.expiresAt) { sessions.delete(token); return false; }
+  if (Date.now() > s.expiresAt) { sessions.delete(token); saveSessions(); return false; }
   return s.userId === userId;
 }
 
-function destroySession(token) { if (token) sessions.delete(token); }
+function destroySession(token) {
+  if (token) { sessions.delete(token); saveSessions(); }
+}
 
 function destroyAllSessions(userId) {
   for (const [t, s] of sessions) if (s.userId === userId) sessions.delete(t);
+  saveSessions();
 }
 
 // Sweep expired sessions hourly.
 setInterval(() => {
   const now = Date.now();
-  for (const [t, s] of sessions) if (now > s.expiresAt) sessions.delete(t);
+  let changed = false;
+  for (const [t, s] of sessions) if (now > s.expiresAt) { sessions.delete(t); changed = true; }
+  if (changed) saveSessions();
 }, 60 * 60 * 1000);
 
 // ── Fixtures helpers ───────────────────────────────────────────────────────────
@@ -907,6 +931,7 @@ app.listen(PORT, () => {
   console.log(`⚽  World Cup 2026 running at http://localhost:${PORT}`);
   console.log(`🔑  Admin password: ${ADMIN_PASSWORD}`);
   if (!emailEnabled) console.log('⚠️   Email not configured — set RESEND_API_KEY (recommended) or GMAIL_USER + GMAIL_APP_PASSWORD to enable password reset.');
+  loadSessions();
   seedAdminAccount();
   seedAccessCodes();
 });
