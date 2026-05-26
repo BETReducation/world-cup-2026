@@ -124,6 +124,7 @@ nav.site-nav {
   font-size: 16px;
 }
 .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+[data-theme="light"] .theme-toggle { color: #f0c500; border-color: rgba(240,197,0,0.35); }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
 .hero {
@@ -1072,7 +1073,7 @@ footer span {
 }
 
 /* ── Member nav link ─────────────────────────────────────────────────────── */
-.nav-member-link { color: var(--accent) !important; }
+.nav-member-link { color: var(--accent) !important; display: inline-flex; align-items: center; gap: 6px; }
 
 /* ── Knockout round label ────────────────────────────────────────────────── */
 .ko-round-header {
