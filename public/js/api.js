@@ -1,7 +1,7 @@
 // Centralised API helpers
 const API = {
-  async get(path) {
-    const r = await fetch(path);
+  async get(path, extraHeaders = {}) {
+    const r = await fetch(path, { headers: extraHeaders });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
@@ -13,15 +13,24 @@ const API = {
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
-  async del(path, adminPwd) {
-    const r = await fetch(path, { method: 'DELETE', headers: { 'x-admin-password': adminPwd } });
+  async del(path, adminPwd = null) {
+    const { token } = Session.load();
+    const headers = {};
+    if (adminPwd) headers['x-admin-password'] = adminPwd;
+    if (token)    headers['x-session-token']  = token;
+    const r = await fetch(path, { method: 'DELETE', headers });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
 
   // Auth
-  register: (name, email, password, legacyPin = null) =>
-    API.post('/api/register', { name, email, password, ...(legacyPin ? { legacyPin } : {}) }),
+  register(name, email, password, legacyPin = null, accessCode = null) {
+    return API.post('/api/register', {
+      name, email, password,
+      ...(legacyPin   ? { legacyPin }   : {}),
+      ...(accessCode  ? { accessCode }  : {})
+    });
+  },
   forgotPassword: (email) =>
     API.post('/api/forgot-password', { email }),
   resetPassword: (token, password) =>
@@ -32,6 +41,13 @@ const API = {
       method: 'POST',
       headers: token ? { 'x-session-token': token } : {}
     }).catch(() => {});
+  },
+  me() {
+    const { token } = Session.load();
+    if (!token) return Promise.resolve({ userId: null, isAdmin: false });
+    return fetch('/api/me', { headers: { 'x-session-token': token } })
+      .then(r => r.json())
+      .catch(() => ({ userId: null, isAdmin: false }));
   },
 
   // Fixtures & lock
@@ -48,11 +64,47 @@ const API = {
   },
 
   // Results & leaderboard
-  results:      ()                   => API.get('/api/results'),
-  leaderboard:  ()                   => API.get('/api/leaderboard'),
-  verifyAdmin:  (pwd)                => fetch('/api/admin/verify', { headers: { 'x-admin-password': pwd } }).then(r => r.ok),
-  saveResult:   (matchId, hg, ag, pwd) => API.post('/api/results', { matchId, homeGoals: hg, awayGoals: ag }, pwd),
-  deleteResult: (matchId, pwd)       => API.del(`/api/results/${matchId}`, pwd)
+  results:     () => API.get('/api/results'),
+  leaderboard: () => API.get('/api/leaderboard'),
+  verifyAdmin(pwd) {
+    const { token } = Session.load();
+    const headers = {};
+    if (pwd)   headers['x-admin-password'] = pwd;
+    if (token) headers['x-session-token']  = token;
+    return fetch('/api/admin/verify', { headers }).then(r => r.ok);
+  },
+  saveResult(matchId, hg, ag, pwd = null) {
+    const { token } = Session.load();
+    return API.post('/api/results', { matchId, homeGoals: hg, awayGoals: ag }, pwd, token);
+  },
+  deleteResult: (matchId, pwd = null) => API.del(`/api/results/${matchId}`, pwd),
+
+  // Admin: access codes + user management
+  getAccessCodes() {
+    const { token } = Session.load();
+    const headers = {};
+    if (token) headers['x-session-token'] = token;
+    return fetch('/api/access-codes', { headers }).then(r => r.json());
+  },
+  adminResetAllUsers() {
+    const { token } = Session.load();
+    return API.post('/api/admin/reset-all-users', {}, null, token);
+  },
+  adminBackup(pwd = null) {
+    const { token } = Session.load();
+    const headers = {};
+    if (pwd)   headers['x-admin-password'] = pwd;
+    if (token) headers['x-session-token']  = token;
+    return fetch('/api/admin/backup', { headers });
+  },
+  adminClearResults(pwd = null) {
+    const { token } = Session.load();
+    return API.post('/api/admin/clear-results', {}, pwd, token);
+  },
+  adminRestore(data, pwd = null) {
+    const { token } = Session.load();
+    return API.post('/api/admin/restore', data, pwd, token);
+  }
 };
 
 // Session helpers — stores userId, display name, and session token in localStorage

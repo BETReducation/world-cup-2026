@@ -24,28 +24,112 @@ if (!fs.existsSync(PERSISTENT_DIR)) fs.mkdirSync(PERSISTENT_DIR, { recursive: tr
 const FIXTURES_FILE    = path.join(DATA_DIR,       'fixtures.json');
 const PREDICTIONS_FILE = path.join(PERSISTENT_DIR, 'predictions.json');
 const RESULTS_FILE     = path.join(PERSISTENT_DIR, 'results.json');
+const ACCESS_CODES_FILE = path.join(PERSISTENT_DIR, 'access-codes.json');
+
+const ADMIN_EMAIL = 'gbyatt@gmail.com';
+
+// ── One-time invite codes (50 footballer name mashups) ─────────────────────────
+
+const INITIAL_ACCESS_CODES = [
+  'Cristiano Maldini',    'Lionel Ronaldo',       'Zinedine Lampard',
+  'Thierry Ibrahimovic',  'Didier Pirlo',          'Frank Torres',
+  'Steven Zidane',        'Wayne Iniesta',          'Fernando Gerrard',
+  'Andres Rooney',        'Cesc Buffon',            'Zlatan Fabregas',
+  'Arjen Henry',          'Samuel Beckham',         'Pavel Drogba',
+  'Michael Totti',        'Patrick Bale',           'Hidetoshi Messi',
+  'David Nedved',         'Dimitar Ribery',         'Sergio Robben',
+  'Iker Hazard',          'Gianluigi Suarez',       'Andrea Salah',
+  'Gareth Seedorf',       'Eden Cannavaro',         'Luis Vieira',
+  'Virgil van Ballack',   'Mohamed Scholes',        'Sadio Nesta',
+  'Luka Del Piero',       'Toni van Nistelrooy',    'Thomas Essien',
+  'Franck Bergkamp',      'Alessandro Aguero',      'Paolo Modric',
+  'Francesco Berbatov',   'Ruud Gattuso',           'Juan Makelele',
+  'Diego Sneijder',       'Kaka Terry',             'Roberto Ferdinand',
+  'Ronaldinho Neville',   'Xavi Muller',            'Petr Mane',
+  'Rio Casillas',         'Raul van Persie',         'Robbie Nakata',
+  'John Eto',             'Dennis Gerrard'
+];
+
+// ── Startup seeding ────────────────────────────────────────────────────────────
+
+function seedAdminAccount() {
+  const data  = readJSON(PREDICTIONS_FILE, { users: [] });
+  const admin = data.users.find(u => u.email && u.email.toLowerCase() === ADMIN_EMAIL);
+  if (admin) {
+    if (!admin.isAdmin) {
+      admin.isAdmin = true;
+      writeJSON(PREDICTIONS_FILE, data);
+      console.log(`✅  Admin flag added to existing account: ${ADMIN_EMAIL}`);
+    }
+    return;
+  }
+  // Create fresh admin account
+  const adminPw = process.env.ADMIN_USER_PASSWORD || crypto.randomBytes(8).toString('hex');
+  const userId  = 'user_' + crypto.randomBytes(8).toString('hex');
+  const salt    = crypto.randomBytes(16).toString('hex');
+  data.users.push({
+    id: userId, name: 'Gary', email: ADMIN_EMAIL,
+    passwordSalt: salt, passwordHash: hashStr(adminPw, salt),
+    isAdmin: true, predictions: {}, registeredAt: new Date().toISOString()
+  });
+  writeJSON(PREDICTIONS_FILE, data);
+  if (!process.env.ADMIN_USER_PASSWORD) {
+    console.log(`\n⚑   ADMIN ACCOUNT CREATED`);
+    console.log(`    Email:    ${ADMIN_EMAIL}`);
+    console.log(`    Password: ${adminPw}`);
+    console.log(`    ⚠️  Change this after first sign-in!\n`);
+  } else {
+    console.log(`✅  Admin account created for ${ADMIN_EMAIL}`);
+  }
+}
+
+function seedAccessCodes() {
+  if (fs.existsSync(ACCESS_CODES_FILE)) return;
+  writeJSON(ACCESS_CODES_FILE, {
+    codes: INITIAL_ACCESS_CODES.map(code => ({ code, used: false, usedBy: null, usedAt: null }))
+  });
+  console.log(`✅  ${INITIAL_ACCESS_CODES.length} invite codes seeded`);
+}
 
 app.use(cors());
 app.use(express.json({ limit: '400kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── Email (nodemailer via Gmail) ───────────────────────────────────────────────
-// Set GMAIL_USER and GMAIL_APP_PASSWORD env vars to enable email sending.
-// Set APP_URL to your public URL so reset links work (e.g. https://yourapp.railway.app).
+// ── Email ──────────────────────────────────────────────────────────────────────
+// Provider priority (first one configured wins):
+//   1. Resend  — set RESEND_API_KEY  (recommended; free at resend.com)
+//   2. Gmail   — set GMAIL_USER + GMAIL_APP_PASSWORD  (requires App Password)
+// Also set APP_URL to your public URL so reset links work.
 
-const emailEnabled = !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
+const emailEnabled = !!(process.env.RESEND_API_KEY || (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD));
 
-const mailer = emailEnabled
-  ? nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD }
-    })
-  : null;
+let mailer = null;
+if (process.env.RESEND_API_KEY) {
+  mailer = nodemailer.createTransport({
+    host: 'smtp.resend.com',
+    port: 465,
+    secure: true,
+    auth: { user: 'resend', pass: process.env.RESEND_API_KEY }
+  });
+} else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+  mailer = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD }
+  });
+}
+
+// Sender address: use MAIL_FROM env var, or auto-pick a sensible default
+function getFromAddress() {
+  if (process.env.MAIL_FROM) return process.env.MAIL_FROM;
+  if (process.env.RESEND_API_KEY) return '"WC26 Prediction League" <onboarding@resend.dev>';
+  if (process.env.GMAIL_USER)     return `"WC26 Prediction League" <${process.env.GMAIL_USER}>`;
+  return '"WC26 Prediction League" <noreply@example.com>';
+}
 
 async function sendPasswordResetEmail(to, name, resetLink) {
   if (!mailer) throw new Error('Email is not configured on this server.');
   await mailer.sendMail({
-    from: `"WC26 Prediction League" <${process.env.GMAIL_USER}>`,
+    from: getFromAddress(),
     to,
     subject: 'WC26 — Reset your password',
     text: `Hi ${name},\n\nWe received a request to reset your WC26 Prediction League password.\n\nClick the link below to set a new password. This link expires in 1 hour.\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email.\n\n— WC26 Prediction League`,
@@ -324,9 +408,19 @@ function resolveKnockoutFixtures(fixtures, results) {
 // ── Admin middleware ───────────────────────────────────────────────────────────
 
 function requireAdmin(req, res, next) {
-  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
-    return res.status(401).json({ error: 'Unauthorized' });
-  next();
+  // Accept legacy admin-password header
+  if (req.headers['x-admin-password'] === ADMIN_PASSWORD) return next();
+  // Accept session token from an admin user (auto-admin)
+  const token = req.headers['x-session-token'];
+  if (token) {
+    const s = sessions.get(token);
+    if (s && Date.now() <= s.expiresAt) {
+      const data = readJSON(PREDICTIONS_FILE, { users: [] });
+      const user = data.users.find(u => u.id === s.userId);
+      if (user?.isAdmin) return next();
+    }
+  }
+  return res.status(401).json({ error: 'Unauthorized' });
 }
 
 // ── Admin routes ───────────────────────────────────────────────────────────────
@@ -357,6 +451,21 @@ app.post('/api/admin/restore', requireAdmin, (req, res) => {
 app.post('/api/admin/clear-results', requireAdmin, (req, res) => {
   writeJSON(RESULTS_FILE, { results: {} });
   res.json({ ok: true });
+});
+
+// Delete all non-admin accounts (keeps Gary's admin account)
+app.post('/api/admin/reset-all-users', requireAdmin, (req, res) => {
+  const data    = readJSON(PREDICTIONS_FILE, { users: [] });
+  const toRemove = data.users.filter(u => !u.isAdmin);
+  toRemove.forEach(u => destroyAllSessions(u.id));
+  data.users = data.users.filter(u => u.isAdmin);
+  writeJSON(PREDICTIONS_FILE, data);
+  res.json({ ok: true, removed: toRemove.length });
+});
+
+// Return all access codes (admin only)
+app.get('/api/access-codes', requireAdmin, (req, res) => {
+  res.json(readJSON(ACCESS_CODES_FILE, { codes: [] }).codes);
 });
 
 // ── Fixtures ───────────────────────────────────────────────────────────────────
@@ -442,6 +551,17 @@ app.post('/api/register', (req, res) => {
   if (!name)
     return res.status(400).json({ error: 'Please enter your display name to create an account.' });
 
+  // Validate invite code
+  const accessCode = sanitise(req.body.accessCode || '', 100);
+  const codesData  = readJSON(ACCESS_CODES_FILE, { codes: [] });
+  const codeEntry  = codesData.codes.find(
+    c => c.code.toLowerCase() === accessCode.toLowerCase()
+  );
+  if (!codeEntry)
+    return res.status(400).json({ error: 'A valid invite code is required to create an account.' });
+  if (codeEntry.used)
+    return res.status(400).json({ error: 'This invite code has already been used.' });
+
   const userId = 'user_' + crypto.randomBytes(8).toString('hex');
   const salt   = crypto.randomBytes(16).toString('hex');
   data.users.push({
@@ -454,6 +574,13 @@ app.post('/api/register', (req, res) => {
     registeredAt: new Date().toISOString()
   });
   writeJSON(PREDICTIONS_FILE, data);
+
+  // Mark code as used
+  codeEntry.used   = true;
+  codeEntry.usedBy = userId;
+  codeEntry.usedAt = new Date().toISOString();
+  writeJSON(ACCESS_CODES_FILE, codesData);
+
   const token = createSession(userId);
   res.json({ userId, name, token });
 });
@@ -463,6 +590,20 @@ app.post('/api/register', (req, res) => {
 app.post('/api/logout', (req, res) => {
   destroySession(req.headers['x-session-token']);
   res.json({ ok: true });
+});
+
+// ── Whoami ─────────────────────────────────────────────────────────────────────
+
+app.get('/api/me', (req, res) => {
+  const token = req.headers['x-session-token'];
+  if (!token) return res.json({ userId: null, isAdmin: false });
+  const s = sessions.get(token);
+  if (!s) return res.json({ userId: null, isAdmin: false });
+  if (Date.now() > s.expiresAt) { sessions.delete(token); return res.json({ userId: null, isAdmin: false }); }
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  const user = data.users.find(u => u.id === s.userId);
+  if (!user) return res.json({ userId: null, isAdmin: false });
+  res.json({ userId: user.id, name: user.displayName || user.name, isAdmin: !!user.isAdmin });
 });
 
 // ── Forgot password ────────────────────────────────────────────────────────────
@@ -642,6 +783,7 @@ app.get('/api/profile/:userId', (req, res) => {
     id: user.id, name: user.name,
     displayName: user.displayName || user.name,
     bio: user.bio || '', avatar: user.avatar || null,
+    isAdmin: !!user.isAdmin,
     joinedAt: user.registeredAt,
     stats: {
       totalPoints:        entry.totalPoints        || 0,
@@ -730,5 +872,7 @@ app.delete('/api/users/:userId', (req, res) => {
 app.listen(PORT, () => {
   console.log(`⚽  World Cup 2026 running at http://localhost:${PORT}`);
   console.log(`🔑  Admin password: ${ADMIN_PASSWORD}`);
-  if (!emailEnabled) console.log('⚠️   Email not configured — set GMAIL_USER and GMAIL_APP_PASSWORD to enable password reset.');
+  if (!emailEnabled) console.log('⚠️   Email not configured — set RESEND_API_KEY (recommended) or GMAIL_USER + GMAIL_APP_PASSWORD to enable password reset.');
+  seedAdminAccount();
+  seedAccessCodes();
 });

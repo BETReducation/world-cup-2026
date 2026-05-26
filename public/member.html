@@ -294,6 +294,54 @@
     }
 
 
+    /* ── Access codes (admin) ─────────────────────────────────────────────── */
+    .code-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .code-table th {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border2);
+      padding: 7px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+    }
+    .code-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .code-table tr:last-child td { border-bottom: none; }
+    .code-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .code-name.used { color: var(--muted); text-decoration: line-through; }
+    .code-available { font-size: 11px; color: var(--accent); font-weight: 500; }
+    .code-used-label { font-size: 11px; color: var(--muted); }
+    .btn-copy {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      color: var(--accent);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-copy:hover { background: var(--border); border-color: var(--accent); }
+    .codes-summary {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+
     /* ── Danger zone ──────────────────────────────────────────────────────── */
     .danger-section {
       background: var(--surface);
@@ -565,6 +613,17 @@
     </div>
   </div>
 
+  <!-- Admin: Access Codes (shown only for admin account) -->
+  <div class="profile-section" id="adminSection" style="display:none;">
+    <div class="section-hdr"><i class="fa-solid fa-shield-halved" style="color:var(--accent);margin-right:6px;"></i>Access Codes</div>
+    <div class="section-body">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Invite codes — share these privately with people you want to invite. Each code can only be used once.</p>
+      <div id="accessCodesContent">
+        <p style="color:var(--muted);font-size:13px;">Loading…</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Danger Zone -->
   <div class="danger-section">
     <div class="danger-hdr">Danger Zone</div>
@@ -578,6 +637,11 @@
         <div class="danger-title">Delete Account</div>
         <div class="danger-desc">Permanently remove your account and all predictions from the league. You will be signed out immediately and cannot re-join with the same name.</div>
         <button class="btn btn-danger" onclick="confirmDelete()">Delete Account</button>
+      </div>
+      <div class="danger-item" id="adminResetItem" style="display:none;">
+        <div class="danger-title">Reset All Accounts</div>
+        <div class="danger-desc">Delete every player account except yours. All predictions will be lost. Players will need new invite codes to re-register. This cannot be undone.</div>
+        <button class="btn btn-danger" onclick="confirmResetAllUsers()">Reset All Accounts</button>
       </div>
     </div>
   </div>
@@ -651,6 +715,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('memberPage').style.display = 'flex';
   await loadProfile();
   await loadPredictions();
+
+  // Show admin section if this is the admin account
+  try {
+    const me = await API.me();
+    if (me.isAdmin) {
+      document.getElementById('adminSection').style.display = 'block';
+      document.getElementById('adminResetItem').style.display = 'flex';
+      await loadAccessCodes();
+    }
+  } catch {}
 });
 
 // ── Load profile ───────────────────────────────────────────────────────────────
@@ -1014,6 +1088,78 @@ async function runConfirmedAction() {
     }
     return;
   }
+
+  if (pendingAction.type === 'resetAllUsers') {
+    try {
+      const result = await API.adminResetAllUsers();
+      showToast(`✓ Removed ${result.removed} account${result.removed === 1 ? '' : 's'}`, 'ok');
+      closeConfirm();
+    } catch {
+      err.textContent = 'Reset failed — try again';
+    }
+    return;
+  }
+}
+
+// ── Admin: load & render access codes ─────────────────────────────────────────
+async function loadAccessCodes() {
+  const el = document.getElementById('accessCodesContent');
+  try {
+    const codes = await API.getAccessCodes();
+    if (!codes || !codes.length) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;">No codes found.</p>'; return; }
+    const available = codes.filter(c => !c.used).length;
+    el.innerHTML = `
+      <p class="codes-summary">${available} of ${codes.length} codes available</p>
+      <table class="code-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Status</th>
+            <th>Copy</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${codes.map(c => `
+            <tr>
+              <td><span class="code-name${c.used ? ' used' : ''}">${c.code}</span></td>
+              <td>${c.used
+                ? '<span class="code-used-label">Used</span>'
+                : '<span class="code-available">Available</span>'}</td>
+              <td>${!c.used
+                ? `<button class="btn-copy" onclick="copyCode('${c.code.replace(/'/g, "\\'")}')"><i class="fa-regular fa-copy"></i> Copy</button>`
+                : ''}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--red);font-size:13px;">Could not load access codes.</p>';
+  }
+}
+
+function copyCode(code) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(code).then(() => showToast('Copied: ' + code, 'ok'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied: ' + code, 'ok');
+  }
+}
+
+// ── Admin: reset all user accounts ────────────────────────────────────────────
+function confirmResetAllUsers() {
+  pendingAction = { type: 'resetAllUsers' };
+  openConfirm(
+    'Reset All Accounts',
+    'This will permanently delete every player account except yours. All predictions will be lost. Players will need a new invite code to re-register. This cannot be undone.',
+    false,
+    'Reset All'
+  );
 }
 
 // ── Confirm modal helpers ──────────────────────────────────────────────────────

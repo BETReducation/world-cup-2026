@@ -29,6 +29,17 @@ async function init() {
   $('loadingState').style.display = 'none';
   $('resultsApp').style.display   = 'block';
 
+  // Auto-detect admin account (Gary) via session token
+  try {
+    const me = await API.me();
+    if (me.isAdmin) {
+      isAdmin = true;
+      $('adminLabel').textContent   = '✓ Admin active';
+      $('adminToggleBtn').innerHTML = 'Exit Admin';
+      $('adminBackup').classList.remove('hidden');
+    }
+  } catch {}
+
   buildTabs();
   showGroup(activeGroup);
   renderLeaderboard();
@@ -36,18 +47,28 @@ async function init() {
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 
-$('adminToggleBtn').addEventListener('click', () => {
+$('adminToggleBtn').addEventListener('click', async () => {
   if (isAdmin) {
-    isAdmin = false;
+    isAdmin       = false;
     adminPassword = null;
-    $('adminLabel').textContent     = '';
+    $('adminLabel').textContent   = '';
     $('adminToggleBtn').innerHTML = '<i class="fa-solid fa-key"></i> Admin Mode';
     $('adminBackup').classList.add('hidden');
     if (activeKoRound) showKoRound(activeKoRound); else showGroup(activeGroup);
   } else {
-    $('adminModal').classList.add('open');
-    $('adminPwdInput').value = '';
-    setTimeout(() => $('adminPwdInput').focus(), 50);
+    // Check if session already grants admin access (Gary)
+    const me = await API.me().catch(() => ({}));
+    if (me.isAdmin) {
+      isAdmin = true;
+      $('adminLabel').textContent   = '✓ Admin active';
+      $('adminToggleBtn').innerHTML = 'Exit Admin';
+      $('adminBackup').classList.remove('hidden');
+      if (activeKoRound) showKoRound(activeKoRound); else showGroup(activeGroup);
+    } else {
+      $('adminModal').classList.add('open');
+      $('adminPwdInput').value = '';
+      setTimeout(() => $('adminPwdInput').focus(), 50);
+    }
   }
 });
 
@@ -80,18 +101,18 @@ $('adminPwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('
 // ── Backup / Restore ──────────────────────────────────────────────────────────
 
 $('backupBtn').addEventListener('click', async () => {
-  const res = await fetch('/api/admin/backup', {
-    headers: { 'x-admin-password': adminPassword }
-  });
-  if (!res.ok) { alert('Backup failed'); return; }
-  const blob = await res.blob();
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  const date = new Date().toISOString().slice(0, 10);
-  a.href     = url;
-  a.download = `wc2026-backup-${date}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  try {
+    const res = await API.adminBackup(adminPassword);
+    if (!res.ok) { alert('Backup failed'); return; }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href     = url;
+    a.download = `wc2026-backup-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch { alert('Backup failed'); }
 });
 
 $('clearResultsBtn').addEventListener('click', async () => {
@@ -100,11 +121,7 @@ $('clearResultsBtn').addEventListener('click', async () => {
   status.textContent = 'Clearing…';
   status.style.color = 'var(--text-muted)';
   try {
-    const res = await fetch('/api/admin/clear-results', {
-      method:  'POST',
-      headers: { 'x-admin-password': adminPassword }
-    });
-    if (!res.ok) throw new Error();
+    await API.adminClearResults(adminPassword);
     status.textContent = '✓ Results cleared — reloading…';
     status.style.color = 'var(--accent)';
     setTimeout(() => location.reload(), 1000);
@@ -123,12 +140,7 @@ $('restoreInput').addEventListener('change', async e => {
   try {
     const text = await file.text();
     const data = JSON.parse(text);
-    const res  = await fetch('/api/admin/restore', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
-      body:    JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error('Server error');
+    await API.adminRestore(data, adminPassword);
     status.textContent = '✓ Restored — reloading…';
     status.style.color = 'var(--accent)';
     setTimeout(() => location.reload(), 1200);
@@ -136,7 +148,7 @@ $('restoreInput').addEventListener('change', async e => {
     status.textContent = '✗ Restore failed — invalid file?';
     status.style.color = 'var(--red)';
   }
-  e.target.value = ''; // reset file input
+  e.target.value = '';
 });
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────

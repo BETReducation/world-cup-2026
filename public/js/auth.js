@@ -71,6 +71,28 @@ document.addEventListener('DOMContentLoaded', () => {
       drawerFooter.appendChild(drawerLogout);
     }
 
+    // ── Logout confirmation modal ──────────────────────────────────────────
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="modal-overlay" id="logoutModal">
+        <div class="modal" style="max-width:360px;">
+          <h2><i class="fa-solid fa-right-from-bracket"></i> Log out?</h2>
+          <p style="margin-bottom:20px;color:var(--text-muted);">Are you sure you want to sign out?</p>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-danger btn-full" id="logoutConfirmBtn">Log out</button>
+            <button class="btn btn-outline btn-full" id="logoutCancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>`);
+
+    document.getElementById('logoutConfirmBtn').addEventListener('click', performLogout);
+    document.getElementById('logoutCancelBtn').addEventListener('click', () => {
+      document.getElementById('logoutModal').classList.remove('open');
+    });
+    document.getElementById('logoutModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('logoutModal'))
+        document.getElementById('logoutModal').classList.remove('open');
+    });
+
   } else {
     // ── Logged out ───────────────────────────────────────────────────────────
     const signInBtn = document.createElement('button');
@@ -88,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- ── Sign in / Sign up view ── -->
           <div id="navAuthSigninView">
             <h2><i class="fa-regular fa-futbol"></i> Sign In</h2>
-            <p>Sign in with your email and password. New to the league? A new account will be created automatically.</p>
+            <p>Sign in with your email and password. New players need an invite code to create an account.</p>
             <div id="navAuthError" class="error-msg hidden"></div>
             <div class="form-group">
               <label for="navAuthName">Display name <span style="color:var(--muted);font-size:11px;">(new accounts only)</span></label>
@@ -102,6 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
               <label for="navAuthPassword">Password <span style="color:var(--muted);font-size:11px;">(min. 8 characters)</span></label>
               <input type="password" id="navAuthPassword" placeholder="Your password" autocomplete="current-password">
               <small><a href="#" id="navForgotLink" style="color:var(--accent);">Forgot password?</a></small>
+            </div>
+            <div class="form-group">
+              <label for="navAuthCode">Invite code <span style="color:var(--muted);font-size:11px;">(new accounts only — leave blank to sign in)</span></label>
+              <input type="text" id="navAuthCode" placeholder="e.g. Cristiano Maldini" autocomplete="off">
             </div>
             <details style="margin-bottom:12px;">
               <summary style="cursor:pointer;font-size:12px;color:var(--muted);user-select:none;">Had a PIN-based account? Click to claim it</summary>
@@ -142,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameInput     = document.getElementById('navAuthName');
     const emailInput    = document.getElementById('navAuthEmail');
     const passwordInput = document.getElementById('navAuthPassword');
+    const codeInput     = document.getElementById('navAuthCode');
     const submitBtn     = document.getElementById('navAuthSubmit');
     const cancelBtn     = document.getElementById('navAuthCancel');
     const errorEl       = document.getElementById('navAuthError');
@@ -150,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
       nameInput.value     = '';
       emailInput.value    = '';
       passwordInput.value = '';
+      codeInput.value     = '';
       errorEl.classList.add('hidden');
       showSignin();
       modal.classList.add('open');
@@ -167,13 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tab flow
     nameInput.addEventListener('keydown',     e => { if (e.key === 'Enter') emailInput.focus(); });
     emailInput.addEventListener('keydown',    e => { if (e.key === 'Enter') passwordInput.focus(); });
-    passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitBtn.click(); });
+    passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') codeInput.focus(); });
+    codeInput.addEventListener('keydown',     e => { if (e.key === 'Enter') submitBtn.click(); });
 
     // Sign in / sign up
     submitBtn.addEventListener('click', async () => {
       const n  = nameInput.value.trim();
       const em = emailInput.value.trim();
       const pw = passwordInput.value.trim();
+      const ac = codeInput.value.trim() || null;
       const lp = document.getElementById('navAuthLegacyPin')?.value.trim() || null;
       errorEl.classList.add('hidden');
 
@@ -183,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.disabled    = true;
       submitBtn.textContent = 'Signing in…';
       try {
-        const data = await API.register(n, em, pw, lp || null);
+        const data = await API.register(n, em, pw, lp || null, ac);
         Session.save(data.userId, data.name, data.token);
         location.reload();
       } catch (e) {
@@ -239,7 +269,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function doLogout() {
+  function doLogout() {
+    const modal = document.getElementById('logoutModal');
+    if (modal) modal.classList.add('open');
+    else performLogout();
+  }
+
+  async function performLogout() {
     await API.logout();
     Session.clear();
     location.reload();

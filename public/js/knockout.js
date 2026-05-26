@@ -119,6 +119,7 @@ $('registerBtn').addEventListener('click', async () => {
   const em   = $('regEmail').value.trim();
   const pw   = $('regPassword').value.trim();
   const lp   = $('regLegacyPin')?.value.trim() || null;
+  const ac   = $('regAccessCode')?.value.trim() || null;
   const err  = $('registerError');
   err.classList.add('hidden');
 
@@ -128,7 +129,7 @@ $('registerBtn').addEventListener('click', async () => {
   $('registerBtn').disabled    = true;
   $('registerBtn').textContent = 'Signing in…';
   try {
-    const result = await API.register(name, em, pw, lp || null);
+    const result = await API.register(name, em, pw, lp || null, ac || null);
     userId = result.userId;
     Session.save(result.userId, result.name, result.token);
     $('playerName').textContent = result.name;
