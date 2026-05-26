@@ -101,6 +101,9 @@ app.use(cors());
 app.use(express.json({ limit: '400kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── Health check (used by Railway to confirm startup) ─────────────────────────
+app.get('/api/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
+
 // ── Email ──────────────────────────────────────────────────────────────────────
 // Provider priority (first one configured wins):
 //   1. Resend  — set RESEND_API_KEY  (uses HTTPS API, not SMTP — works on Railway)
