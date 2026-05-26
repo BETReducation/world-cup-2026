@@ -1126,6 +1126,7 @@ footer span {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-left: 6px;
   transition: color 0.15s, border-color 0.15s;
 }
 .nav-hamburger:hover { color: var(--text); border-color: var(--accent); }
