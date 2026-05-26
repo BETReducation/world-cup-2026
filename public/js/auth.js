@@ -143,8 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error');
-        localStorage.setItem('wc2026_userId', data.userId);
-        localStorage.setItem('wc2026_name',   data.name);
+        Session.save(data.userId, data.name, data.token);
         location.reload();
       } catch (e) {
         const msg = e.message.includes('PIN')
@@ -174,9 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function doLogout() {
-    localStorage.removeItem('wc2026_userId');
-    localStorage.removeItem('wc2026_name');
+  async function doLogout() {
+    await API.logout();
+    Session.clear();
     location.reload();
   }
 });

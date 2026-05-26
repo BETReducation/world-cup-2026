@@ -1,9 +1,10 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const cors = require('cors');
+const express  = require('express');
+const fs       = require('fs');
+const path     = require('path');
+const cors     = require('cors');
+const crypto   = require('crypto');
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin2026';
 
@@ -24,21 +25,117 @@ const PREDICTIONS_FILE = path.join(PERSISTENT_DIR, 'predictions.json');
 const RESULTS_FILE     = path.join(PERSISTENT_DIR, 'results.json');
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '400kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ── JSON helpers ──────────────────────────────────────────────────────────────
 
 function readJSON(filePath, defaultValue = {}) {
   if (!fs.existsSync(filePath)) return defaultValue;
-  try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  } catch {
-    return defaultValue;
-  }
+  try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); }
+  catch { return defaultValue; }
 }
 
 function writeJSON(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
+
+// ── Input sanitisation ────────────────────────────────────────────────────────
+
+// Strip < and > to prevent HTML injection, then trim and cap length.
+function sanitise(str, maxLen) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[<>]/g, '').trim().slice(0, maxLen);
+}
+
+// ── PIN hashing (PBKDF2 via Node built-in crypto) ─────────────────────────────
+
+function hashPin(pin, salt) {
+  return crypto.pbkdf2Sync(String(pin), salt, 100_000, 32, 'sha256').toString('hex');
+}
+
+// Supports both legacy plaintext PINs and new hashed PINs.
+// Returns true if the supplied pin is correct.
+function checkPin(inputPin, user) {
+  if (user.pinSalt && user.pinHash) {
+    return hashPin(inputPin, user.pinSalt) === user.pinHash;
+  }
+  // Legacy plaintext — compare and migrate on success (caller must save)
+  return String(user.pin) === String(inputPin);
+}
+
+// Upgrade a user record from plaintext PIN to hashed PIN in-place.
+// Caller is responsible for persisting the change.
+function upgradePin(user, plaintextPin) {
+  const salt    = crypto.randomBytes(16).toString('hex');
+  user.pinSalt  = salt;
+  user.pinHash  = hashPin(plaintextPin, salt);
+  delete user.pin;
+}
+
+// ── Rate limiting (in-memory, per IP) ────────────────────────────────────────
+
+const loginAttempts = new Map(); // ip → { count, firstAt }
+const RATE_MAX    = 5;
+const RATE_WINDOW = 15 * 60 * 1000; // 15 min
+
+function getIP(req) {
+  return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || 'unknown';
+}
+
+function isRateLimited(req) {
+  const key   = getIP(req);
+  const entry = loginAttempts.get(key);
+  if (!entry) return false;
+  if (Date.now() - entry.firstAt > RATE_WINDOW) { loginAttempts.delete(key); return false; }
+  return entry.count >= RATE_MAX;
+}
+
+function recordFailure(req) {
+  const key  = getIP(req);
+  const now  = Date.now();
+  const prev = loginAttempts.get(key);
+  if (!prev || now - prev.firstAt > RATE_WINDOW) {
+    loginAttempts.set(key, { count: 1, firstAt: now });
+  } else {
+    loginAttempts.set(key, { count: prev.count + 1, firstAt: prev.firstAt });
+  }
+}
+
+function clearFailures(req) {
+  loginAttempts.delete(getIP(req));
+}
+
+// ── Session tokens (in-memory, 30-day TTL) ────────────────────────────────────
+
+const sessions = new Map(); // token → { userId, expiresAt }
+const SESSION_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+function createSession(userId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  sessions.set(token, { userId, expiresAt: Date.now() + SESSION_TTL });
+  return token;
+}
+
+function validateSession(token, userId) {
+  if (!token) return false;
+  const s = sessions.get(token);
+  if (!s) return false;
+  if (Date.now() > s.expiresAt) { sessions.delete(token); return false; }
+  return s.userId === userId;
+}
+
+function destroySession(token) {
+  if (token) sessions.delete(token);
+}
+
+// Sweep expired sessions hourly so the Map doesn't grow unbounded.
+setInterval(() => {
+  const now = Date.now();
+  for (const [t, s] of sessions) if (now > s.expiresAt) sessions.delete(t);
+}, 60 * 60 * 1000);
+
+// ── Fixtures helpers ──────────────────────────────────────────────────────────
 
 function isRoundLocked(round, fixtures) {
   const lockTime = fixtures.lockDates?.[String(round)];
@@ -106,20 +203,17 @@ function resolveSlot(slot, slotMap, resolvedMatches, results) {
     if (!result?.played) return null;
     if (result.home > result.away) return type === 'W' ? resolved.home : resolved.away;
     if (result.away > result.home) return type === 'W' ? resolved.away : resolved.home;
-    return null; // draw — shouldn't occur in knockout
+    return null;
   }
   return null;
 }
 
 function formatSlotLabel(slot) {
   if (!slot) return 'TBD';
-  // "3rd_ABCDF" → "Best 3rd (A/B/C/D/F)"
   const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
   if (m3rd) return `Best 3rd (${m3rd[1].split('').join('/')})`;
-  // "1A" → "1st Group A", "2B" → "2nd Group B"
   const mPos = slot.match(/^([12])([A-L])$/);
   if (mPos) return `${mPos[1] === '1' ? '1st' : '2nd'} Group ${mPos[2]}`;
-  // "W:R32_1" → "Winner R32-1", "L:SF_1" → "Loser SF-1"
   const mWL = slot.match(/^([WL]):(.+)$/);
   if (mWL) return `${mWL[1] === 'W' ? 'Winner' : 'Loser'} ${mWL[2].replace('_', '-')}`;
   return 'TBD';
@@ -128,12 +222,10 @@ function formatSlotLabel(slot) {
 function resolveKnockoutFixtures(fixtures, results) {
   if (!fixtures.knockout) return fixtures;
 
-  // Build slot map from group standings: "1A" → teamId, "2B" → teamId
   const slotMap = {};
   const thirdPlaceTeams = [];
 
   for (const [groupKey, group] of Object.entries(fixtures.groups || {})) {
-    // Only resolve knockout slots once ALL group matches have been played
     const groupComplete = group.matches.every(m => results[m.id]?.played);
     if (!groupComplete) continue;
     const rows = calcGroupStandings(group.teams, group.matches, results);
@@ -146,16 +238,12 @@ function resolveKnockoutFixtures(fixtures, results) {
     });
   }
 
-  // Sort all 3rd-place teams by performance
   thirdPlaceTeams.sort((a, b) =>
     b.pts !== a.pts ? b.pts - a.pts :
     b.gd  !== a.gd  ? b.gd  - a.gd  :
     b.gf  - a.gf
   );
 
-  // Resolve group-specific "3rd_ABCDF" slots in bracket order
-  // Each 3rd-place team can only fill one slot
-  // ALL groups in the slot must be complete before we resolve it
   const usedIn3rd = new Set();
   for (const roundKey of ['R32', 'R16', 'QF', 'SF', '3P', 'F']) {
     const round = fixtures.knockout[roundKey];
@@ -166,7 +254,6 @@ function resolveKnockoutFixtures(fixtures, results) {
         const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
         if (!m3rd) continue;
         const groupLetters = m3rd[1];
-        // Only resolve once every group in this slot has finished all its matches
         const allComplete = groupLetters.split('').every(
           g => fixtures.groups[g]?.matches.every(m => results[m.id]?.played)
         );
@@ -182,7 +269,6 @@ function resolveKnockoutFixtures(fixtures, results) {
     }
   }
 
-  // Resolve each round in bracket order
   const resolvedMatches = {};
   for (const roundKey of ['R32', 'R16', 'QF', 'SF', '3P', 'F']) {
     const round = fixtures.knockout[roundKey];
@@ -202,19 +288,21 @@ function resolveKnockoutFixtures(fixtures, results) {
   return fixtures;
 }
 
-// ── Admin verify ─────────────────────────────────────────────────────────────
+// ── Admin middleware ───────────────────────────────────────────────────────────
 
-app.get('/api/admin/verify', (req, res) => {
+function requireAdmin(req, res, next) {
   if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
     return res.status(401).json({ error: 'Unauthorized' });
-  res.json({ ok: true });
-});
+  next();
+}
 
-app.get('/api/admin/backup', (req, res) => {
-  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
-    return res.status(401).json({ error: 'Unauthorized' });
+// ── Admin routes ───────────────────────────────────────────────────────────────
+
+app.get('/api/admin/verify', requireAdmin, (req, res) => res.json({ ok: true }));
+
+app.get('/api/admin/backup', requireAdmin, (req, res) => {
   const backup = {
-    exportedAt: new Date().toISOString(),
+    exportedAt:  new Date().toISOString(),
     predictions: readJSON(PREDICTIONS_FILE, { users: [] }),
     results:     readJSON(RESULTS_FILE,     { results: {} })
   };
@@ -224,9 +312,7 @@ app.get('/api/admin/backup', (req, res) => {
   res.send(JSON.stringify(backup, null, 2));
 });
 
-app.post('/api/admin/restore', (req, res) => {
-  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
-    return res.status(401).json({ error: 'Unauthorized' });
+app.post('/api/admin/restore', requireAdmin, (req, res) => {
   const { predictions, results } = req.body;
   if (!predictions || !results)
     return res.status(400).json({ error: 'Invalid backup — must contain predictions and results' });
@@ -235,14 +321,12 @@ app.post('/api/admin/restore', (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/admin/clear-results', (req, res) => {
-  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
-    return res.status(401).json({ error: 'Unauthorized' });
+app.post('/api/admin/clear-results', requireAdmin, (req, res) => {
   writeJSON(RESULTS_FILE, { results: {} });
   res.json({ ok: true });
 });
 
-// ── Fixtures ──────────────────────────────────────────────────────────────────
+// ── Fixtures ───────────────────────────────────────────────────────────────────
 
 app.get('/api/fixtures', (req, res) => {
   const fixtures = readJSON(FIXTURES_FILE, { groups: {}, lockDates: {} });
@@ -250,20 +334,19 @@ app.get('/api/fixtures', (req, res) => {
   res.json(resolveKnockoutFixtures(fixtures, results));
 });
 
-// ── Lock status ───────────────────────────────────────────────────────────────
+// ── Lock status ────────────────────────────────────────────────────────────────
 
 app.get('/api/lock-status', (req, res) => {
   const fixtures = readJSON(FIXTURES_FILE, { lockDates: {} });
   const now = new Date();
   const status = {};
   for (const [round, lockTime] of Object.entries(fixtures.lockDates || {})) {
-    const locked = !!(lockTime && now >= new Date(lockTime));
-    status[round] = { locked, lockTime };
+    status[round] = { locked: !!(lockTime && now >= new Date(lockTime)), lockTime };
   }
   res.json(status);
 });
 
-// ── Users / registration ──────────────────────────────────────────────────────
+// ── Users / registration ───────────────────────────────────────────────────────
 
 app.get('/api/users', (req, res) => {
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
@@ -271,31 +354,60 @@ app.get('/api/users', (req, res) => {
 });
 
 app.post('/api/register', (req, res) => {
-  const { name, pin } = req.body;
-  if (!name || !pin) return res.status(400).json({ error: 'Name and PIN required' });
+  // Rate limiting
+  if (isRateLimited(req))
+    return res.status(429).json({ error: 'Too many attempts. Please wait 15 minutes and try again.' });
 
-  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  // Sanitise inputs
+  const name = sanitise(req.body.name, 30);
+  const pin  = String(req.body.pin || '').trim();
+
+  if (!name)                    return res.status(400).json({ error: 'Name is required.' });
+  if (!/^\d{4}$/.test(pin))     return res.status(400).json({ error: 'PIN must be exactly 4 digits.' });
+
+  const data     = readJSON(PREDICTIONS_FILE, { users: [] });
   const existing = data.users.find(u => u.name.toLowerCase() === name.toLowerCase());
 
   if (existing) {
-    if (String(existing.pin) !== String(pin))
-      return res.status(401).json({ error: 'Incorrect PIN for that name' });
-    return res.json({ userId: existing.id, name: existing.name });
+    // Use generic message — don't reveal whether the name exists
+    if (!checkPin(pin, existing)) {
+      recordFailure(req);
+      return res.status(401).json({ error: 'Name or PIN incorrect.' });
+    }
+    clearFailures(req);
+    // Transparently upgrade legacy plaintext PINs to hashed on first login
+    if (!existing.pinSalt) {
+      upgradePin(existing, pin);
+      writeJSON(PREDICTIONS_FILE, data);
+    }
+    const token = createSession(existing.id);
+    return res.json({ userId: existing.id, name: existing.name, token });
   }
 
-  const userId = `user_${Date.now()}`;
+  // New user — use random ID instead of timestamp
+  const userId = 'user_' + crypto.randomBytes(8).toString('hex');
+  const salt   = crypto.randomBytes(16).toString('hex');
   data.users.push({
-    id: userId,
-    name: name.trim(),
-    pin: String(pin),
-    predictions: {},
+    id:           userId,
+    name,
+    pinSalt:      salt,
+    pinHash:      hashPin(pin, salt),
+    predictions:  {},
     registeredAt: new Date().toISOString()
   });
   writeJSON(PREDICTIONS_FILE, data);
-  res.json({ userId, name: name.trim() });
+  const token = createSession(userId);
+  res.json({ userId, name, token });
 });
 
-// ── Predictions ───────────────────────────────────────────────────────────────
+// ── Logout ─────────────────────────────────────────────────────────────────────
+
+app.post('/api/logout', (req, res) => {
+  destroySession(req.headers['x-session-token']);
+  res.json({ ok: true });
+});
+
+// ── Predictions ────────────────────────────────────────────────────────────────
 
 app.get('/api/predictions', (req, res) => {
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
@@ -310,23 +422,23 @@ app.get('/api/predictions/:userId', (req, res) => {
 });
 
 app.post('/api/predictions/:userId', (req, res) => {
+  // Require a valid session token — prevents anyone guessing a userId from
+  // overwriting another player's predictions.
+  if (!validateSession(req.headers['x-session-token'], req.params.userId))
+    return res.status(401).json({ error: 'Session invalid or expired. Please sign in again.' });
+
   const { predictions } = req.body;
   const fixtures = readJSON(FIXTURES_FILE, { groups: {}, lockDates: {} });
-  const data = readJSON(PREDICTIONS_FILE, { users: [] });
-
-  const user = data.users.find(u => u.id === req.params.userId);
+  const data     = readJSON(PREDICTIONS_FILE, { users: [] });
+  const user     = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  // Build from scratch:
-  // 1. Always keep existing locked predictions (client cannot change or delete them)
+  // Keep locked predictions, accept unlocked ones from the request
   const updated = {};
   for (const [matchId, score] of Object.entries(user.predictions)) {
     const round = getMatchRound(matchId, fixtures);
-    if (!round || isRoundLocked(round, fixtures)) {
-      updated[matchId] = score;
-    }
+    if (!round || isRoundLocked(round, fixtures)) updated[matchId] = score;
   }
-  // 2. Write unlocked predictions from the request (absent = deleted, enabling reset)
   for (const [matchId, score] of Object.entries(predictions)) {
     const round = getMatchRound(matchId, fixtures);
     if (round && !isRoundLocked(round, fixtures)) {
@@ -340,92 +452,40 @@ app.post('/api/predictions/:userId', (req, res) => {
   res.json({ success: true, saved: Object.keys(updated).length });
 });
 
-// ── Results (admin) ───────────────────────────────────────────────────────────
+// ── Results (admin) ────────────────────────────────────────────────────────────
 
 app.get('/api/results', (req, res) => {
   res.json(readJSON(RESULTS_FILE, { results: {} }));
 });
 
-app.post('/api/results', (req, res) => {
-  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
-    return res.status(401).json({ error: 'Unauthorized' });
-
+app.post('/api/results', requireAdmin, (req, res) => {
   const { matchId, homeGoals, awayGoals } = req.body;
   if (!matchId || homeGoals === undefined || awayGoals === undefined)
     return res.status(400).json({ error: 'matchId, homeGoals, awayGoals required' });
 
   const data = readJSON(RESULTS_FILE, { results: {} });
   data.results[matchId] = {
-    home: parseInt(homeGoals),
-    away: parseInt(awayGoals),
-    played: true,
+    home:       parseInt(homeGoals),
+    away:       parseInt(awayGoals),
+    played:     true,
     recordedAt: new Date().toISOString()
   };
   writeJSON(RESULTS_FILE, data);
   res.json({ success: true });
 });
 
-app.delete('/api/results/:matchId', (req, res) => {
-  if (req.headers['x-admin-password'] !== ADMIN_PASSWORD)
-    return res.status(401).json({ error: 'Unauthorized' });
-
+app.delete('/api/results/:matchId', requireAdmin, (req, res) => {
   const data = readJSON(RESULTS_FILE, { results: {} });
   delete data.results[req.params.matchId];
   writeJSON(RESULTS_FILE, data);
   res.json({ success: true });
 });
 
-// ── Leaderboard ───────────────────────────────────────────────────────────────
-
-app.get('/api/leaderboard', (req, res) => {
-  const users = readJSON(PREDICTIONS_FILE, { users: [] }).users;
-  const results = readJSON(RESULTS_FILE, { results: {} }).results;
-
-  const board = users.map(user => {
-    let pts = 0, correctResults = 0, correctScores = 0;
-    const matchPoints = {};
-
-    for (const [matchId, result] of Object.entries(results)) {
-      if (!result.played) continue;
-      const pred = user.predictions[matchId];
-      if (!pred) continue;
-
-      const actualSign = Math.sign(result.home - result.away);
-      const predSign = Math.sign(pred.home - pred.away);
-      let p = 0;
-
-      if (actualSign === predSign) {
-        p += 3;
-        correctResults++;
-        if (pred.home === result.home && pred.away === result.away) {
-          p += 2;
-          correctScores++;
-        }
-      }
-
-      matchPoints[matchId] = p;
-      pts += p;
-    }
-
-    return {
-      id: user.id,
-      name: user.name,
-      totalPoints: pts,
-      correctResults,
-      correctScores,
-      matchPoints,
-      predictionsEntered: Object.keys(user.predictions).length
-    };
-  }).sort((a, b) => b.totalPoints - a.totalPoints);
-
-  res.json(board);
-});
-
-// ── Profile ───────────────────────────────────────────────────────────────────
+// ── Leaderboard ────────────────────────────────────────────────────────────────
 
 function calcLeaderboard() {
-  const users = readJSON(PREDICTIONS_FILE, { users: [] }).users;
-  const results = readJSON(RESULTS_FILE, { results: {} }).results;
+  const users   = readJSON(PREDICTIONS_FILE, { users: [] }).users;
+  const results = readJSON(RESULTS_FILE,     { results: {} }).results;
 
   return users.map(user => {
     let pts = 0, correctResults = 0, correctScores = 0;
@@ -435,58 +495,52 @@ function calcLeaderboard() {
       if (!result.played) continue;
       const pred = user.predictions[matchId];
       if (!pred) continue;
-
       const actualSign = Math.sign(result.home - result.away);
-      const predSign = Math.sign(pred.home - pred.away);
+      const predSign   = Math.sign(pred.home   - pred.away);
       let p = 0;
-
       if (actualSign === predSign) {
-        p += 3;
-        correctResults++;
-        if (pred.home === result.home && pred.away === result.away) {
-          p += 2;
-          correctScores++;
-        }
+        p += 3; correctResults++;
+        if (pred.home === result.home && pred.away === result.away) { p += 2; correctScores++; }
       }
-
       matchPoints[matchId] = p;
       pts += p;
     }
 
     return {
-      id: user.id,
-      name: user.name,
-      totalPoints: pts,
-      correctResults,
-      correctScores,
+      id: user.id, name: user.name,
+      totalPoints: pts, correctResults, correctScores,
       matchPoints,
       predictionsEntered: Object.keys(user.predictions).length
     };
   }).sort((a, b) => b.totalPoints - a.totalPoints);
 }
 
+app.get('/api/leaderboard', (req, res) => res.json(calcLeaderboard()));
+
+// ── Profile ────────────────────────────────────────────────────────────────────
+
 app.get('/api/profile/:userId', (req, res) => {
-  const data = readJSON(PREDICTIONS_FILE, { users: [] });
-  const user = data.users.find(u => u.id === req.params.userId);
+  const data  = readJSON(PREDICTIONS_FILE, { users: [] });
+  const user  = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const board = calcLeaderboard();
-  const rank = board.findIndex(u => u.id === req.params.userId) + 1;
+  const rank  = board.findIndex(u => u.id === req.params.userId) + 1;
   const entry = board.find(u => u.id === req.params.userId) || {};
 
   res.json({
-    id: user.id,
-    name: user.name,
+    id:          user.id,
+    name:        user.name,
     displayName: user.displayName || user.name,
-    bio: user.bio || '',
-    avatar: user.avatar || null,
-    joinedAt: user.registeredAt,
+    bio:         user.bio || '',
+    avatar:      user.avatar || null,
+    joinedAt:    user.registeredAt,
     stats: {
-      totalPoints: entry.totalPoints || 0,
+      totalPoints:       entry.totalPoints       || 0,
       rank,
-      totalPlayers: board.length,
-      correctResults: entry.correctResults || 0,
-      correctScores: entry.correctScores || 0,
+      totalPlayers:      board.length,
+      correctResults:    entry.correctResults    || 0,
+      correctScores:     entry.correctScores     || 0,
       predictionsEntered: entry.predictionsEntered || 0
     },
     matchPoints: entry.matchPoints || {}
@@ -498,11 +552,12 @@ app.post('/api/profile/:userId/update', (req, res) => {
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (String(user.pin) !== String(pin)) return res.status(401).json({ error: 'Incorrect PIN' });
-  if (!displayName || !displayName.trim()) return res.status(400).json({ error: 'Display name required' });
+  if (!checkPin(pin, user)) return res.status(401).json({ error: 'Incorrect PIN.' });
 
-  user.displayName = displayName.trim();
-  if (bio !== undefined) user.bio = String(bio).slice(0, 200);
+  const cleanName = sanitise(displayName, 30);
+  if (!cleanName) return res.status(400).json({ error: 'Display name required.' });
+  user.displayName = cleanName;
+  if (bio !== undefined) user.bio = sanitise(String(bio), 200);
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
 });
@@ -512,38 +567,40 @@ app.post('/api/profile/:userId/avatar', (req, res) => {
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (String(user.pin) !== String(pin)) return res.status(401).json({ error: 'Incorrect PIN' });
-  if (!avatar || !avatar.startsWith('data:image/')) return res.status(400).json({ error: 'Invalid image' });
-  if (avatar.length > 250000) return res.status(400).json({ error: 'Image too large — please use a smaller photo' });
+  if (!checkPin(pin, user)) return res.status(401).json({ error: 'Incorrect PIN.' });
+  if (!avatar || !/^data:image\/(jpeg|png|gif|webp);base64,/.test(avatar))
+    return res.status(400).json({ error: 'Invalid image format. Please use JPEG, PNG, GIF or WebP.' });
+  if (avatar.length > 250_000)
+    return res.status(400).json({ error: 'Image too large — please use a smaller photo.' });
 
   user.avatar = avatar;
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
 });
 
-// ── Change PIN ────────────────────────────────────────────────────────────────
+// ── Change PIN ─────────────────────────────────────────────────────────────────
 
 app.post('/api/users/:userId/change-pin', (req, res) => {
   const { currentPin, newPin } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (String(user.pin) !== String(currentPin)) return res.status(401).json({ error: 'Current PIN incorrect' });
-  if (!/^\d{4}$/.test(String(newPin))) return res.status(400).json({ error: 'New PIN must be exactly 4 digits' });
+  if (!checkPin(currentPin, user)) return res.status(401).json({ error: 'Current PIN incorrect.' });
+  if (!/^\d{4}$/.test(String(newPin))) return res.status(400).json({ error: 'New PIN must be exactly 4 digits.' });
 
-  user.pin = String(newPin);
+  upgradePin(user, String(newPin));
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
 });
 
-// ── Reset predictions ─────────────────────────────────────────────────────────
+// ── Reset predictions ──────────────────────────────────────────────────────────
 
 app.post('/api/predictions/:userId/reset', (req, res) => {
   const { pin } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (String(user.pin) !== String(pin)) return res.status(401).json({ error: 'Incorrect PIN' });
+  if (!checkPin(pin, user)) return res.status(401).json({ error: 'Incorrect PIN.' });
 
   user.predictions = {};
   user.lastUpdated = new Date().toISOString();
@@ -551,19 +608,21 @@ app.post('/api/predictions/:userId/reset', (req, res) => {
   res.json({ success: true });
 });
 
-// ── Delete user ───────────────────────────────────────────────────────────────
+// ── Delete user ────────────────────────────────────────────────────────────────
 
 app.delete('/api/users/:userId', (req, res) => {
   const { pin } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
-  const idx = data.users.findIndex(u => u.id === req.params.userId);
+  const idx  = data.users.findIndex(u => u.id === req.params.userId);
   if (idx === -1) return res.status(404).json({ error: 'User not found' });
-  if (String(data.users[idx].pin) !== String(pin)) return res.status(401).json({ error: 'Incorrect PIN' });
+  if (!checkPin(pin, data.users[idx])) return res.status(401).json({ error: 'Incorrect PIN.' });
 
   data.users.splice(idx, 1);
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
 });
+
+// ── Start ──────────────────────────────────────────────────────────────────────
 
 app.listen(PORT, () => {
   console.log(`⚽  World Cup 2026 running at http://localhost:${PORT}`);

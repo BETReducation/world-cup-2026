@@ -37,7 +37,7 @@ $('registerBtn').addEventListener('click', async () => {
   try {
     const result = await API.register(name, pin);
     userId = result.userId;
-    Session.save(result.userId, result.name);
+    Session.save(result.userId, result.name, result.token);
     $('playerName').textContent = result.name;
     $('registerModal').classList.remove('open');
     await loadAndRender();
@@ -282,9 +282,11 @@ $('saveBtn').addEventListener('click', async () => {
     $('saveStatus').textContent = `✓ Saved ${result.saved} predictions`;
     $('saveStatus').style.color = 'var(--accent)';
     enterSavedState();
-  } catch {
-    $('saveStatus').textContent = '✗ Save failed';
+  } catch (e) {
+    const expired = e.message && e.message.includes('Session');
+    $('saveStatus').textContent = expired ? '✗ Session expired — please sign in again' : '✗ Save failed';
     $('saveStatus').style.color = 'var(--red)';
+    if (expired) { Session.clear(); setTimeout(() => location.reload(), 2000); }
   } finally {
     $('saveBtn').disabled = false;
     $('saveBtn').textContent = 'Save Predictions';
@@ -326,9 +328,11 @@ $('clearBtn').addEventListener('click', async () => {
     enterEditState();
     $('saveStatus').textContent = '✓ Predictions reset';
     $('saveStatus').style.color = 'var(--accent)';
-  } catch {
-    $('saveStatus').textContent = '✗ Reset failed';
+  } catch (e) {
+    const expired = e.message && e.message.includes('Session');
+    $('saveStatus').textContent = expired ? '✗ Session expired — please sign in again' : '✗ Reset failed';
     $('saveStatus').style.color = 'var(--red)';
+    if (expired) { Session.clear(); setTimeout(() => location.reload(), 2000); }
   } finally {
     $('clearBtn').disabled = false;
     $('clearBtn').textContent = 'Reset Predictions';
