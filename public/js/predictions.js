@@ -22,37 +22,77 @@ async function init() {
 
 // ── Registration ─────────────────────────────────────────────────────────────
 
+// Toggle between sign-in and forgot-password views
+$('regForgotLink').addEventListener('click', e => {
+  e.preventDefault();
+  $('regSigninView').style.display = 'none';
+  $('regForgotView').style.display = '';
+  setTimeout(() => $('regForgotEmail').focus(), 50);
+});
+$('regForgotBack').addEventListener('click', e => {
+  e.preventDefault();
+  $('regForgotView').style.display = 'none';
+  $('regSigninView').style.display = '';
+});
+
+$('regForgotSubmit').addEventListener('click', async () => {
+  const em   = $('regForgotEmail').value.trim();
+  const errEl = $('regForgotError');
+  errEl.classList.add('hidden');
+  if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+    errEl.textContent = 'Please enter a valid email address.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const btn = $('regForgotSubmit');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await API.forgotPassword(em);
+  } catch (e) {
+    let msg = 'Could not send email. Please try again.';
+    try { const d = JSON.parse(e.message); msg = d.error || msg; } catch {}
+    errEl.textContent = msg; errEl.classList.remove('hidden');
+    btn.disabled = false; btn.textContent = 'Send reset link →';
+    return;
+  }
+  $('regForgotSuccess').classList.remove('hidden');
+  $('regForgotEmailGroup').style.display = 'none';
+  btn.style.display = 'none';
+});
+
 $('registerBtn').addEventListener('click', async () => {
   const name = $('regName').value.trim();
-  const pin  = $('regPin').value.trim();
+  const em   = $('regEmail').value.trim();
+  const pw   = $('regPassword').value.trim();
+  const lp   = $('regLegacyPin')?.value.trim() || null;
   const err  = $('registerError');
 
-  err.style.display = 'none';
-  if (!name) { showErr(err, 'Please enter your name.'); return; }
-  if (!/^\d{4}$/.test(pin)) { showErr(err, 'PIN must be exactly 4 digits.'); return; }
+  err.classList.add('hidden');
+  if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showErr(err, 'Please enter a valid email address.'); return; }
+  if (!pw || pw.length < 8) { showErr(err, 'Password must be at least 8 characters.'); return; }
 
-  $('registerBtn').disabled = true;
+  $('registerBtn').disabled    = true;
   $('registerBtn').textContent = 'Signing in…';
 
   try {
-    const result = await API.register(name, pin);
+    const result = await API.register(name, em, pw, lp || null);
     userId = result.userId;
     Session.save(result.userId, result.name, result.token);
     $('playerName').textContent = result.name;
     $('registerModal').classList.remove('open');
     await loadAndRender();
   } catch (e) {
-    const msg = e.message.includes('PIN')
-      ? 'That name already exists with a different PIN.'
-      : 'Could not connect to server. Is it running?';
+    let msg = 'Could not connect to server. Is it running?';
+    try { const d = JSON.parse(e.message); msg = d.error || msg; } catch {}
     showErr(err, msg);
-    $('registerBtn').disabled = false;
-    $('registerBtn').textContent = 'Continue →';
+    $('registerBtn').disabled    = false;
+    $('registerBtn').textContent = 'Sign in / Sign up →';
   }
 });
 
-$('regPin').addEventListener('keydown', e => { if (e.key === 'Enter') $('registerBtn').click(); });
-$('regName').addEventListener('keydown', e => { if (e.key === 'Enter') $('regPin').focus(); });
+$('regEmail').addEventListener('keydown',    e => { if (e.key === 'Enter') $('regPassword').focus(); });
+$('regPassword').addEventListener('keydown', e => { if (e.key === 'Enter') $('registerBtn').click(); });
+$('regName').addEventListener('keydown',     e => { if (e.key === 'Enter') $('regEmail').focus(); });
 
 $('browseBtn').addEventListener('click', async () => {
   browseMode = true;

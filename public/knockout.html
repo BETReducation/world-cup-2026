@@ -45,19 +45,55 @@
 <!-- Register modal -->
 <div class="modal-overlay" id="registerModal">
   <div class="modal">
-    <h2><i class="fa-regular fa-futbol"></i> Join the League</h2>
-    <p>Enter your name and PIN to load your predictions. Same details as the group stage.</p>
-    <div id="registerError" class="error-msg hidden"></div>
-    <div class="form-group">
-      <label for="regName">Your name</label>
-      <input type="text" id="regName" placeholder="e.g. Gary" maxlength="30" autocomplete="off">
+
+    <!-- Sign in / Sign up view -->
+    <div id="regSigninView">
+      <h2><i class="fa-regular fa-futbol"></i> Join the League</h2>
+      <p>Sign in with your email and password to load your predictions.</p>
+      <div id="registerError" class="error-msg hidden"></div>
+      <div class="form-group">
+        <label for="regName">Display name <span style="color:var(--muted);font-size:11px;">(new accounts only)</span></label>
+        <input type="text" id="regName" placeholder="e.g. Gary" maxlength="30" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="regEmail">Email address</label>
+        <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="regPassword">Password <span style="color:var(--muted);font-size:11px;">(min. 8 characters)</span></label>
+        <input type="password" id="regPassword" placeholder="Your password" autocomplete="current-password">
+        <small><a href="#" id="regForgotLink" style="color:var(--accent);">Forgot password?</a></small>
+      </div>
+      <details style="margin-bottom:12px;">
+        <summary style="cursor:pointer;font-size:12px;color:var(--muted);user-select:none;">Had a PIN-based account? Click to claim it</summary>
+        <div style="margin-top:8px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="regLegacyPin">Old 4-digit PIN</label>
+            <input type="number" id="regLegacyPin" placeholder="e.g. 1234" min="1000" max="9999" inputmode="numeric">
+            <small>Enter your old PIN along with your name above to keep your previous predictions.</small>
+          </div>
+        </div>
+      </details>
+      <button class="btn btn-primary btn-full" id="registerBtn">Sign in →</button>
+      <button class="btn btn-outline btn-full" id="browseBtn" style="margin-top:8px;">Browse without signing in</button>
     </div>
-    <div class="form-group">
-      <label for="regPin">4-digit PIN</label>
-      <input type="number" id="regPin" placeholder="e.g. 1234" min="1000" max="9999" inputmode="numeric">
+
+    <!-- Forgot password view -->
+    <div id="regForgotView" style="display:none;">
+      <h2><i class="fa-solid fa-key"></i> Forgot Password</h2>
+      <p>Enter your email and we'll send a link to reset your password.</p>
+      <div id="regForgotError" class="error-msg hidden"></div>
+      <div id="regForgotSuccess" class="hidden" style="color:var(--accent);font-size:14px;margin-bottom:12px;padding:10px 12px;border:1px solid var(--accent);border-radius:var(--radius-sm);background:var(--accent-dim);">
+        <i class="fa-solid fa-circle-check"></i> Check your inbox — a reset link is on its way.
+      </div>
+      <div class="form-group" id="regForgotEmailGroup">
+        <label for="regForgotEmail">Email address</label>
+        <input type="email" id="regForgotEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <button class="btn btn-primary btn-full" id="regForgotSubmit">Send reset link →</button>
+      <button class="btn btn-outline btn-full" id="regForgotBack" style="margin-top:8px;">← Back to sign in</button>
     </div>
-    <button class="btn btn-primary btn-full" id="registerBtn">Sign in →</button>
-    <button class="btn btn-outline btn-full" id="browseBtn" style="margin-top:8px;">Browse without signing in</button>
+
   </div>
 </div>
 

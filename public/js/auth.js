@@ -25,45 +25,41 @@ document.addEventListener('DOMContentLoaded', () => {
   drawerOverlay?.addEventListener('click', closeDrawer);
   drawerClose?.addEventListener('click', closeDrawer);
 
-  // Mark the active drawer link based on current page
+  // Mark active drawer link
   if (drawer) {
     const page = location.pathname.split('/').pop() || 'index.html';
     drawer.querySelectorAll('a[href]').forEach(a => {
       const href = a.getAttribute('href');
-      if (href === page || (page === '' && href === 'index.html')) {
-        a.classList.add('active');
-      }
+      if (href === page || (page === '' && href === 'index.html')) a.classList.add('active');
     });
-    // Close drawer when a real nav link is tapped
     drawer.querySelectorAll('.nav-drawer-links a').forEach(a =>
       a.addEventListener('click', closeDrawer)
     );
   }
 
   // ── Desktop nav member link ────────────────────────────────────────────────
-  const link        = document.getElementById('navMemberLink');
+  const link         = document.getElementById('navMemberLink');
   const drawerFooter = document.getElementById('navDrawerUser');
 
   if (!link) return;
 
   if (userId && name) {
-    // ── Logged in ─────────────────────────────────────────────────────────────
+    // ── Logged in ────────────────────────────────────────────────────────────
     link.innerHTML     = '<i class="fa-solid fa-user"></i> ' + name;
     link.href          = 'member.html?id=' + userId;
     link.style.display = 'flex';
 
     const logoutBtn = document.createElement('button');
-    logoutBtn.textContent    = 'Log out';
-    logoutBtn.className      = 'btn btn-outline btn-sm';
+    logoutBtn.textContent      = 'Log out';
+    logoutBtn.className        = 'btn btn-outline btn-sm';
     logoutBtn.style.marginLeft = '4px';
     logoutBtn.addEventListener('click', doLogout);
     link.insertAdjacentElement('afterend', logoutBtn);
 
-    // Drawer footer: profile link + logout
     if (drawerFooter) {
       const profileLink = document.createElement('a');
       profileLink.innerHTML = '<i class="fa-solid fa-user"></i> ' + name;
-      profileLink.href        = 'member.html?id=' + userId;
+      profileLink.href      = 'member.html?id=' + userId;
       profileLink.addEventListener('click', closeDrawer);
 
       const drawerLogout = document.createElement('button');
@@ -76,79 +72,123 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
   } else {
-    // ── Logged out ────────────────────────────────────────────────────────────
+    // ── Logged out ───────────────────────────────────────────────────────────
     const signInBtn = document.createElement('button');
-    signInBtn.textContent    = 'Sign in';
-    signInBtn.className      = 'btn btn-outline btn-sm';
+    signInBtn.textContent      = 'Sign in';
+    signInBtn.className        = 'btn btn-outline btn-sm';
     signInBtn.style.marginLeft = '4px';
     signInBtn.addEventListener('click', () => openAuthModal());
     link.insertAdjacentElement('afterend', signInBtn);
 
-    // Inject auth modal
+    // Inject modal
     document.body.insertAdjacentHTML('beforeend', `
       <div class="modal-overlay" id="navAuthModal">
         <div class="modal">
-          <h2><i class="fa-regular fa-futbol"></i> Sign in</h2>
-          <p>Enter your name and 4-digit PIN. New here? A new account will be created automatically.</p>
-          <div id="navAuthError" class="error-msg hidden"></div>
-          <div class="form-group">
-            <label for="navAuthName">Your name</label>
-            <input type="text" id="navAuthName" placeholder="e.g. Gary" maxlength="30" autocomplete="off">
+
+          <!-- ── Sign in / Sign up view ── -->
+          <div id="navAuthSigninView">
+            <h2><i class="fa-regular fa-futbol"></i> Sign In</h2>
+            <p>Sign in with your email and password. New to the league? A new account will be created automatically.</p>
+            <div id="navAuthError" class="error-msg hidden"></div>
+            <div class="form-group">
+              <label for="navAuthName">Display name <span style="color:var(--muted);font-size:11px;">(new accounts only)</span></label>
+              <input type="text" id="navAuthName" placeholder="e.g. Gary" maxlength="30" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="navAuthEmail">Email address</label>
+              <input type="email" id="navAuthEmail" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label for="navAuthPassword">Password <span style="color:var(--muted);font-size:11px;">(min. 8 characters)</span></label>
+              <input type="password" id="navAuthPassword" placeholder="Your password" autocomplete="current-password">
+              <small><a href="#" id="navForgotLink" style="color:var(--accent);">Forgot password?</a></small>
+            </div>
+            <details style="margin-bottom:12px;">
+              <summary style="cursor:pointer;font-size:12px;color:var(--muted);user-select:none;">Had a PIN-based account? Click to claim it</summary>
+              <div style="margin-top:8px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="navAuthLegacyPin">Old 4-digit PIN</label>
+                  <input type="number" id="navAuthLegacyPin" placeholder="e.g. 1234" min="1000" max="9999" inputmode="numeric">
+                  <small>Enter your old PIN along with your name above to keep your previous predictions.</small>
+                </div>
+              </div>
+            </details>
+            <button class="btn btn-primary btn-full" id="navAuthSubmit">Sign in →</button>
+            <button class="btn btn-outline btn-full" id="navAuthCancel" style="margin-top:8px;">Cancel</button>
           </div>
-          <div class="form-group">
-            <label for="navAuthPin">4-digit PIN</label>
-            <input type="number" id="navAuthPin" placeholder="e.g. 1234" min="1000" max="9999" inputmode="numeric">
-            <small>Choose any 4-digit number — you'll need it to log in again.</small>
+
+          <!-- ── Forgot password view ── -->
+          <div id="navAuthForgotView" style="display:none;">
+            <h2><i class="fa-solid fa-key"></i> Forgot Password</h2>
+            <p>Enter your email address and we'll send you a link to reset your password.</p>
+            <div id="navForgotError" class="error-msg hidden"></div>
+            <div id="navForgotSuccess" class="hidden" style="color:var(--accent);font-size:14px;margin-bottom:12px;padding:10px 12px;border:1px solid var(--accent);border-radius:var(--radius-sm);background:var(--accent-dim);">
+              <i class="fa-solid fa-circle-check"></i> Check your inbox — a reset link is on its way.
+            </div>
+            <div class="form-group" id="navForgotEmailGroup">
+              <label for="navForgotEmail">Email address</label>
+              <input type="email" id="navForgotEmail" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <button class="btn btn-primary btn-full" id="navForgotSubmit">Send reset link →</button>
+            <button class="btn btn-outline btn-full" id="navForgotBack" style="margin-top:8px;">← Back to sign in</button>
           </div>
-          <button class="btn btn-primary btn-full" id="navAuthSubmit">Sign in →</button>
-          <button class="btn btn-outline btn-full" id="navAuthCancel" style="margin-top:8px;">Cancel</button>
+
         </div>
       </div>`);
 
-    const modal     = document.getElementById('navAuthModal');
-    const nameInput = document.getElementById('navAuthName');
-    const pinInput  = document.getElementById('navAuthPin');
-    const submitBtn = document.getElementById('navAuthSubmit');
-    const cancelBtn = document.getElementById('navAuthCancel');
-    const errorEl   = document.getElementById('navAuthError');
+    const modal         = document.getElementById('navAuthModal');
+    const signinView    = document.getElementById('navAuthSigninView');
+    const forgotView    = document.getElementById('navAuthForgotView');
+    const nameInput     = document.getElementById('navAuthName');
+    const emailInput    = document.getElementById('navAuthEmail');
+    const passwordInput = document.getElementById('navAuthPassword');
+    const submitBtn     = document.getElementById('navAuthSubmit');
+    const cancelBtn     = document.getElementById('navAuthCancel');
+    const errorEl       = document.getElementById('navAuthError');
 
     function openAuthModal() {
-      nameInput.value = '';
-      pinInput.value  = '';
+      nameInput.value     = '';
+      emailInput.value    = '';
+      passwordInput.value = '';
       errorEl.classList.add('hidden');
+      showSignin();
       modal.classList.add('open');
-      setTimeout(() => nameInput.focus(), 50);
+      setTimeout(() => emailInput.focus(), 50);
     }
     function closeAuthModal() { modal.classList.remove('open'); }
+    function showSignin()     { signinView.style.display = ''; forgotView.style.display = 'none'; }
+    function showForgot()     { signinView.style.display = 'none'; forgotView.style.display = ''; setTimeout(() => document.getElementById('navForgotEmail').focus(), 50); }
 
     cancelBtn.addEventListener('click', closeAuthModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeAuthModal(); });
-    nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') pinInput.focus(); });
-    pinInput.addEventListener('keydown',  e => { if (e.key === 'Enter') submitBtn.click(); });
+    document.getElementById('navForgotLink').addEventListener('click', e => { e.preventDefault(); showForgot(); });
+    document.getElementById('navForgotBack').addEventListener('click', e => { e.preventDefault(); showSignin(); });
 
+    // Tab flow
+    nameInput.addEventListener('keydown',     e => { if (e.key === 'Enter') emailInput.focus(); });
+    emailInput.addEventListener('keydown',    e => { if (e.key === 'Enter') passwordInput.focus(); });
+    passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitBtn.click(); });
+
+    // Sign in / sign up
     submitBtn.addEventListener('click', async () => {
-      const n = nameInput.value.trim();
-      const p = pinInput.value.trim();
+      const n  = nameInput.value.trim();
+      const em = emailInput.value.trim();
+      const pw = passwordInput.value.trim();
+      const lp = document.getElementById('navAuthLegacyPin')?.value.trim() || null;
       errorEl.classList.add('hidden');
-      if (!n) { showNavErr('Please enter your name.'); return; }
-      if (!/^\d{4}$/.test(p)) { showNavErr('PIN must be exactly 4 digits.'); return; }
+
+      if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showNavErr('Please enter a valid email address.'); return; }
+      if (!pw || pw.length < 8) { showNavErr('Password must be at least 8 characters.'); return; }
 
       submitBtn.disabled    = true;
       submitBtn.textContent = 'Signing in…';
       try {
-        const res  = await fetch('/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: n, pin: p })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error');
+        const data = await API.register(n, em, pw, lp || null);
         Session.save(data.userId, data.name, data.token);
         location.reload();
       } catch (e) {
-        const msg = e.message.includes('PIN')
-          ? 'That name exists with a different PIN.'
-          : 'Could not reach server. Is it running?';
+        let msg = 'Could not reach server. Is it running?';
+        try { const d = JSON.parse(e.message); msg = d.error || msg; } catch {}
         showNavErr(msg);
         submitBtn.disabled    = false;
         submitBtn.textContent = 'Sign in →';
@@ -160,15 +200,41 @@ document.addEventListener('DOMContentLoaded', () => {
       errorEl.classList.remove('hidden');
     }
 
+    // Forgot password
+    document.getElementById('navForgotSubmit').addEventListener('click', async () => {
+      const em     = document.getElementById('navForgotEmail').value.trim();
+      const errEl2 = document.getElementById('navForgotError');
+      errEl2.classList.add('hidden');
+      if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+        errEl2.textContent = 'Please enter a valid email address.';
+        errEl2.classList.remove('hidden');
+        return;
+      }
+      const btn = document.getElementById('navForgotSubmit');
+      btn.disabled    = true;
+      btn.textContent = 'Sending…';
+      try {
+        await API.forgotPassword(em);
+      } catch (e) {
+        let msg = 'Could not send email. Please try again.';
+        try { const d = JSON.parse(e.message); msg = d.error || msg; } catch {}
+        errEl2.textContent = msg;
+        errEl2.classList.remove('hidden');
+        btn.disabled    = false;
+        btn.textContent = 'Send reset link →';
+        return;
+      }
+      document.getElementById('navForgotSuccess').classList.remove('hidden');
+      document.getElementById('navForgotEmailGroup').style.display = 'none';
+      btn.style.display = 'none';
+    });
+
     // Drawer footer: sign-in button
     if (drawerFooter) {
       const drawerSignIn = document.createElement('button');
       drawerSignIn.textContent = 'Sign in';
       drawerSignIn.className   = 'btn btn-outline btn-sm btn-full';
-      drawerSignIn.addEventListener('click', () => {
-        closeDrawer();
-        openAuthModal();
-      });
+      drawerSignIn.addEventListener('click', () => { closeDrawer(); openAuthModal(); });
       drawerFooter.appendChild(drawerSignIn);
     }
   }

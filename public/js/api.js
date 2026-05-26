@@ -7,8 +7,8 @@ const API = {
   },
   async post(path, body, adminPwd = null, sessionToken = null) {
     const headers = { 'Content-Type': 'application/json' };
-    if (adminPwd)     headers['x-admin-password']  = adminPwd;
-    if (sessionToken) headers['x-session-token']   = sessionToken;
+    if (adminPwd)     headers['x-admin-password'] = adminPwd;
+    if (sessionToken) headers['x-session-token']  = sessionToken;
     const r = await fetch(path, { method: 'POST', headers, body: JSON.stringify(body) });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
@@ -19,16 +19,13 @@ const API = {
     return r.json();
   },
 
-  fixtures:      ()                     => API.get('/api/fixtures'),
-  lockStatus:    ()                     => API.get('/api/lock-status'),
-  users:         ()                     => API.get('/api/users'),
-  register:      (name, pin)            => API.post('/api/register', { name, pin }),
-  allPredictions:()                     => API.get('/api/predictions'),
-  myPredictions: (userId)               => API.get(`/api/predictions/${userId}`),
-  savePredictions(userId, predictions)  {
-    const { token } = Session.load();
-    return API.post(`/api/predictions/${userId}`, { predictions }, null, token);
-  },
+  // Auth
+  register: (name, email, password, legacyPin = null) =>
+    API.post('/api/register', { name, email, password, ...(legacyPin ? { legacyPin } : {}) }),
+  forgotPassword: (email) =>
+    API.post('/api/forgot-password', { email }),
+  resetPassword: (token, password) =>
+    API.post('/api/reset-password', { token, password }),
   logout() {
     const { token } = Session.load();
     return fetch('/api/logout', {
@@ -36,14 +33,29 @@ const API = {
       headers: token ? { 'x-session-token': token } : {}
     }).catch(() => {});
   },
-  results:      ()                        => API.get('/api/results'),
-  verifyAdmin:  (pwd)                     => fetch('/api/admin/verify', { headers: { 'x-admin-password': pwd } }).then(r => r.ok),
-  saveResult:   (matchId, hg, ag, pwd)    => API.post('/api/results', { matchId, homeGoals: hg, awayGoals: ag }, pwd),
-  deleteResult: (matchId, pwd)            => API.del(`/api/results/${matchId}`, pwd),
-  leaderboard:  ()                        => API.get('/api/leaderboard')
+
+  // Fixtures & lock
+  fixtures:   () => API.get('/api/fixtures'),
+  lockStatus: () => API.get('/api/lock-status'),
+  users:      () => API.get('/api/users'),
+
+  // Predictions
+  allPredictions: ()         => API.get('/api/predictions'),
+  myPredictions:  (userId)   => API.get(`/api/predictions/${userId}`),
+  savePredictions(userId, predictions) {
+    const { token } = Session.load();
+    return API.post(`/api/predictions/${userId}`, { predictions }, null, token);
+  },
+
+  // Results & leaderboard
+  results:      ()                   => API.get('/api/results'),
+  leaderboard:  ()                   => API.get('/api/leaderboard'),
+  verifyAdmin:  (pwd)                => fetch('/api/admin/verify', { headers: { 'x-admin-password': pwd } }).then(r => r.ok),
+  saveResult:   (matchId, hg, ag, pwd) => API.post('/api/results', { matchId, homeGoals: hg, awayGoals: ag }, pwd),
+  deleteResult: (matchId, pwd)       => API.del(`/api/results/${matchId}`, pwd)
 };
 
-// Session helpers — now stores token alongside userId and name
+// Session helpers — stores userId, display name, and session token in localStorage
 const Session = {
   save(userId, name, token) {
     localStorage.setItem('wc2026_userId', userId);

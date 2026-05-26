@@ -1,19 +1,20 @@
-const express  = require('express');
-const fs       = require('fs');
-const path     = require('path');
-const cors     = require('cors');
-const crypto   = require('crypto');
+const express    = require('express');
+const fs         = require('fs');
+const path       = require('path');
+const cors       = require('cors');
+const crypto     = require('crypto');
+const nodemailer = require('nodemailer');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin2026';
 
+// ── Paths ──────────────────────────────────────────────────────────────────────
+
 const DATA_DIR = path.join(__dirname, 'data');
 
-// Mutable user data lives in a separate persistent directory.
 // In production (Railway) set PERSISTENT_DATA_DIR to a mounted volume path
 // so predictions and results survive redeployments.
-// Locally it falls back to ./data — no config needed.
 const PERSISTENT_DIR = process.env.PERSISTENT_DATA_DIR
   ? path.resolve(process.env.PERSISTENT_DATA_DIR)
   : DATA_DIR;
@@ -28,7 +29,39 @@ app.use(cors());
 app.use(express.json({ limit: '400kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── JSON helpers ──────────────────────────────────────────────────────────────
+// ── Email (nodemailer via Gmail) ───────────────────────────────────────────────
+// Set GMAIL_USER and GMAIL_APP_PASSWORD env vars to enable email sending.
+// Set APP_URL to your public URL so reset links work (e.g. https://yourapp.railway.app).
+
+const emailEnabled = !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
+
+const mailer = emailEnabled
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD }
+    })
+  : null;
+
+async function sendPasswordResetEmail(to, name, resetLink) {
+  if (!mailer) throw new Error('Email is not configured on this server.');
+  await mailer.sendMail({
+    from: `"WC26 Prediction League" <${process.env.GMAIL_USER}>`,
+    to,
+    subject: 'WC26 — Reset your password',
+    text: `Hi ${name},\n\nWe received a request to reset your WC26 Prediction League password.\n\nClick the link below to set a new password. This link expires in 1 hour.\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email.\n\n— WC26 Prediction League`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#0b0f1a;color:#e2e8f4;border-radius:12px;">
+        <h2 style="font-size:20px;font-weight:700;margin:0 0 8px;color:#4dc97a;">WC26 Prediction League</h2>
+        <p style="margin:0 0 20px;color:#6b7a99;font-size:14px;">Password reset request</p>
+        <p style="margin:0 0 16px;">Hi <strong>${name}</strong>,</p>
+        <p style="margin:0 0 24px;color:#a0aec0;">We received a request to reset your password. Click the button below — the link expires in <strong>1 hour</strong>.</p>
+        <a href="${resetLink}" style="display:inline-block;padding:12px 28px;background:#4dc97a;color:#0b0f1a;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Reset my password →</a>
+        <p style="margin:24px 0 0;font-size:12px;color:#6b7a99;">If you didn't request this, you can safely ignore this email. Your password won't change.</p>
+      </div>`
+  });
+}
+
+// ── JSON helpers ───────────────────────────────────────────────────────────────
 
 function readJSON(filePath, defaultValue = {}) {
   if (!fs.existsSync(filePath)) return defaultValue;
@@ -42,42 +75,46 @@ function writeJSON(filePath, data) {
 
 // ── Input sanitisation ────────────────────────────────────────────────────────
 
-// Strip < and > to prevent HTML injection, then trim and cap length.
 function sanitise(str, maxLen) {
   if (typeof str !== 'string') return '';
   return str.replace(/[<>]/g, '').trim().slice(0, maxLen);
 }
 
-// ── PIN hashing (PBKDF2 via Node built-in crypto) ─────────────────────────────
+// ── Password hashing (PBKDF2 via Node built-in crypto) ────────────────────────
 
-function hashPin(pin, salt) {
-  return crypto.pbkdf2Sync(String(pin), salt, 100_000, 32, 'sha256').toString('hex');
+function hashStr(value, salt) {
+  return crypto.pbkdf2Sync(String(value), salt, 100_000, 32, 'sha256').toString('hex');
 }
 
-// Supports both legacy plaintext PINs and new hashed PINs.
-// Returns true if the supplied pin is correct.
-function checkPin(inputPin, user) {
-  if (user.pinSalt && user.pinHash) {
-    return hashPin(inputPin, user.pinSalt) === user.pinHash;
-  }
-  // Legacy plaintext — compare and migrate on success (caller must save)
-  return String(user.pin) === String(inputPin);
+// Checks a submitted password against a user record.
+// Supports new passwordSalt/passwordHash fields, legacy hashed PINs (pinSalt/pinHash),
+// and legacy plaintext PINs — enabling transparent migration.
+function checkPassword(input, user) {
+  if (user.passwordSalt && user.passwordHash)
+    return hashStr(input, user.passwordSalt) === user.passwordHash;
+  if (user.pinSalt && user.pinHash)                       // legacy hashed PIN
+    return hashStr(input, user.pinSalt)     === user.pinHash;
+  if (user.pin !== undefined)                             // legacy plaintext PIN
+    return String(user.pin) === String(input);
+  return false;
 }
 
-// Upgrade a user record from plaintext PIN to hashed PIN in-place.
-// Caller is responsible for persisting the change.
-function upgradePin(user, plaintextPin) {
-  const salt    = crypto.randomBytes(16).toString('hex');
-  user.pinSalt  = salt;
-  user.pinHash  = hashPin(plaintextPin, salt);
+// Writes a new hashed password onto a user record and removes legacy PIN fields.
+// Caller must persist the data file.
+function setPassword(user, password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  user.passwordSalt = salt;
+  user.passwordHash = hashStr(password, salt);
+  delete user.pinSalt;
+  delete user.pinHash;
   delete user.pin;
 }
 
-// ── Rate limiting (in-memory, per IP) ────────────────────────────────────────
+// ── Rate limiting (in-memory, per IP) ─────────────────────────────────────────
 
-const loginAttempts = new Map(); // ip → { count, firstAt }
-const RATE_MAX    = 5;
-const RATE_WINDOW = 15 * 60 * 1000; // 15 min
+const loginAttempts = new Map();
+const RATE_MAX    = 10;
+const RATE_WINDOW = 15 * 60 * 1000;
 
 function getIP(req) {
   return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || 'unknown';
@@ -102,14 +139,12 @@ function recordFailure(req) {
   }
 }
 
-function clearFailures(req) {
-  loginAttempts.delete(getIP(req));
-}
+function clearFailures(req) { loginAttempts.delete(getIP(req)); }
 
 // ── Session tokens (in-memory, 30-day TTL) ────────────────────────────────────
 
-const sessions = new Map(); // token → { userId, expiresAt }
-const SESSION_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+const sessions = new Map();
+const SESSION_TTL = 30 * 24 * 60 * 60 * 1000;
 
 function createSession(userId) {
   const token = crypto.randomBytes(32).toString('hex');
@@ -125,17 +160,19 @@ function validateSession(token, userId) {
   return s.userId === userId;
 }
 
-function destroySession(token) {
-  if (token) sessions.delete(token);
+function destroySession(token) { if (token) sessions.delete(token); }
+
+function destroyAllSessions(userId) {
+  for (const [t, s] of sessions) if (s.userId === userId) sessions.delete(t);
 }
 
-// Sweep expired sessions hourly so the Map doesn't grow unbounded.
+// Sweep expired sessions hourly.
 setInterval(() => {
   const now = Date.now();
   for (const [t, s] of sessions) if (now > s.expiresAt) sessions.delete(t);
 }, 60 * 60 * 1000);
 
-// ── Fixtures helpers ──────────────────────────────────────────────────────────
+// ── Fixtures helpers ───────────────────────────────────────────────────────────
 
 function isRoundLocked(round, fixtures) {
   const lockTime = fixtures.lockDates?.[String(round)];
@@ -155,7 +192,7 @@ function getMatchRound(matchId, fixtures) {
   return null;
 }
 
-// ── Knockout bracket auto-resolution ─────────────────────────────────────────
+// ── Knockout bracket auto-resolution ──────────────────────────────────────────
 
 function calcGroupStandings(teams, matches, results) {
   const stats = {};
@@ -221,7 +258,6 @@ function formatSlotLabel(slot) {
 
 function resolveKnockoutFixtures(fixtures, results) {
   if (!fixtures.knockout) return fixtures;
-
   const slotMap = {};
   const thirdPlaceTeams = [];
 
@@ -233,15 +269,12 @@ function resolveKnockoutFixtures(fixtures, results) {
     if (rows[1]) slotMap[`2${groupKey}`] = rows[1].team.id;
     if (rows[2]) thirdPlaceTeams.push({
       team: rows[2].team, pts: rows[2].pts,
-      gd: rows[2].gf - rows[2].ga, gf: rows[2].gf,
-      groupKey
+      gd: rows[2].gf - rows[2].ga, gf: rows[2].gf, groupKey
     });
   }
 
   thirdPlaceTeams.sort((a, b) =>
-    b.pts !== a.pts ? b.pts - a.pts :
-    b.gd  !== a.gd  ? b.gd  - a.gd  :
-    b.gf  - a.gf
+    b.pts !== a.pts ? b.pts - a.pts : b.gd !== a.gd ? b.gd - a.gd : b.gf - a.gf
   );
 
   const usedIn3rd = new Set();
@@ -354,44 +387,69 @@ app.get('/api/users', (req, res) => {
 });
 
 app.post('/api/register', (req, res) => {
-  // Rate limiting
   if (isRateLimited(req))
-    return res.status(429).json({ error: 'Too many attempts. Please wait 15 minutes and try again.' });
+    return res.status(429).json({ error: 'Too many sign-in attempts. Please wait 15 minutes and try again.' });
 
-  // Sanitise inputs
-  const name = sanitise(req.body.name, 30);
-  const pin  = String(req.body.pin || '').trim();
+  const name      = sanitise(req.body.name, 30);
+  const email     = sanitise(req.body.email || '', 254).toLowerCase();
+  const password  = String(req.body.password || '').trim();
+  const legacyPin = req.body.legacyPin ? String(req.body.legacyPin).trim() : null;
 
-  if (!name)                    return res.status(400).json({ error: 'Name is required.' });
-  if (!/^\d{4}$/.test(pin))     return res.status(400).json({ error: 'PIN must be exactly 4 digits.' });
+  // Validate email
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return res.status(400).json({ error: 'A valid email address is required.' });
 
-  const data     = readJSON(PREDICTIONS_FILE, { users: [] });
-  const existing = data.users.find(u => u.name.toLowerCase() === name.toLowerCase());
+  // Validate password
+  if (!password || password.length < 8)
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
 
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+
+  // ── Sign in to existing email account ───────────────────────────────────────
+  const existing = data.users.find(u => u.email && u.email.toLowerCase() === email);
   if (existing) {
-    // Use generic message — don't reveal whether the name exists
-    if (!checkPin(pin, existing)) {
+    if (!checkPassword(password, existing)) {
       recordFailure(req);
-      return res.status(401).json({ error: 'Name or PIN incorrect.' });
+      return res.status(401).json({ error: 'Email or password incorrect.' });
     }
     clearFailures(req);
-    // Transparently upgrade legacy plaintext PINs to hashed on first login
-    if (!existing.pinSalt) {
-      upgradePin(existing, pin);
-      writeJSON(PREDICTIONS_FILE, data);
-    }
     const token = createSession(existing.id);
-    return res.json({ userId: existing.id, name: existing.name, token });
+    return res.json({ userId: existing.id, name: existing.displayName || existing.name, token });
   }
 
-  // New user — use random ID instead of timestamp
+  // ── Optional migration: claim a legacy PIN-based account ────────────────────
+  if (legacyPin && name) {
+    const legacy = data.users.find(u =>
+      !u.email && u.name.toLowerCase() === name.toLowerCase()
+    );
+    if (legacy && checkPassword(legacyPin, legacy)) {
+      // Merge: attach email + new password to existing account, keep userId + predictions
+      legacy.email = email;
+      setPassword(legacy, password);
+      writeJSON(PREDICTIONS_FILE, data);
+      const token = createSession(legacy.id);
+      return res.json({
+        userId: legacy.id,
+        name:   legacy.displayName || legacy.name,
+        token,
+        migrated: true
+      });
+    }
+    // Wrong legacy PIN or no match — fall through to create a fresh account
+  }
+
+  // ── New account ──────────────────────────────────────────────────────────────
+  if (!name)
+    return res.status(400).json({ error: 'Please enter your display name to create an account.' });
+
   const userId = 'user_' + crypto.randomBytes(8).toString('hex');
   const salt   = crypto.randomBytes(16).toString('hex');
   data.users.push({
     id:           userId,
     name,
-    pinSalt:      salt,
-    pinHash:      hashPin(pin, salt),
+    email,
+    passwordSalt: salt,
+    passwordHash: hashStr(password, salt),
     predictions:  {},
     registeredAt: new Date().toISOString()
   });
@@ -404,6 +462,68 @@ app.post('/api/register', (req, res) => {
 
 app.post('/api/logout', (req, res) => {
   destroySession(req.headers['x-session-token']);
+  res.json({ ok: true });
+});
+
+// ── Forgot password ────────────────────────────────────────────────────────────
+
+app.post('/api/forgot-password', async (req, res) => {
+  const email = sanitise(req.body.email || '', 254).toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return res.status(400).json({ error: 'A valid email address is required.' });
+
+  // Always return 200 so attackers can't enumerate registered emails.
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  const user = data.users.find(u => u.email && u.email.toLowerCase() === email);
+  if (!user) return res.json({ ok: true });
+
+  // Generate a 1-hour reset token
+  const token = crypto.randomBytes(32).toString('hex');
+  user.resetToken       = token;
+  user.resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  writeJSON(PREDICTIONS_FILE, data);
+
+  const appUrl    = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+  const resetLink = `${appUrl}/reset.html?token=${token}`;
+
+  try {
+    await sendPasswordResetEmail(user.email, user.displayName || user.name, resetLink);
+  } catch (err) {
+    console.error('Password reset email failed:', err.message);
+    if (!emailEnabled)
+      return res.status(503).json({ error: 'Email is not configured on this server. Please contact the admin.' });
+  }
+
+  res.json({ ok: true });
+});
+
+// ── Reset password (via email token) ──────────────────────────────────────────
+
+app.post('/api/reset-password', (req, res) => {
+  const { token, password } = req.body;
+  if (!token)
+    return res.status(400).json({ error: 'Reset token required.' });
+  if (!password || password.length < 8)
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  const user = data.users.find(u =>
+    u.resetToken === token &&
+    u.resetTokenExpiry &&
+    new Date(u.resetTokenExpiry) > new Date()
+  );
+
+  if (!user)
+    return res.status(400).json({ error: 'This reset link is invalid or has expired. Please request a new one.' });
+
+  setPassword(user, password);
+  delete user.resetToken;
+  delete user.resetTokenExpiry;
+  writeJSON(PREDICTIONS_FILE, data);
+
+  // Invalidate all existing sessions so the user must sign in with new password
+  destroyAllSessions(user.id);
+
   res.json({ ok: true });
 });
 
@@ -422,8 +542,6 @@ app.get('/api/predictions/:userId', (req, res) => {
 });
 
 app.post('/api/predictions/:userId', (req, res) => {
-  // Require a valid session token — prevents anyone guessing a userId from
-  // overwriting another player's predictions.
   if (!validateSession(req.headers['x-session-token'], req.params.userId))
     return res.status(401).json({ error: 'Session invalid or expired. Please sign in again.' });
 
@@ -433,7 +551,6 @@ app.post('/api/predictions/:userId', (req, res) => {
   const user     = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  // Keep locked predictions, accept unlocked ones from the request
   const updated = {};
   for (const [matchId, score] of Object.entries(user.predictions)) {
     const round = getMatchRound(matchId, fixtures);
@@ -462,13 +579,10 @@ app.post('/api/results', requireAdmin, (req, res) => {
   const { matchId, homeGoals, awayGoals } = req.body;
   if (!matchId || homeGoals === undefined || awayGoals === undefined)
     return res.status(400).json({ error: 'matchId, homeGoals, awayGoals required' });
-
   const data = readJSON(RESULTS_FILE, { results: {} });
   data.results[matchId] = {
-    home:       parseInt(homeGoals),
-    away:       parseInt(awayGoals),
-    played:     true,
-    recordedAt: new Date().toISOString()
+    home: parseInt(homeGoals), away: parseInt(awayGoals),
+    played: true, recordedAt: new Date().toISOString()
   };
   writeJSON(RESULTS_FILE, data);
   res.json({ success: true });
@@ -490,7 +604,6 @@ function calcLeaderboard() {
   return users.map(user => {
     let pts = 0, correctResults = 0, correctScores = 0;
     const matchPoints = {};
-
     for (const [matchId, result] of Object.entries(results)) {
       if (!result.played) continue;
       const pred = user.predictions[matchId];
@@ -505,7 +618,6 @@ function calcLeaderboard() {
       matchPoints[matchId] = p;
       pts += p;
     }
-
     return {
       id: user.id, name: user.name,
       totalPoints: pts, correctResults, correctScores,
@@ -523,24 +635,19 @@ app.get('/api/profile/:userId', (req, res) => {
   const data  = readJSON(PREDICTIONS_FILE, { users: [] });
   const user  = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-
   const board = calcLeaderboard();
   const rank  = board.findIndex(u => u.id === req.params.userId) + 1;
   const entry = board.find(u => u.id === req.params.userId) || {};
-
   res.json({
-    id:          user.id,
-    name:        user.name,
+    id: user.id, name: user.name,
     displayName: user.displayName || user.name,
-    bio:         user.bio || '',
-    avatar:      user.avatar || null,
-    joinedAt:    user.registeredAt,
+    bio: user.bio || '', avatar: user.avatar || null,
+    joinedAt: user.registeredAt,
     stats: {
-      totalPoints:       entry.totalPoints       || 0,
-      rank,
-      totalPlayers:      board.length,
-      correctResults:    entry.correctResults    || 0,
-      correctScores:     entry.correctScores     || 0,
+      totalPoints:        entry.totalPoints        || 0,
+      rank, totalPlayers: board.length,
+      correctResults:     entry.correctResults     || 0,
+      correctScores:      entry.correctScores      || 0,
       predictionsEntered: entry.predictionsEntered || 0
     },
     matchPoints: entry.matchPoints || {}
@@ -548,12 +655,11 @@ app.get('/api/profile/:userId', (req, res) => {
 });
 
 app.post('/api/profile/:userId/update', (req, res) => {
-  const { pin, displayName, bio } = req.body;
+  const { password, displayName, bio } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (!checkPin(pin, user)) return res.status(401).json({ error: 'Incorrect PIN.' });
-
+  if (!checkPassword(password, user)) return res.status(401).json({ error: 'Incorrect password.' });
   const cleanName = sanitise(displayName, 30);
   if (!cleanName) return res.status(400).json({ error: 'Display name required.' });
   user.displayName = cleanName;
@@ -563,32 +669,30 @@ app.post('/api/profile/:userId/update', (req, res) => {
 });
 
 app.post('/api/profile/:userId/avatar', (req, res) => {
-  const { pin, avatar } = req.body;
+  const { password, avatar } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (!checkPin(pin, user)) return res.status(401).json({ error: 'Incorrect PIN.' });
+  if (!checkPassword(password, user)) return res.status(401).json({ error: 'Incorrect password.' });
   if (!avatar || !/^data:image\/(jpeg|png|gif|webp);base64,/.test(avatar))
     return res.status(400).json({ error: 'Invalid image format. Please use JPEG, PNG, GIF or WebP.' });
   if (avatar.length > 250_000)
     return res.status(400).json({ error: 'Image too large — please use a smaller photo.' });
-
   user.avatar = avatar;
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
 });
 
-// ── Change PIN ─────────────────────────────────────────────────────────────────
+// ── Change password ────────────────────────────────────────────────────────────
 
-app.post('/api/users/:userId/change-pin', (req, res) => {
-  const { currentPin, newPin } = req.body;
+app.post('/api/users/:userId/change-password', (req, res) => {
+  const { currentPassword, newPassword } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (!checkPin(currentPin, user)) return res.status(401).json({ error: 'Current PIN incorrect.' });
-  if (!/^\d{4}$/.test(String(newPin))) return res.status(400).json({ error: 'New PIN must be exactly 4 digits.' });
-
-  upgradePin(user, String(newPin));
+  if (!checkPassword(currentPassword, user)) return res.status(401).json({ error: 'Current password incorrect.' });
+  if (!newPassword || newPassword.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters.' });
+  setPassword(user, newPassword);
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
 });
@@ -596,12 +700,11 @@ app.post('/api/users/:userId/change-pin', (req, res) => {
 // ── Reset predictions ──────────────────────────────────────────────────────────
 
 app.post('/api/predictions/:userId/reset', (req, res) => {
-  const { pin } = req.body;
+  const { password } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const user = data.users.find(u => u.id === req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  if (!checkPin(pin, user)) return res.status(401).json({ error: 'Incorrect PIN.' });
-
+  if (!checkPassword(password, user)) return res.status(401).json({ error: 'Incorrect password.' });
   user.predictions = {};
   user.lastUpdated = new Date().toISOString();
   writeJSON(PREDICTIONS_FILE, data);
@@ -611,12 +714,12 @@ app.post('/api/predictions/:userId/reset', (req, res) => {
 // ── Delete user ────────────────────────────────────────────────────────────────
 
 app.delete('/api/users/:userId', (req, res) => {
-  const { pin } = req.body;
+  const { password } = req.body;
   const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const idx  = data.users.findIndex(u => u.id === req.params.userId);
   if (idx === -1) return res.status(404).json({ error: 'User not found' });
-  if (!checkPin(pin, data.users[idx])) return res.status(401).json({ error: 'Incorrect PIN.' });
-
+  if (!checkPassword(password, data.users[idx])) return res.status(401).json({ error: 'Incorrect password.' });
+  destroyAllSessions(data.users[idx].id);
   data.users.splice(idx, 1);
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
@@ -627,4 +730,5 @@ app.delete('/api/users/:userId', (req, res) => {
 app.listen(PORT, () => {
   console.log(`⚽  World Cup 2026 running at http://localhost:${PORT}`);
   console.log(`🔑  Admin password: ${ADMIN_PASSWORD}`);
+  if (!emailEnabled) console.log('⚠️   Email not configured — set GMAIL_USER and GMAIL_APP_PASSWORD to enable password reset.');
 });

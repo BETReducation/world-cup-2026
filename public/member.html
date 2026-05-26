@@ -543,23 +543,23 @@
 
       <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
 
-      <!-- Change PIN -->
-      <p class="section-label" style="margin-bottom: 10px;">Change PIN</p>
+      <!-- Change Password -->
+      <p class="section-label" style="margin-bottom: 10px;">Change Password</p>
       <div class="pin-grid">
         <div class="form-group" style="margin-bottom:0;">
-          <label for="currentPin">Current PIN</label>
-          <input type="password" id="currentPin" inputmode="numeric" maxlength="4" placeholder="••••">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" placeholder="Current password" autocomplete="current-password">
         </div>
         <div class="form-group" style="margin-bottom:0;">
-          <label for="newPin">New PIN</label>
-          <input type="password" id="newPin" inputmode="numeric" maxlength="4" placeholder="••••">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" placeholder="Min. 8 characters" autocomplete="new-password">
         </div>
         <div class="form-group" style="margin-bottom:0;">
-          <label for="confirmPin">Confirm New PIN</label>
-          <input type="password" id="confirmPin" inputmode="numeric" maxlength="4" placeholder="••••">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" placeholder="Repeat new password" autocomplete="new-password">
         </div>
       </div>
-      <button class="btn btn-outline" onclick="changePin()">Update PIN</button>
+      <button class="btn btn-outline" onclick="changePassword()">Update Password</button>
       <div class="field-feedback" id="pinFeedback"></div>
 
     </div>
@@ -590,8 +590,8 @@
     <div class="confirm-title" id="confirmTitle">Confirm</div>
     <div class="confirm-desc" id="confirmDesc">Are you sure?</div>
     <div class="form-group" id="confirmPinGroup" style="display:none; margin-bottom:16px;">
-      <label for="confirmPinInput">Enter your PIN to confirm</label>
-      <input type="password" id="confirmPinInput" inputmode="numeric" maxlength="4" placeholder="••••">
+      <label for="confirmPinInput">Enter your password to confirm</label>
+      <input type="password" id="confirmPinInput" placeholder="Your password" autocomplete="current-password">
     </div>
     <div class="field-feedback err" id="confirmError" style="margin-bottom:10px;"></div>
     <div class="confirm-actions">
@@ -838,35 +838,35 @@ async function saveProfile() {
   pendingAction = { type: 'displayName', value: name, bio };
   openConfirm(
     'Save Profile',
-    `Save display name "${name}"? Enter your PIN to confirm.`,
+    `Save display name "${name}"? Enter your password to confirm.`,
     true,
     'Save'
   );
 }
 
-// ── Change PIN ─────────────────────────────────────────────────────────────────
-async function changePin() {
+// ── Change Password ────────────────────────────────────────────────────────────
+async function changePassword() {
   const fb      = document.getElementById('pinFeedback');
-  const current = document.getElementById('currentPin').value.trim();
-  const nw      = document.getElementById('newPin').value.trim();
-  const confirm = document.getElementById('confirmPin').value.trim();
+  const current = document.getElementById('currentPassword').value.trim();
+  const nw      = document.getElementById('newPassword').value.trim();
+  const confirm = document.getElementById('confirmPassword').value.trim();
 
-  if (!current || !nw || !confirm) { setFeedback(fb, 'All three PIN fields are required.', 'err'); return; }
-  if (!/^\d{4}$/.test(nw))         { setFeedback(fb, 'New PIN must be exactly 4 digits.', 'err'); return; }
-  if (nw !== confirm)               { setFeedback(fb, 'New PIN and confirmation do not match.', 'err'); return; }
+  if (!current || !nw || !confirm) { setFeedback(fb, 'All three password fields are required.', 'err'); return; }
+  if (nw.length < 8)               { setFeedback(fb, 'New password must be at least 8 characters.', 'err'); return; }
+  if (nw !== confirm)              { setFeedback(fb, 'New password and confirmation do not match.', 'err'); return; }
 
   try {
-    await fetch(`/api/users/${currentUserId}/change-pin`, {
+    await fetch(`/api/users/${currentUserId}/change-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ currentPin: current, newPin: nw })
+      body: JSON.stringify({ currentPassword: current, newPassword: nw })
     }).then(async r => {
       if (!r.ok) { const d = await r.json(); throw new Error(d.error || 'Failed'); }
     });
-    setFeedback(fb, 'PIN updated successfully.', 'ok');
-    document.getElementById('currentPin').value = '';
-    document.getElementById('newPin').value = '';
-    document.getElementById('confirmPin').value = '';
+    setFeedback(fb, 'Password updated successfully.', 'ok');
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value     = '';
+    document.getElementById('confirmPassword').value = '';
   } catch (e) {
     setFeedback(fb, e.message, 'err');
   }
@@ -907,7 +907,7 @@ function confirmReset() {
   pendingAction = { type: 'reset' };
   openConfirm(
     'Reset All Predictions',
-    'This will clear every match prediction you have entered. This cannot be undone. Enter your PIN to confirm.',
+    'This will clear every match prediction you have entered. This cannot be undone. Enter your password to confirm.',
     true,
     'Reset'
   );
@@ -917,26 +917,26 @@ function confirmDelete() {
   pendingAction = { type: 'delete' };
   openConfirm(
     'Delete Account',
-    'This will permanently remove your account and all your predictions from the league. Enter your PIN to confirm.',
+    'This will permanently remove your account and all your predictions from the league. Enter your password to confirm.',
     true,
     'Delete'
   );
 }
 
 async function runConfirmedAction() {
-  const pin = document.getElementById('confirmPinInput').value.trim();
-  const err = document.getElementById('confirmError');
+  const password = document.getElementById('confirmPinInput').value.trim();
+  const err      = document.getElementById('confirmError');
   err.textContent = '';
 
   if (!pendingAction) { closeConfirm(); return; }
 
   if (pendingAction.type === 'displayName') {
-    if (!pin) { err.textContent = 'PIN required.'; return; }
+    if (!password) { err.textContent = 'Password required.'; return; }
     try {
       await fetch(`/api/profile/${currentUserId}/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin, displayName: pendingAction.value, bio: pendingAction.bio })
+        body: JSON.stringify({ password, displayName: pendingAction.value, bio: pendingAction.bio })
       }).then(async r => {
         if (!r.ok) { const d = await r.json(); throw new Error(d.error || 'Failed'); }
       });
@@ -958,12 +958,12 @@ async function runConfirmedAction() {
   }
 
   if (pendingAction.type === 'avatar') {
-    if (!pin) { err.textContent = 'PIN required.'; return; }
+    if (!password) { err.textContent = 'Password required.'; return; }
     try {
       const r = await fetch(`/api/profile/${currentUserId}/avatar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin, avatar: pendingAction.dataUrl })
+        body: JSON.stringify({ password, avatar: pendingAction.dataUrl })
       });
       if (!r.ok) { const d = await r.json(); throw new Error(d.error || 'Failed'); }
       const img = document.getElementById('avatarImg');
@@ -979,12 +979,12 @@ async function runConfirmedAction() {
   }
 
   if (pendingAction.type === 'reset') {
-    if (!pin) { err.textContent = 'PIN required.'; return; }
+    if (!password) { err.textContent = 'Password required.'; return; }
     try {
       const r = await fetch(`/api/predictions/${currentUserId}/reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin })
+        body: JSON.stringify({ password })
       });
       const d = await r.json();
       if (!r.ok) { err.textContent = d.error || 'Incorrect PIN'; return; }
@@ -999,12 +999,12 @@ async function runConfirmedAction() {
   }
 
   if (pendingAction.type === 'delete') {
-    if (!pin) { err.textContent = 'PIN required.'; return; }
+    if (!password) { err.textContent = 'Password required.'; return; }
     try {
       const r = await fetch(`/api/users/${currentUserId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin })
+        body: JSON.stringify({ password })
       });
       if (!r.ok) { const d = await r.json(); err.textContent = d.error || 'Failed'; return; }
       Session.clear();
