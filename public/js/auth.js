@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="form-group">
               <label for="navAuthCode">Invite code <span style="color:var(--muted);font-size:11px;">(new accounts only — leave blank to sign in)</span></label>
-              <input type="text" id="navAuthCode" placeholder="e.g. Cristiano Maldini" autocomplete="off">
+              <input type="text" id="navAuthCode" placeholder="e.g. Robin Van Shearer" autocomplete="off">
             </div>
             <details style="margin-bottom:12px;">
               <summary style="cursor:pointer;font-size:12px;color:var(--muted);user-select:none;">Had a PIN-based account? Click to claim it</summary>
