@@ -261,18 +261,9 @@ function showKoRound(roundKey) {
   const round  = fixtures.knockout?.[roundKey];
   if (!round) { panels.innerHTML = ''; return; }
 
-  const lock      = lockStatus[roundKey];
-  const locked    = lock?.locked || false;
-  const lockLabel = locked
-    ? '<i class="fa-solid fa-lock"></i> Locked'
-    : lock?.lockTime
-      ? `Locks · ${fmtLockTimezones(lock.lockTime)}`
-      : '';
-
   let html = `<div class="card">`;
   html += `<div class="ko-round-header">
     <span class="ko-round-title">${round.name || roundKey}</span>
-    ${lockLabel ? `<span class="ko-lock-info">${lockLabel}</span>` : ''}
   </div>`;
   html += `<div class="match-list">`;
 
