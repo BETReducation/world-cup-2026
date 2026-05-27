@@ -1272,15 +1272,16 @@ footer span {
   /* Save bar: left group + save button on one line */
   .save-bar { flex-wrap: nowrap; gap: 8px; padding: 8px 12px; align-items: stretch; }
   .save-status { display: none; }
-  .save-bar-left { gap: 6px; }
+  .save-bar #saveBtn { flex-shrink: 0; }
+  .save-bar-left { gap: 6px; flex: 1; min-width: 0; }
   .save-bar-left .btn {
+    flex: 1;
     white-space: normal;
     text-align: center;
     line-height: 1.25;
-    padding: 5px 7px;
+    padding: 5px 6px;
     font-size: 11px;
     min-width: 0;
-    width: 70px;
     align-items: center;
     justify-content: center;
   }
