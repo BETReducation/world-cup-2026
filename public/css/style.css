@@ -888,12 +888,9 @@ nav.site-nav {
 }
 .save-bar-left {
   display: flex;
-  flex: 1;
   gap: 8px;
+  margin-right: auto;
   align-items: center;
-}
-.save-bar-left .btn {
-  flex: 1;
 }
 .save-status {
   font-family: 'JetBrains Mono', monospace;
@@ -1275,8 +1272,9 @@ footer span {
   /* Save bar: compact one-line layout on mobile */
   .save-bar { flex-wrap: nowrap; gap: 6px; padding: 8px 12px; align-items: stretch; }
   .save-status { display: none; }
-  .save-bar-left { gap: 4px; min-width: 0; }
+  .save-bar-left { flex: 1; gap: 4px; min-width: 0; margin-right: 0; }
   .save-bar-left .btn {
+    flex: 1 1 0;
     white-space: normal;
     text-align: center;
     line-height: 1.25;
