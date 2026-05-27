@@ -875,7 +875,7 @@ nav.site-nav {
   position: sticky;
   bottom: 1rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   gap: 12px;
   background: var(--surface);
