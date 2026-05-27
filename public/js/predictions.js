@@ -137,7 +137,8 @@ async function loadAndRender() {
     $('saveBtn').textContent = 'Sign in to Save';
     $('saveBtn').onclick = () => { location.reload(); };
   } else if (userId) {
-    $('clearBtn').style.display = 'inline-flex';
+    $('clearBtn').style.display      = 'inline-flex';
+    $('clearGroupBtn').style.display = 'inline-flex';
   }
 
   buildTabs();
@@ -163,6 +164,8 @@ function buildTabs() {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       showGroup(key);
+      const cgb = $('clearGroupBtn');
+      if (cgb) cgb.textContent = `Reset Group ${key}`;
     });
     bar.appendChild(btn);
   });
@@ -328,6 +331,49 @@ $('saveBtn').addEventListener('click', async () => {
   } finally {
     $('saveBtn').disabled = false;
     $('saveBtn').textContent = 'Save Predictions';
+  }
+});
+
+// ── Reset unlocked predictions for the active group only ─────────────────────
+
+$('clearGroupBtn').addEventListener('click', async () => {
+  if (!fixtures) return;
+  const group = fixtures.groups[activeGroup];
+  if (!group) return;
+
+  const toDelete = [];
+  const byRound = {};
+  group.matches.forEach(m => (byRound[m.round] = byRound[m.round] || []).push(m));
+  Object.entries(byRound).forEach(([round, matches]) => {
+    if (!lockStatus[round]?.locked) matches.forEach(m => toDelete.push(m.id));
+  });
+
+  if (toDelete.length === 0) {
+    alert(`Group ${activeGroup} predictions are all locked — nothing to reset.`);
+    return;
+  }
+
+  if (!confirm(`Reset predictions for Group ${activeGroup} (${toDelete.length} unlocked match${toDelete.length === 1 ? '' : 'es'})? Locked rounds will not be affected.`)) return;
+
+  toDelete.forEach(id => delete userPredictions[id]);
+
+  $('clearGroupBtn').disabled = true;
+  $('clearGroupBtn').textContent = 'Resetting…';
+  try {
+    await API.savePredictions(userId, userPredictions);
+    showGroup(activeGroup);
+    renderAllTables();
+    enterEditState();
+    $('saveStatus').textContent = `✓ Group ${activeGroup} predictions reset`;
+    $('saveStatus').style.color = 'var(--accent)';
+  } catch (e) {
+    const expired = e.message && e.message.includes('Session');
+    $('saveStatus').textContent = expired ? '✗ Session expired — please sign in again' : '✗ Reset failed';
+    $('saveStatus').style.color = 'var(--red)';
+    if (expired) { Session.clear(); setTimeout(() => location.reload(), 2000); }
+  } finally {
+    $('clearGroupBtn').disabled = false;
+    $('clearGroupBtn').textContent = `Reset Group ${activeGroup}`;
   }
 });
 

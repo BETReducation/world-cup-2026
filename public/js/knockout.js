@@ -390,7 +390,7 @@ $('clearBtn').addEventListener('click', async () => {
     if (expired) { Session.clear(); setTimeout(() => location.reload(), 2000); }
   } finally {
     $('clearBtn').disabled = false;
-    $('clearBtn').textContent = 'Reset Predictions';
+    $('clearBtn').textContent = 'Reset Knockout Predictions';
   }
 });
 
