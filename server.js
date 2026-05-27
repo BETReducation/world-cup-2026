@@ -785,7 +785,12 @@ app.post('/api/predictions/:userId', (req, res) => {
   for (const [matchId, score] of Object.entries(predictions)) {
     const round = getMatchRound(matchId, fixtures);
     if (round && !isRoundLocked(round, fixtures)) {
-      updated[matchId] = { home: parseInt(score.home) || 0, away: parseInt(score.away) || 0 };
+      const h = parseInt(score.home);
+      const a = parseInt(score.away);
+      // Only save if both sides have a valid integer — cleared/empty inputs are skipped (treated as deleted)
+      if (!isNaN(h) && !isNaN(a)) {
+        updated[matchId] = { home: h, away: a };
+      }
     }
   }
 
