@@ -649,7 +649,8 @@ app.post('/api/register', (req, res) => {
     passwordSalt: salt,
     passwordHash: hashStr(password, salt),
     predictions:  {},
-    registeredAt: new Date().toISOString()
+    registeredAt: new Date().toISOString(),
+    inviteCode:   accessCode
   });
 
   try {
@@ -869,6 +870,7 @@ app.get('/api/profile/:userId', (req, res) => {
     bio: user.bio || '', avatar: user.avatar || null,
     isAdmin: !!user.isAdmin,
     joinedAt: user.registeredAt,
+    inviteCode: user.inviteCode || null,
     stats: {
       totalPoints:        entry.totalPoints        || 0,
       rank, totalPlayers: board.length,

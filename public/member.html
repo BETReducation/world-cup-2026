@@ -754,7 +754,8 @@ function populateHero(data) {
   }
 
   const joined = data.joinedAt ? new Date(data.joinedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
-  document.getElementById('heroJoined').textContent = 'Joined ' + joined;
+  const joinedText = data.inviteCode ? `Joined ${joined} · via "${data.inviteCode}"` : `Joined ${joined}`;
+  document.getElementById('heroJoined').textContent = joinedText;
 
   const rank = data.stats.rank;
   const total = data.stats.totalPlayers;
