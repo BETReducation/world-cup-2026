@@ -1269,13 +1269,15 @@ footer span {
   /* Match meta */
   .match-meta { display: none; }
 
-  /* Save bar: left group + save button on one line */
-  .save-bar { flex-wrap: nowrap; gap: 8px; padding: 8px 12px; align-items: stretch; }
+  /* Save bar: compact one-line layout on mobile */
+  .save-bar { flex-wrap: nowrap; gap: 6px; padding: 8px 12px; align-items: stretch; }
   .save-status { display: none; }
-  .save-bar #saveBtn { flex-shrink: 0; }
-  .save-bar-left { gap: 6px; flex: 1; min-width: 0; }
+  /* Override desktop margin-right:auto — use flex:1 to grow instead */
+  .save-bar-left { gap: 6px; flex: 1 1 0; min-width: 0; margin-right: 0; }
+  /* Save button: fixed size, sits at the right edge */
+  .save-bar #saveBtn { flex: 0 0 auto; }
   .save-bar-left .btn {
-    flex: 1;
+    flex: 1 1 0;
     white-space: normal;
     text-align: center;
     line-height: 1.25;
