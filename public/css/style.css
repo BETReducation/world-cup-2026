@@ -892,11 +892,7 @@ nav.site-nav {
   gap: 8px;
   align-items: center;
 }
-/* Desktop: push edit/save button to the far right of the bar */
-.save-bar-left #editBtn,
-.save-bar-left #saveBtn {
-  margin-left: auto;
-}
+/* Desktop: save-bar-left flex:1 fills space, pushing edit/save to the far right */
 .save-status {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
@@ -1275,12 +1271,12 @@ footer span {
   .match-meta { display: none; }
 
   /* Save bar: compact one-line layout on mobile */
-  .save-bar { flex-wrap: nowrap; gap: 6px; padding: 8px 12px; align-items: stretch; }
+  .save-bar { flex-wrap: nowrap; gap: 4px; padding: 8px 12px; align-items: stretch; }
   .save-status { display: none; }
-  .save-bar-left { flex: 1; gap: 4px; min-width: 0; }
-  .save-bar-left #editBtn,
-  .save-bar-left #saveBtn { margin-left: 0; }
-  .save-bar-left .btn {
+  /* display:contents makes save-bar-left transparent to flexbox —
+     all its children participate directly in the save-bar's equal-width layout */
+  .save-bar-left { display: contents; }
+  .save-bar .btn {
     flex: 1 1 0;
     white-space: normal;
     text-align: center;
