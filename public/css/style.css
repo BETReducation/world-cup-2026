@@ -888,9 +888,12 @@ nav.site-nav {
 }
 .save-bar-left {
   display: flex;
+  flex: 1;
   gap: 8px;
-  margin-right: auto;
   align-items: center;
+}
+.save-bar-left .btn {
+  flex: 1;
 }
 .save-status {
   font-family: 'JetBrains Mono', monospace;
@@ -1272,16 +1275,12 @@ footer span {
   /* Save bar: compact one-line layout on mobile */
   .save-bar { flex-wrap: nowrap; gap: 6px; padding: 8px 12px; align-items: stretch; }
   .save-status { display: none; }
-  /* Override desktop margin-right:auto — use flex:1 to grow instead */
-  .save-bar-left { gap: 6px; flex: 1 1 0; min-width: 0; margin-right: 0; }
-  /* Save button: fixed size, sits at the right edge */
-  .save-bar #saveBtn { flex: 0 0 auto; }
+  .save-bar-left { gap: 4px; min-width: 0; }
   .save-bar-left .btn {
-    flex: 1 1 0;
     white-space: normal;
     text-align: center;
     line-height: 1.25;
-    padding: 5px 6px;
+    padding: 5px 4px;
     font-size: 11px;
     min-width: 0;
     align-items: center;
