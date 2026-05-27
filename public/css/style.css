@@ -886,8 +886,11 @@ nav.site-nav {
   margin-top: 20px;
   z-index: 100;
 }
-.save-bar #clearBtn {
+.save-bar-left {
+  display: flex;
+  gap: 8px;
   margin-right: auto;
+  align-items: center;
 }
 .save-status {
   font-family: 'JetBrains Mono', monospace;
@@ -1266,9 +1269,21 @@ footer span {
   /* Match meta */
   .match-meta { display: none; }
 
-  /* Save bar: clear button on top row, actions on bottom row */
-  .save-bar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  /* Save bar: left group + save button on one line */
+  .save-bar { flex-wrap: nowrap; gap: 8px; padding: 8px 12px; align-items: stretch; }
   .save-status { display: none; }
+  .save-bar-left { gap: 6px; }
+  .save-bar-left .btn {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+    padding: 5px 7px;
+    font-size: 11px;
+    min-width: 0;
+    width: 70px;
+    align-items: center;
+    justify-content: center;
+  }
 
   /* Round heading on mobile: centre label vertically, hide the ::after line */
   .round-heading { align-items: center; justify-content: space-between; gap: 8px; }
