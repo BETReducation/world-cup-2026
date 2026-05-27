@@ -811,25 +811,30 @@ async function loadPredictions() {
       API.results()
     ]);
 
-    const matchPoints = (profileData && profileData.matchPoints) ? profileData.matchPoints : {};
+    const matchPoints   = (profileData && profileData.matchPoints) ? profileData.matchPoints : {};
     const actualResults = resultsData.results || {};
-    const myPreds = predData.predictions || {};
-    const groups  = fixturesData.groups || {};
+    const myPreds       = predData.predictions || {};
+    const groups        = fixturesData.groups   || {};
+    const knockout      = fixturesData.knockout || {};
+
+    // Build team lookup for knockout name resolution
+    const allTeams = {};
+    Object.values(groups).forEach(g => g.teams.forEach(t => { allTeams[t.id] = t; }));
 
     body.innerHTML = '';
 
+    // ── Group stage ────────────────────────────────────────────────────
     for (const [groupKey, group] of Object.entries(groups)) {
       const matches = group.matches || [];
       const label   = group.name || ('Group ' + groupKey);
 
-      const accordion = document.createElement('div');
-      accordion.className = 'group-accordion';
-
-      // How many predictions entered for this group
       const enteredCount = matches.filter(m => myPreds[m.id] !== undefined).length;
       const ptsForGroup  = matches.reduce((sum, m) => sum + (matchPoints[m.id] || 0), 0);
-      const ptsBadge     = ptsForGroup > 0 ? `<span class="pts-badge pts-${ptsForGroup >= 5 ? 5 : ptsForGroup >= 3 ? 3 : 0}">${ptsForGroup} pts</span>` : '';
+      const ptsBadge     = ptsForGroup > 0
+        ? `<span class="pts-badge pts-${ptsForGroup >= 5 ? 5 : ptsForGroup >= 3 ? 3 : 0}">${ptsForGroup} pts</span>` : '';
 
+      const accordion = document.createElement('div');
+      accordion.className = 'group-accordion';
       accordion.innerHTML = `
         <button class="group-toggle" onclick="toggleGroup(this)">
           <span>${label} &mdash; ${enteredCount}/${matches.length} entered ${ptsBadge}</span>
@@ -846,19 +851,101 @@ async function loadPredictions() {
               </tr>
             </thead>
             <tbody>
-              ${matches.map(m => buildMatchRow(m, myPreds, matchPoints, actualResults)).join('')}
+              ${matches.map(m => buildGroupMatchRow(m, group.teams, myPreds, matchPoints, actualResults)).join('')}
             </tbody>
           </table>
         </div>`;
-
       body.appendChild(accordion);
     }
+
+    // ── Knockout stage ─────────────────────────────────────────────────
+    const ROUND_ORDER = ['R32', 'R16', 'QF', 'SF', '3P', 'F'];
+    const ROUND_NAMES = {
+      R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarter-Finals',
+      SF: 'Semi-Finals', '3P': 'Third Place', F: 'Final'
+    };
+
+    const hasKnockout = ROUND_ORDER.some(r => knockout[r]);
+    if (hasKnockout) {
+      const sep = document.createElement('div');
+      sep.style.cssText = 'margin:16px 0 8px;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);';
+      sep.textContent = 'Knockout Stage';
+      body.appendChild(sep);
+
+      for (const roundKey of ROUND_ORDER) {
+        const round = knockout[roundKey];
+        if (!round) continue;
+        const matches = [...(round.matches || [])].sort((a, b) => (a.num || 0) - (b.num || 0));
+        const label   = ROUND_NAMES[roundKey] || roundKey;
+
+        const enteredCount = matches.filter(m => myPreds[m.id] !== undefined).length;
+        const ptsForRound  = matches.reduce((sum, m) => sum + (matchPoints[m.id] || 0), 0);
+        const ptsBadge     = ptsForRound > 0
+          ? `<span class="pts-badge pts-${ptsForRound >= 5 ? 5 : ptsForRound >= 3 ? 3 : 0}">${ptsForRound} pts</span>` : '';
+
+        const accordion = document.createElement('div');
+        accordion.className = 'group-accordion';
+        accordion.innerHTML = `
+          <button class="group-toggle" onclick="toggleGroup(this)">
+            <span>${label} &mdash; ${enteredCount}/${matches.length} entered ${ptsBadge}</span>
+            <span class="chevron">▾</span>
+          </button>
+          <div class="group-body">
+            <table class="pred-table">
+              <thead>
+                <tr>
+                  <th>Match</th>
+                  <th class="center">My Pick</th>
+                  <th class="center">Result</th>
+                  <th class="center">Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${matches.map(m => buildKoMatchRow(m, allTeams, myPreds, matchPoints, actualResults)).join('')}
+              </tbody>
+            </table>
+          </div>`;
+        body.appendChild(accordion);
+      }
+    }
+
   } catch (e) {
     body.innerHTML = '<p class="section-desc">Could not load predictions.</p>';
   }
 }
 
-function buildMatchRow(match, myPreds, matchPoints, actualResults) {
+// ── Match row builders ─────────────────────────────────────────────────────────
+
+function buildGroupMatchRow(match, teams, myPreds, matchPoints, actualResults) {
+  const homeTeam = teams.find(t => t.id === match.home);
+  const awayTeam = teams.find(t => t.id === match.away);
+  const homeName = homeTeam ? homeTeam.name : (match.home || 'TBD');
+  const awayName = awayTeam ? awayTeam.name : (match.away || 'TBD');
+  return buildPredRow(match, homeName, awayName, myPreds, matchPoints, actualResults);
+}
+
+function koTeamName(m, side, allTeams) {
+  const teamId = m[side];
+  if (teamId && allTeams[teamId]) return allTeams[teamId].name;
+  const slot  = m[side + 'Slot'];
+  const label = m[side + 'Label'];
+  if (label) return label;
+  if (!slot)  return 'TBD';
+  const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
+  if (m3rd) return `3rd (${m3rd[1]})`;
+  if (/^[12][A-L]$/.test(slot)) return slot;
+  const mWL = slot.match(/^([WL]):(.+)$/);
+  if (mWL) return `${mWL[1]} of ${mWL[2].replace(/_/g, '-')}`;
+  return slot;
+}
+
+function buildKoMatchRow(match, allTeams, myPreds, matchPoints, actualResults) {
+  const homeName = koTeamName(match, 'home', allTeams);
+  const awayName = koTeamName(match, 'away', allTeams);
+  return buildPredRow(match, homeName, awayName, myPreds, matchPoints, actualResults);
+}
+
+function buildPredRow(match, homeName, awayName, myPreds, matchPoints, actualResults) {
   const pred   = myPreds[match.id];
   const pts    = matchPoints[match.id];
   const actual = actualResults[match.id];
@@ -882,13 +969,11 @@ function buildMatchRow(match, myPreds, matchPoints, actualResults) {
     ptsBadge = `<span class="pts-badge ${cls}">${pts}</span>`;
   }
 
-  const homeTeam = `${match.homeFlag || ''} ${match.home}`.trim();
-  const awayTeam = `${match.awayFlag || ''} ${match.away}`.trim();
-  const dateStr  = match.date ? fmtDate(match.date) : '';
+  const dateStr = match.date ? fmtDate(match.date, match.time) : '';
 
   return `<tr>
     <td>
-      <div class="match-label">${homeTeam} vs ${awayTeam}</div>
+      <div class="match-label">${homeName} vs ${awayName}</div>
       ${dateStr ? `<div class="match-date">${dateStr}</div>` : ''}
     </td>
     <td class="center">${predCell}</td>
