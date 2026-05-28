@@ -99,7 +99,19 @@ function seedAccessCodes() {
 
 app.use(cors());
 app.use(express.json({ limit: '400kb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+// JS and CSS: always revalidate so browsers + Cloudflare never serve
+// stale versions after a deploy. ETags still let the browser skip the
+// download when nothing changed (304 Not Modified).
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: true,
+  lastModified: true,
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
 
 // ── Health check (used by Railway to confirm startup) ─────────────────────────
 app.get('/api/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
