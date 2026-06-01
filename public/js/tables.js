@@ -113,12 +113,18 @@ function fmtDate(dateStr, timeStr) {
   if (!timeStr || timeStr === 'TBD') {
     return `<span class="match-date">${datePart}</span><span class="match-times">Time TBD</span>`;
   }
-  const [h, m] = timeStr.split(':').map(Number);
-  const pad = n => String(n).padStart(2, '0');
-  const fmtT = (mins) => {
-    const nextDay = mins >= 1440 ? '<sup>+1</sup>' : '';
-    return `${pad(Math.floor(mins / 60) % 24)}:${pad(mins % 60)}${nextDay}`;
+
+  // All fixtures use Eastern Daylight Time (UTC−4) throughout Jun–Jul 2026.
+  // Use Intl for proper timezone conversion so UK shows BST (UTC+1), not UTC.
+  const dt = new Date(`${dateStr}T${timeStr}:00-04:00`);
+
+  const fmtTz = (tz, label) => {
+    const time = dt.toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+    // en-CA gives YYYY-MM-DD for safe string comparison
+    const localDate = dt.toLocaleDateString('en-CA', { timeZone: tz });
+    const nextDay   = localDate > dateStr ? '<sup>+1</sup>' : '';
+    return `<span class="match-tz">${time}${nextDay} ${label}</span>`;
   };
-  const base = h * 60 + m;
-  return `<span class="match-date">${datePart}</span><span class="match-times"><span class="match-tz">${timeStr} ET</span><span class="match-tz">${fmtT(base + 240)} UTC</span><span class="match-tz">${fmtT(base + 660)} VN</span></span>`;
+
+  return `<span class="match-date">${datePart}</span><span class="match-times"><span class="match-tz">${timeStr} ET</span>${fmtTz('Europe/London', 'UK')}${fmtTz('Asia/Ho_Chi_Minh', 'VN')}</span>`;
 }
