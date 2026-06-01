@@ -44,7 +44,8 @@ async function init() {
       <span>Bonus predictions are <strong>open</strong>. Locks <strong>${lockData.lockTime ? formatLockTime(lockData.lockTime) : 'before Round 1'}</strong> — 1 minute before Mexico vs South Africa kicks off.</span>`;
     banner.style.borderColor = 'rgba(77,201,122,0.25)';
   }
-  show('lockBanner');
+  banner.style.display = 'flex';
+  banner.classList.remove('hidden');
 
   // Results
   bonusResults = await fetch('/api/bonus-extras/results').then(r => r.json()).catch(() => ({}));
@@ -116,6 +117,8 @@ async function renderLockedPreds() {
 
 async function renderLeaderboard(hasResults) {
   show('leaderboardSection');
+  const divider = el('lbDivider');
+  if (divider) divider.style.display = 'block';
 
   if (hasResults) {
     show('resultsSummary');

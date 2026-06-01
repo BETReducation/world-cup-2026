@@ -93,73 +93,50 @@
   </div>
 </div>
 
-<main class="container" style="max-width:680px;padding-top:2rem;padding-bottom:3rem;">
+<div class="section">
 
-  <div class="page-header" style="margin-bottom:1.5rem;">
-    <h1 style="font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:800;margin-bottom:0.25rem;">
-      <i class="fa-solid fa-star" style="color:var(--gold);margin-right:0.4rem;"></i>Bonus Extras
-    </h1>
-    <p style="color:var(--muted);font-size:0.95rem;">Tiebreaker predictions — 3 pts each for a correct answer.</p>
-  </div>
+  <!-- Page heading -->
+  <p class="section-label"><i class="fa-solid fa-star" style="color:var(--gold);margin-right:0.3rem;"></i>Tiebreakers</p>
+  <h1 class="section-title">Bonus Extras</h1>
+  <p class="section-desc">Three tiebreaker predictions — 3 pts each for a correct answer. Locked 1 minute before kick-off of Mexico vs South Africa.</p>
 
   <!-- Lock status banner -->
-  <div id="lockBanner" class="hidden" style="
-    background:var(--surface2);border:1px solid var(--border2);
-    border-radius:var(--radius);padding:0.85rem 1rem;
-    margin-bottom:1.5rem;display:flex;align-items:center;gap:0.6rem;font-size:0.9rem;">
-  </div>
+  <div id="lockBanner" class="hidden card-sm" style="display:none;align-items:center;gap:0.6rem;font-size:0.9rem;margin-bottom:20px;"></div>
 
-  <!-- Sign-in prompt (shown when not logged in and not locked) -->
-  <div id="signInPrompt" class="hidden" style="
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);padding:1.25rem;
-    margin-bottom:1.5rem;text-align:center;">
-    <p style="margin-bottom:0.75rem;color:var(--muted);">Sign in to enter your bonus predictions.</p>
+  <!-- Sign-in prompt -->
+  <div id="signInPrompt" class="hidden card" style="text-align:center;margin-bottom:0;">
+    <p style="margin-bottom:16px;color:var(--muted);">Sign in to enter your bonus predictions.</p>
     <button class="btn btn-primary" id="signInBtn">Sign in</button>
   </div>
 
   <!-- Prediction form -->
-  <div id="predForm" class="hidden" style="
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;">
+  <div id="predForm" class="hidden card" style="margin-bottom:0;">
 
-    <div id="formSaveMsg" class="hidden" style="
-      background:var(--accent-dim);color:var(--accent);
-      border-radius:var(--radius-sm);padding:0.6rem 0.9rem;
-      margin-bottom:1rem;font-size:0.9rem;"></div>
-    <div id="formErrMsg" class="hidden" style="
-      background:rgba(240,122,90,0.12);color:var(--red);
-      border-radius:var(--radius-sm);padding:0.6rem 0.9rem;
-      margin-bottom:1rem;font-size:0.9rem;"></div>
+    <div id="formSaveMsg" class="hidden" style="background:var(--accent-dim);color:var(--accent);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:14px;"></div>
+    <div id="formErrMsg"  class="hidden" style="background:rgba(240,122,90,0.12);color:var(--red);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:14px;"></div>
 
-    <div class="form-group" style="margin-bottom:1.25rem;">
-      <label for="inputGoalscorer" style="font-weight:600;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;">
+    <div class="form-group" style="margin-bottom:20px;">
+      <label for="inputGoalscorer" style="font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
         <i class="fa-solid fa-shoe-prints" style="color:var(--accent);"></i> Top Goalscorer
       </label>
-      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.5rem;">Which player will score the most goals across the whole tournament?</p>
-      <input type="text" id="inputGoalscorer" placeholder="e.g. Kylian Mbappé" maxlength="100"
-        style="width:100%;padding:0.6rem 0.8rem;background:var(--surface2);border:1px solid var(--border2);
-               border-radius:var(--radius-sm);color:var(--text);font-size:0.95rem;outline:none;">
+      <p class="card-desc" style="margin-bottom:8px;">Which player will score the most goals across the whole tournament?</p>
+      <input type="text" id="inputGoalscorer" placeholder="e.g. Kylian Mbappé" maxlength="100" class="score-input" style="width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:15px;outline:none;">
     </div>
 
-    <div class="form-group" style="margin-bottom:1.25rem;">
-      <label for="inputRedCards" style="font-weight:600;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;">
+    <div class="form-group" style="margin-bottom:20px;">
+      <label for="inputRedCards" style="font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
         <i class="fa-solid fa-rectangle-xmark" style="color:var(--red);"></i> Team with Most Red Cards
       </label>
-      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.5rem;">Which team will receive the most red cards during the tournament?</p>
-      <input type="text" id="inputRedCards" placeholder="e.g. Argentina" maxlength="100"
-        style="width:100%;padding:0.6rem 0.8rem;background:var(--surface2);border:1px solid var(--border2);
-               border-radius:var(--radius-sm);color:var(--text);font-size:0.95rem;outline:none;">
+      <p class="card-desc" style="margin-bottom:8px;">Which team will receive the most red cards during the tournament?</p>
+      <input type="text" id="inputRedCards" placeholder="e.g. Argentina" maxlength="100" class="score-input" style="width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:15px;outline:none;">
     </div>
 
-    <div class="form-group" style="margin-bottom:1.5rem;">
-      <label for="inputHighScoring" style="font-weight:600;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;">
+    <div class="form-group" style="margin-bottom:24px;">
+      <label for="inputHighScoring" style="font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
         <i class="fa-solid fa-fire" style="color:var(--gold);"></i> Highest Scoring Match
       </label>
-      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.5rem;">Which match will have the most combined goals? Enter as "Team A vs Team B".</p>
-      <input type="text" id="inputHighScoring" placeholder="e.g. France vs Germany" maxlength="100"
-        style="width:100%;padding:0.6rem 0.8rem;background:var(--surface2);border:1px solid var(--border2);
-               border-radius:var(--radius-sm);color:var(--text);font-size:0.95rem;outline:none;">
+      <p class="card-desc" style="margin-bottom:8px;">Which match will have the most combined goals? Enter as "Team A vs Team B".</p>
+      <input type="text" id="inputHighScoring" placeholder="e.g. France vs Germany" maxlength="100" class="score-input" style="width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:15px;outline:none;">
     </div>
 
     <button class="btn btn-primary" id="savePredBtn" style="width:100%;">
@@ -167,40 +144,36 @@
     </button>
   </div>
 
-  <!-- Locked predictions display (read-only after lock) -->
-  <div id="lockedPreds" class="hidden" style="
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;">
-    <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--muted);">
-      <i class="fa-solid fa-lock" style="margin-right:0.4rem;"></i>Your locked predictions
-    </h3>
+  <!-- Locked predictions (read-only after lock) -->
+  <div id="lockedPreds" class="hidden card" style="margin-bottom:0;">
+    <h2><i class="fa-solid fa-lock" style="margin-right:6px;font-size:15px;"></i>Your locked predictions</h2>
     <div id="lockedPredsList"></div>
   </div>
 
+  <hr class="divider" id="lbDivider" style="display:none;">
+
   <!-- Leaderboard -->
   <div id="leaderboardSection" class="hidden">
-    <h2 style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:1rem;">
-      <i class="fa-solid fa-trophy" style="color:var(--gold);margin-right:0.4rem;"></i>Bonus Leaderboard
-    </h2>
+    <p class="section-label"><i class="fa-solid fa-trophy" style="color:var(--gold);margin-right:0.3rem;"></i>Standings</p>
+    <h2 class="section-title">Bonus Leaderboard</h2>
 
-    <!-- Results summary (shown when admin has entered results) -->
-    <div id="resultsSummary" class="hidden" style="
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;">
-      <h3 style="font-size:0.9rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;">Official Answers</h3>
+    <!-- Official answers card -->
+    <div id="resultsSummary" class="hidden card" style="margin-bottom:16px;">
+      <h2>Official Answers</h2>
       <div id="resultsList"></div>
     </div>
 
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+    <!-- Table -->
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:0;">
       <table style="width:100%;border-collapse:collapse;">
         <thead>
-          <tr style="background:var(--surface2);font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">
-            <th style="padding:0.65rem 1rem;text-align:left;width:2.5rem;">#</th>
-            <th style="padding:0.65rem 1rem;text-align:left;">Player</th>
-            <th style="padding:0.65rem 0.75rem;text-align:center;" title="Top Goalscorer"><i class="fa-solid fa-shoe-prints"></i></th>
-            <th style="padding:0.65rem 0.75rem;text-align:center;" title="Most Red Cards"><i class="fa-solid fa-rectangle-xmark" style="color:var(--red);"></i></th>
-            <th style="padding:0.65rem 0.75rem;text-align:center;" title="Highest Scoring Match"><i class="fa-solid fa-fire" style="color:var(--gold);"></i></th>
-            <th style="padding:0.65rem 1rem;text-align:right;">Pts</th>
+          <tr style="background:var(--surface2);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">
+            <th style="padding:10px 16px;text-align:left;width:40px;">#</th>
+            <th style="padding:10px 16px;text-align:left;">Player</th>
+            <th style="padding:10px 12px;text-align:center;" title="Top Goalscorer"><i class="fa-solid fa-shoe-prints"></i></th>
+            <th style="padding:10px 12px;text-align:center;" title="Most Red Cards"><i class="fa-solid fa-rectangle-xmark" style="color:var(--red);"></i></th>
+            <th style="padding:10px 12px;text-align:center;" title="Highest Scoring Match"><i class="fa-solid fa-fire" style="color:var(--gold);"></i></th>
+            <th style="padding:10px 16px;text-align:right;">Pts</th>
           </tr>
         </thead>
         <tbody id="leaderboardBody"></tbody>
@@ -209,40 +182,36 @@
   </div>
 
   <!-- Admin panel -->
-  <div id="adminPanel" class="hidden" style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);">
-    <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.25rem;color:var(--muted);">
-      <i class="fa-solid fa-screwdriver-wrench" style="margin-right:0.4rem;"></i>Admin — Enter Results
-    </h3>
-    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">Fill in the official answers to update the leaderboard. Leave blank to clear.</p>
+  <div id="adminPanel" class="hidden" style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border);">
+    <p class="section-label"><i class="fa-solid fa-screwdriver-wrench" style="margin-right:0.3rem;"></i>Admin</p>
+    <h2 class="section-title" style="font-size:18px;">Enter Results</h2>
+    <p class="section-desc">Fill in the official answers to update the leaderboard. Leave blank to clear a value.</p>
 
-    <div id="adminSaveMsg" class="hidden" style="
-      background:var(--accent-dim);color:var(--accent);
-      border-radius:var(--radius-sm);padding:0.6rem 0.9rem;margin-bottom:1rem;font-size:0.9rem;"></div>
+    <div id="adminSaveMsg" class="hidden" style="background:var(--accent-dim);color:var(--accent);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:14px;"></div>
 
-    <div class="form-group" style="margin-bottom:1rem;">
-      <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.3rem;">Top Goalscorer</label>
-      <input type="text" id="adminGoalscorer" placeholder="Player name" maxlength="100"
-        style="width:100%;padding:0.5rem 0.75rem;background:var(--surface2);border:1px solid var(--border2);
-               border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;">
+    <div class="card">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Top Goalscorer</label>
+        <input type="text" id="adminGoalscorer" placeholder="Player name" maxlength="100"
+          style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Team with Most Red Cards</label>
+        <input type="text" id="adminRedCards" placeholder="Team name" maxlength="100"
+          style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Highest Scoring Match</label>
+        <input type="text" id="adminHighScoring" placeholder="Team A vs Team B" maxlength="100"
+          style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+      </div>
+      <button class="btn btn-primary" id="adminSaveBtn">
+        <i class="fa-solid fa-floppy-disk"></i> Save results
+      </button>
     </div>
-    <div class="form-group" style="margin-bottom:1rem;">
-      <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.3rem;">Team with Most Red Cards</label>
-      <input type="text" id="adminRedCards" placeholder="Team name" maxlength="100"
-        style="width:100%;padding:0.5rem 0.75rem;background:var(--surface2);border:1px solid var(--border2);
-               border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;">
-    </div>
-    <div class="form-group" style="margin-bottom:1.25rem;">
-      <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.3rem;">Highest Scoring Match</label>
-      <input type="text" id="adminHighScoring" placeholder="Team A vs Team B" maxlength="100"
-        style="width:100%;padding:0.5rem 0.75rem;background:var(--surface2);border:1px solid var(--border2);
-               border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;">
-    </div>
-    <button class="btn btn-primary" id="adminSaveBtn">
-      <i class="fa-solid fa-floppy-disk"></i> Save results
-    </button>
   </div>
 
-</main>
+</div>
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
