@@ -17,7 +17,7 @@
       "teams": [
         { "id": "MEX", "name": "Mexico",         "flag": "🇲🇽", "flagCode": "mx" },
         { "id": "RSA", "name": "South Africa",   "flag": "🇿🇦", "flagCode": "za" },
-        { "id": "KOR", "name": "Korea Republic", "flag": "🇰🇷", "flagCode": "kr" },
+        { "id": "KOR", "name": "S.Korea", "flag": "🇰🇷", "flagCode": "kr" },
         { "id": "CZE", "name": "Czechia",        "flag": "🇨🇿", "flagCode": "cz" }
       ],
       "matches": [
@@ -33,7 +33,7 @@
       "name": "Group B",
       "teams": [
         { "id": "CAN", "name": "Canada",               "flag": "🇨🇦", "flagCode": "ca" },
-        { "id": "BIH", "name": "Bosnia & Herzegovina", "flag": "🇧🇦", "flagCode": "ba" },
+        { "id": "BIH", "name": "Bosnia", "flag": "🇧🇦", "flagCode": "ba" },
         { "id": "QAT", "name": "Qatar",                "flag": "🇶🇦", "flagCode": "qa" },
         { "id": "SUI", "name": "Switzerland",          "flag": "🇨🇭", "flagCode": "ch" }
       ],
@@ -69,7 +69,7 @@
         { "id": "USA", "name": "USA",       "flag": "🇺🇸", "flagCode": "us" },
         { "id": "PAR", "name": "Paraguay",  "flag": "🇵🇾", "flagCode": "py" },
         { "id": "AUS", "name": "Australia", "flag": "🇦🇺", "flagCode": "au" },
-        { "id": "TUR", "name": "Türkiye",   "flag": "🇹🇷", "flagCode": "tr" }
+        { "id": "TUR", "name": "Turkey",   "flag": "🇹🇷", "flagCode": "tr" }
       ],
       "matches": [
         { "id": "D1", "home": "USA", "away": "PAR", "round": 1, "date": "2026-06-12", "time": "21:00", "venue": "Los Angeles" },
@@ -85,7 +85,7 @@
       "teams": [
         { "id": "GER", "name": "Germany",       "flag": "🇩🇪", "flagCode": "de" },
         { "id": "CUW", "name": "Curaçao",       "flag": "🇨🇼", "flagCode": "cw" },
-        { "id": "CIV", "name": "Côte d'Ivoire", "flag": "🇨🇮", "flagCode": "ci" },
+        { "id": "CIV", "name": "Ivory Coast", "flag": "🇨🇮", "flagCode": "ci" },
         { "id": "ECU", "name": "Ecuador",       "flag": "🇪🇨", "flagCode": "ec" }
       ],
       "matches": [
@@ -119,7 +119,7 @@
       "teams": [
         { "id": "BEL", "name": "Belgium",     "flag": "🇧🇪", "flagCode": "be" },
         { "id": "EGY", "name": "Egypt",       "flag": "🇪🇬", "flagCode": "eg" },
-        { "id": "IRN", "name": "IR Iran",     "flag": "🇮🇷", "flagCode": "ir" },
+        { "id": "IRN", "name": "Iran",     "flag": "🇮🇷", "flagCode": "ir" },
         { "id": "NZL", "name": "New Zealand", "flag": "🇳🇿", "flagCode": "nz" }
       ],
       "matches": [
