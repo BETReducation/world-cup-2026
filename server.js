@@ -26,6 +26,7 @@ const PREDICTIONS_FILE = path.join(PERSISTENT_DIR, 'predictions.json');
 const RESULTS_FILE     = path.join(PERSISTENT_DIR, 'results.json');
 const ACCESS_CODES_FILE = path.join(PERSISTENT_DIR, 'access-codes.json');
 const SESSIONS_FILE     = path.join(PERSISTENT_DIR, 'sessions.json');
+const BONUS_FILE        = path.join(PERSISTENT_DIR, 'bonus-extras.json');
 
 const ADMIN_EMAIL = 'gbyatt@gmail.com';
 
@@ -968,6 +969,96 @@ app.delete('/api/users/:userId', (req, res) => {
   data.users.splice(idx, 1);
   writeJSON(PREDICTIONS_FILE, data);
   res.json({ success: true });
+});
+
+// ── Bonus Extras ───────────────────────────────────────────────────────────────
+
+const BONUS_SEED = {
+  lockTime: '2026-06-11T19:59:00Z',
+  predictions: {},
+  results: { topGoalscorer: null, mostRedCards: null, highestScoringMatch: null }
+};
+
+function readBonus() {
+  if (!fs.existsSync(BONUS_FILE)) {
+    const src = path.join(DATA_DIR, 'bonus-extras.json');
+    if (fs.existsSync(src)) return readJSON(src, BONUS_SEED);
+    return JSON.parse(JSON.stringify(BONUS_SEED));
+  }
+  return readJSON(BONUS_FILE, BONUS_SEED);
+}
+
+function isBonusLocked(bonus) {
+  return !!(bonus.lockTime && new Date() >= new Date(bonus.lockTime));
+}
+
+function calcBonusLeaderboard(bonus) {
+  const results = bonus.results || {};
+  const entries = Object.entries(bonus.predictions || {});
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+
+  return entries.map(([userId, preds]) => {
+    const user = data.users.find(u => u.id === userId);
+    const name = user ? (user.displayName || user.name) : userId;
+    let pts = 0;
+    const breakdown = {};
+    for (const key of ['topGoalscorer', 'mostRedCards', 'highestScoringMatch']) {
+      const actual = (results[key] || '').toLowerCase().trim();
+      const guess  = (preds[key]  || '').toLowerCase().trim();
+      const correct = actual && guess && actual === guess;
+      breakdown[key] = correct ? 3 : 0;
+      pts += breakdown[key];
+    }
+    return { userId, name, pts, breakdown };
+  }).sort((a, b) => b.pts - a.pts);
+}
+
+app.get('/api/bonus-extras/lock-status', (req, res) => {
+  const bonus = readBonus();
+  res.json({ locked: isBonusLocked(bonus), lockTime: bonus.lockTime });
+});
+
+app.get('/api/bonus-extras/predictions', (req, res) => {
+  const bonus = readBonus();
+  res.json(bonus.predictions || {});
+});
+
+app.post('/api/bonus-extras/predictions/:userId', (req, res) => {
+  if (!validateSession(req.headers['x-session-token'], req.params.userId))
+    return res.status(401).json({ error: 'Session invalid or expired. Please sign in again.' });
+
+  const bonus = readBonus();
+  if (isBonusLocked(bonus))
+    return res.status(403).json({ error: 'Bonus predictions are locked.' });
+
+  const { topGoalscorer, mostRedCards, highestScoringMatch } = req.body;
+  bonus.predictions[req.params.userId] = {
+    topGoalscorer:        sanitise(topGoalscorer || '', 100),
+    mostRedCards:         sanitise(mostRedCards || '', 100),
+    highestScoringMatch:  sanitise(highestScoringMatch || '', 100)
+  };
+  writeJSON(BONUS_FILE, bonus);
+  res.json({ success: true });
+});
+
+app.get('/api/bonus-extras/results', (req, res) => {
+  const bonus = readBonus();
+  res.json(bonus.results || {});
+});
+
+app.post('/api/bonus-extras/results', requireAdmin, (req, res) => {
+  const { topGoalscorer, mostRedCards, highestScoringMatch } = req.body;
+  const bonus = readBonus();
+  if (topGoalscorer        !== undefined) bonus.results.topGoalscorer        = sanitise(topGoalscorer, 100);
+  if (mostRedCards         !== undefined) bonus.results.mostRedCards          = sanitise(mostRedCards, 100);
+  if (highestScoringMatch  !== undefined) bonus.results.highestScoringMatch   = sanitise(highestScoringMatch, 100);
+  writeJSON(BONUS_FILE, bonus);
+  res.json({ success: true });
+});
+
+app.get('/api/bonus-extras/leaderboard', (req, res) => {
+  const bonus = readBonus();
+  res.json(calcBonusLeaderboard(bonus));
 });
 
 // ── Global error handler (returns JSON for all unhandled route errors) ─────────
