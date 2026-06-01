@@ -974,7 +974,7 @@ app.delete('/api/users/:userId', (req, res) => {
 // ── Bonus Extras ───────────────────────────────────────────────────────────────
 
 const BONUS_SEED = {
-  lockTime: '2026-06-11T19:59:00Z',
+  lockTime: '2026-06-11T18:59:00Z',
   predictions: {},
   results: { topGoalscorer: null, mostRedCards: null, highestScoringMatch: null }
 };
