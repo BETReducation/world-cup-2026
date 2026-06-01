@@ -135,7 +135,7 @@
       "name": "Group H",
       "teams": [
         { "id": "ESP", "name": "Spain",        "flag": "🇪🇸", "flagCode": "es" },
-        { "id": "CPV", "name": "Cabo Verde",   "flag": "🇨🇻", "flagCode": "cv" },
+        { "id": "CPV", "name": "Cape Verde",   "flag": "🇨🇻", "flagCode": "cv" },
         { "id": "KSA", "name": "Saudi Arabia", "flag": "🇸🇦", "flagCode": "sa" },
         { "id": "URU", "name": "Uruguay",      "flag": "🇺🇾", "flagCode": "uy" }
       ],
