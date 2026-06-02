@@ -971,7 +971,7 @@ app.delete('/api/users/:userId', (req, res) => {
   res.json({ success: true });
 });
 
-// ── Bonus Extras ───────────────────────────────────────────────────────────────
+// ── Tie Breakers ───────────────────────────────────────────────────────────────
 
 const BONUS_SEED = {
   lockTime: '2026-06-11T18:59:00Z',

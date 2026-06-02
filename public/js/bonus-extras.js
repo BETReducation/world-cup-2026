@@ -1,4 +1,4 @@
-/* Bonus Extras page */
+/* Tie Breakers page */
 
 let bonusLocked = false;
 let currentUserId = null;
