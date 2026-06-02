@@ -100,6 +100,12 @@
   <h1 class="section-title">Tie Breakers</h1>
   <p class="section-desc">Three tiebreaker predictions — 3 pts each for a correct answer. Locked 1 minute before kick-off of Mexico vs South Africa.</p>
 
+  <!-- Spelling notice -->
+  <div style="background:rgba(77,201,122,0.1);border:1px solid rgba(77,201,122,0.3);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;color:var(--accent);font-size:14px;line-height:1.6;">
+    <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>
+    <strong>Important:</strong> For the Top Goalscorer, the player's <strong>full name must be spelled correctly</strong> — including any accents (e.g. Mbappé, not Mbappe) — to score the 3 points. Double-check before saving!
+  </div>
+
   <!-- Lock status banner -->
   <div id="lockBanner" class="hidden card-sm" style="display:none;align-items:center;gap:0.6rem;font-size:0.9rem;margin-bottom:20px;"></div>
 
@@ -128,15 +134,25 @@
         <i class="fa-solid fa-rectangle-xmark" style="color:var(--red);"></i> Team with Most Red Cards
       </label>
       <p class="card-desc" style="margin-bottom:8px;">Which team will receive the most red cards during the tournament?</p>
-      <input type="text" id="inputRedCards" placeholder="e.g. Argentina" maxlength="100" class="score-input" style="width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:15px;outline:none;">
+      <select id="inputRedCards" class="tb-select">
+        <option value="">— Select a team —</option>
+      </select>
     </div>
 
     <div class="form-group" style="margin-bottom:24px;">
-      <label for="inputHighScoring" style="font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <label style="font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
         <i class="fa-solid fa-fire" style="color:var(--gold);"></i> Highest Scoring Match
       </label>
-      <p class="card-desc" style="margin-bottom:8px;">Which match will have the most combined goals? Enter as "Team A vs Team B".</p>
-      <input type="text" id="inputHighScoring" placeholder="e.g. Spain vs Cape Verde" maxlength="100" class="score-input" style="width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:15px;outline:none;">
+      <p class="card-desc" style="margin-bottom:8px;">Which match will have the most combined goals? Pick both teams.</p>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <select id="inputHighScoringHome" class="tb-select" style="flex:1;">
+          <option value="">— Team —</option>
+        </select>
+        <span style="color:var(--muted);font-weight:700;white-space:nowrap;font-size:13px;">vs</span>
+        <select id="inputHighScoringAway" class="tb-select" style="flex:1;">
+          <option value="">— Team —</option>
+        </select>
+      </div>
     </div>
 
     <button class="btn btn-primary" id="savePredBtn" style="width:100%;">
@@ -197,13 +213,21 @@
       </div>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Team with Most Red Cards</label>
-        <input type="text" id="adminRedCards" placeholder="Team name" maxlength="100"
-          style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+        <select id="adminRedCards" class="tb-select">
+          <option value="">— Select a team —</option>
+        </select>
       </div>
       <div class="form-group" style="margin-bottom:20px;">
         <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Highest Scoring Match</label>
-        <input type="text" id="adminHighScoring" placeholder="Team A vs Team B" maxlength="100"
-          style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <select id="adminHighScoringHome" class="tb-select" style="flex:1;">
+            <option value="">— Team —</option>
+          </select>
+          <span style="color:var(--muted);font-weight:700;white-space:nowrap;font-size:13px;">vs</span>
+          <select id="adminHighScoringAway" class="tb-select" style="flex:1;">
+            <option value="">— Team —</option>
+          </select>
+        </div>
       </div>
       <button class="btn btn-primary" id="adminSaveBtn">
         <i class="fa-solid fa-floppy-disk"></i> Save results

@@ -4,6 +4,7 @@ let bonusLocked = false;
 let currentUserId = null;
 let isAdmin = false;
 let bonusResults = {};
+let teamNames = []; // sorted list of all team names from fixtures
 
 const QUESTION_LABELS = {
   topGoalscorer:       'Top Goalscorer',
@@ -23,9 +24,43 @@ function formatLockTime(iso) {
   });
 }
 
+// Build sorted team list from fixtures groups
+async function loadTeams() {
+  try {
+    const fixtures = await fetch('/api/fixtures').then(r => r.json());
+    const names = new Set();
+    for (const group of Object.values(fixtures.groups || {})) {
+      for (const team of group.teams || []) {
+        if (team.name) names.add(team.name);
+      }
+    }
+    teamNames = [...names].sort((a, b) => a.localeCompare(b));
+  } catch { teamNames = []; }
+}
+
+// Populate a <select> element with the team list
+function populateTeamSelect(selectId, placeholder, selectedValue) {
+  const sel = el(selectId);
+  if (!sel) return;
+  // Clear existing options beyond the placeholder
+  while (sel.options.length > 1) sel.remove(1);
+  for (const name of teamNames) {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    if (name === selectedValue) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  // Also set placeholder text
+  sel.options[0].textContent = placeholder;
+}
+
 async function init() {
-  // Determine auth state
-  const meData = await API.me().catch(() => ({ userId: null, isAdmin: false }));
+  // Load teams and auth state in parallel
+  const [meData] = await Promise.all([
+    API.me().catch(() => ({ userId: null, isAdmin: false })),
+    loadTeams()
+  ]);
   currentUserId = meData.userId;
   isAdmin = meData.isAdmin;
 
@@ -37,11 +72,11 @@ async function init() {
   const banner = el('lockBanner');
   if (bonusLocked) {
     banner.innerHTML = `<i class="fa-solid fa-lock" style="color:var(--red);"></i>
-      <span>Bonus predictions are <strong>locked</strong>. Locked ${lockData.lockTime ? formatLockTime(lockData.lockTime) : ''}.</span>`;
+      <span>Tie Breaker predictions are <strong>locked</strong>. Locked ${lockData.lockTime ? formatLockTime(lockData.lockTime) : ''}.</span>`;
     banner.style.borderColor = 'rgba(240,122,90,0.3)';
   } else {
     banner.innerHTML = `<i class="fa-solid fa-lock-open" style="color:var(--accent);"></i>
-      <span>Bonus predictions are <strong>open</strong>. Locks <strong>${lockData.lockTime ? formatLockTime(lockData.lockTime) : 'before Round 1'}</strong> — 1 minute before Mexico vs South Africa kicks off.</span>`;
+      <span>Tie Breaker predictions are <strong>open</strong>. Locks <strong>${lockData.lockTime ? formatLockTime(lockData.lockTime) : 'before Round 1'}</strong> — 1 minute before Mexico vs South Africa kicks off.</span>`;
     banner.style.borderColor = 'rgba(77,201,122,0.25)';
   }
   banner.style.display = 'flex';
@@ -70,11 +105,21 @@ async function init() {
   // Admin panel
   if (isAdmin) {
     show('adminPanel');
-    if (bonusResults.topGoalscorer)       el('adminGoalscorer').value  = bonusResults.topGoalscorer;
-    if (bonusResults.mostRedCards)        el('adminRedCards').value    = bonusResults.mostRedCards;
-    if (bonusResults.highestScoringMatch) el('adminHighScoring').value = bonusResults.highestScoringMatch;
+    // Populate admin dropdowns
+    const [homeTeam, awayTeam] = splitVs(bonusResults.highestScoringMatch || '');
+    populateTeamSelect('adminRedCards',       '— Select a team —', bonusResults.mostRedCards || '');
+    populateTeamSelect('adminHighScoringHome','— Team —',           homeTeam);
+    populateTeamSelect('adminHighScoringAway','— Team —',           awayTeam);
+    if (bonusResults.topGoalscorer) el('adminGoalscorer').value = bonusResults.topGoalscorer;
     el('adminSaveBtn').addEventListener('click', saveAdminResults);
   }
+}
+
+// Split a "Team A vs Team B" string into [homeTeam, awayTeam]
+function splitVs(value) {
+  if (!value) return ['', ''];
+  const parts = value.split(' vs ');
+  return [parts[0]?.trim() || '', parts[1]?.trim() || ''];
 }
 
 async function renderForm() {
@@ -83,9 +128,17 @@ async function renderForm() {
   // Load existing predictions
   const allPreds = await fetch('/api/bonus-extras/predictions').then(r => r.json()).catch(() => ({}));
   const mine = allPreds[currentUserId] || {};
-  if (mine.topGoalscorer)       el('inputGoalscorer').value  = mine.topGoalscorer;
-  if (mine.mostRedCards)        el('inputRedCards').value    = mine.mostRedCards;
-  if (mine.highestScoringMatch) el('inputHighScoring').value = mine.highestScoringMatch;
+
+  // Goalscorer (free text)
+  if (mine.topGoalscorer) el('inputGoalscorer').value = mine.topGoalscorer;
+
+  // Red cards dropdown
+  populateTeamSelect('inputRedCards', '— Select a team —', mine.mostRedCards || '');
+
+  // Highest scoring match — two dropdowns
+  const [homeTeam, awayTeam] = splitVs(mine.highestScoringMatch || '');
+  populateTeamSelect('inputHighScoringHome', '— Team —', homeTeam);
+  populateTeamSelect('inputHighScoringAway', '— Team —', awayTeam);
 
   el('savePredBtn').addEventListener('click', savePredictions);
 }
@@ -169,6 +222,10 @@ async function savePredictions() {
   hide('formSaveMsg');
   hide('formErrMsg');
 
+  const homeTeam = el('inputHighScoringHome').value;
+  const awayTeam = el('inputHighScoringAway').value;
+  const highestScoringMatch = (homeTeam && awayTeam) ? `${homeTeam} vs ${awayTeam}` : '';
+
   const { token } = Session.load();
   try {
     await fetch(`/api/bonus-extras/predictions/${currentUserId}`, {
@@ -176,8 +233,8 @@ async function savePredictions() {
       headers: { 'Content-Type': 'application/json', 'x-session-token': token },
       body: JSON.stringify({
         topGoalscorer:       el('inputGoalscorer').value.trim(),
-        mostRedCards:        el('inputRedCards').value.trim(),
-        highestScoringMatch: el('inputHighScoring').value.trim()
+        mostRedCards:        el('inputRedCards').value,
+        highestScoringMatch
       })
     }).then(r => { if (!r.ok) return r.json().then(e => { throw new Error(e.error); }); });
 
@@ -199,6 +256,10 @@ async function saveAdminResults() {
   btn.disabled = true;
   hide('adminSaveMsg');
 
+  const homeTeam = el('adminHighScoringHome').value;
+  const awayTeam = el('adminHighScoringAway').value;
+  const highestScoringMatch = (homeTeam && awayTeam) ? `${homeTeam} vs ${awayTeam}` : '';
+
   const { token } = Session.load();
   try {
     await fetch('/api/bonus-extras/results', {
@@ -206,8 +267,8 @@ async function saveAdminResults() {
       headers: { 'Content-Type': 'application/json', 'x-session-token': token },
       body: JSON.stringify({
         topGoalscorer:       el('adminGoalscorer').value.trim(),
-        mostRedCards:        el('adminRedCards').value.trim(),
-        highestScoringMatch: el('adminHighScoring').value.trim()
+        mostRedCards:        el('adminRedCards').value,
+        highestScoringMatch
       })
     }).then(r => { if (!r.ok) return r.json().then(e => { throw new Error(e.error); }); });
 
