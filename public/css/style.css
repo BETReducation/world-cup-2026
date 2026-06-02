@@ -179,8 +179,10 @@ nav.site-nav {
 .section {
   max-width: 760px;
   margin: 0 auto;
-  padding: 0 2rem 72px;
+  padding: 40px 2rem 72px;
 }
+
+.section--no-top-pad { padding-top: 0; }
 
 .section-label {
   font-family: 'JetBrains Mono', monospace;
