@@ -640,6 +640,14 @@
         <div class="danger-desc">Permanently remove your account and all predictions from the league. You will be signed out immediately and cannot re-join with the same name.</div>
         <button class="btn btn-danger" onclick="confirmDelete()">Delete Account</button>
       </div>
+      <div class="danger-item" id="adminRemovePlayerItem" style="display:none;">
+        <div class="danger-title">Remove a Player</div>
+        <div class="danger-desc">Permanently remove any player and their predictions from the league. Use this when someone wants to drop out or has created a duplicate account.</div>
+        <select id="removePlayerSelect" style="width:100%;margin-bottom:10px;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;">
+          <option value="">— select a player —</option>
+        </select>
+        <button class="btn btn-danger" onclick="confirmRemovePlayer()">Remove Player</button>
+      </div>
       <div class="danger-item" id="adminResetItem" style="display:none;">
         <div class="danger-title">Reset All Accounts</div>
         <div class="danger-desc">Delete every player account except yours. All predictions will be lost. Players will need new invite codes to re-register. This cannot be undone.</div>
@@ -723,8 +731,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const me = await API.me();
     if (me.isAdmin) {
       document.getElementById('adminSection').style.display = 'block';
+      document.getElementById('adminRemovePlayerItem').style.display = 'flex';
       document.getElementById('adminResetItem').style.display = 'flex';
       await loadAccessCodes();
+      await loadRemovePlayerDropdown();
     }
   } catch {}
 });
@@ -1187,6 +1197,19 @@ async function runConfirmedAction() {
     }
     return;
   }
+
+  if (pendingAction.type === 'adminRemovePlayer') {
+    try {
+      const r = await API.adminDeleteUser(pendingAction.userId);
+      if (r.error) { err.textContent = r.error; return; }
+      showToast(`✓ ${pendingAction.name} removed`, 'ok');
+      closeConfirm();
+      await loadRemovePlayerDropdown();
+    } catch {
+      err.textContent = 'Failed — try again';
+    }
+    return;
+  }
 }
 
 // ── Admin: load & render access codes ─────────────────────────────────────────
@@ -1257,6 +1280,35 @@ function copyCode(code) {
 }
 
 // ── Admin: reset all user accounts ────────────────────────────────────────────
+async function loadRemovePlayerDropdown() {
+  const sel = document.getElementById('removePlayerSelect');
+  try {
+    const users = await API.users();
+    const me = await API.me();
+    sel.innerHTML = '<option value="">— select a player —</option>';
+    users.filter(u => u.id !== me.userId).forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.name;
+      sel.appendChild(opt);
+    });
+  } catch { sel.innerHTML = '<option value="">Failed to load players</option>'; }
+}
+
+function confirmRemovePlayer() {
+  const sel = document.getElementById('removePlayerSelect');
+  const userId = sel.value;
+  const name = sel.options[sel.selectedIndex]?.text;
+  if (!userId) { showToast('Select a player first', 'err'); return; }
+  pendingAction = { type: 'adminRemovePlayer', userId, name };
+  openConfirm(
+    'Remove Player',
+    `This will permanently remove ${name} and all their predictions from the league. This cannot be undone.`,
+    false,
+    'Remove'
+  );
+}
+
 function confirmResetAllUsers() {
   pendingAction = { type: 'resetAllUsers' };
   openConfirm(

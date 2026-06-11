@@ -86,6 +86,12 @@ const API = {
     if (token) headers['x-session-token'] = token;
     return fetch('/api/access-codes', { headers }).then(r => r.json());
   },
+  adminDeleteUser(userId) {
+    const { token } = Session.load();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['x-session-token'] = token;
+    return fetch(`/api/admin/users/${userId}`, { method: 'DELETE', headers }).then(r => r.json());
+  },
   adminResetAllUsers() {
     const { token } = Session.load();
     return API.post('/api/admin/reset-all-users', {}, null, token);

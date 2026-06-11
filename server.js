@@ -971,6 +971,19 @@ app.delete('/api/users/:userId', (req, res) => {
   res.json({ success: true });
 });
 
+// ── Admin: delete any user ──────────────────────────────────────────────────────
+
+app.delete('/api/admin/users/:userId', requireAdmin, (req, res) => {
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  const idx  = data.users.findIndex(u => u.id === req.params.userId);
+  if (idx === -1) return res.status(404).json({ error: 'User not found' });
+  if (data.users[idx].isAdmin) return res.status(403).json({ error: 'Cannot remove the admin account.' });
+  destroyAllSessions(data.users[idx].id);
+  data.users.splice(idx, 1);
+  writeJSON(PREDICTIONS_FILE, data);
+  res.json({ success: true });
+});
+
 // ── Tie Breakers ───────────────────────────────────────────────────────────────
 
 const BONUS_SEED = {
