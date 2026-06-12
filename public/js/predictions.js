@@ -209,7 +209,7 @@ function showGroup(groupKey) {
 
       html += `
         <div class="match-row ${cls}">
-          <div class="match-meta">${fmtDate(m.date, m.time)}</div>
+          <div class="match-meta">${fmtDate(m.date, m.time)}${m.note ? `<span class="match-note">(${m.note})</span>` : ''}</div>
           <div class="team-name">
             <span class="flag fi fi-${home.flagCode}"></span>${home.name}
           </div>

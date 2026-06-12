@@ -73,7 +73,7 @@
       ],
       "matches": [
         { "id": "D1", "home": "USA", "away": "PAR", "round": 1, "date": "2026-06-12", "time": "21:00", "venue": "Los Angeles" },
-        { "id": "D2", "home": "AUS", "away": "TUR", "round": 1, "date": "2026-06-13", "time": "00:00", "venue": "Vancouver" },
+        { "id": "D2", "home": "AUS", "away": "TUR", "round": 1, "date": "2026-06-14", "time": "00:00", "venue": "Vancouver", "note": "Played Saturday 13 Jun local time in the US" },
         { "id": "D3", "home": "TUR", "away": "PAR", "round": 2, "date": "2026-06-19", "time": "23:00", "venue": "San Francisco Bay Area" },
         { "id": "D4", "home": "USA", "away": "AUS", "round": 2, "date": "2026-06-19", "time": "15:00", "venue": "Seattle" },
         { "id": "D5", "home": "TUR", "away": "USA", "round": 3, "date": "2026-06-25", "time": "22:00", "venue": "Los Angeles" },

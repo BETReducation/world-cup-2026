@@ -174,7 +174,7 @@ function showGroup(groupKey) {
 
       html += `
         <div class="result-row ${played ? '' : 'not-played'}">
-          <div class="match-meta">${fmtDate(m.date, m.time)}</div>
+          <div class="match-meta">${fmtDate(m.date, m.time)}${m.note ? `<span class="match-note">(${m.note})</span>` : ''}</div>
           <div class="team-name"><span class="flag fi fi-${home.flagCode}"></span>${home.name}</div>
           <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
           <div class="team-name right">${away.name}<span class="flag fi fi-${away.flagCode}"></span></div>

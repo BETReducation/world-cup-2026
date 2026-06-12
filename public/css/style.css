@@ -464,6 +464,13 @@ nav.site-nav {
   color: var(--muted);
   line-height: 1.6;
 }
+.match-note {
+  font-size: 9px;
+  color: var(--muted);
+  opacity: 0.7;
+  font-style: italic;
+  line-height: 1.4;
+}
 .match-meta sup {
   font-size: 8px;
   color: var(--accent);
