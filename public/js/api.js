@@ -86,6 +86,10 @@ const API = {
     if (token) headers['x-session-token'] = token;
     return fetch('/api/access-codes', { headers }).then(r => r.json());
   },
+  adminSetPrediction(userId, matchId, home, away) {
+    const { token } = Session.load();
+    return API.post(`/api/admin/predictions/${userId}/${matchId}`, { home, away }, null, token);
+  },
   adminDeleteUser(userId) {
     const { token } = Session.load();
     const headers = { 'Content-Type': 'application/json' };

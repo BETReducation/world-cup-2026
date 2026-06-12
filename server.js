@@ -813,6 +813,23 @@ app.post('/api/predictions/:userId', (req, res) => {
   res.json({ success: true, saved: Object.keys(updated).length });
 });
 
+// ── Admin: override any player's prediction ────────────────────────────────────
+
+app.post('/api/admin/predictions/:userId/:matchId', requireAdmin, (req, res) => {
+  const { home, away } = req.body;
+  const h = parseInt(home);
+  const a = parseInt(away);
+  if (isNaN(h) || isNaN(a) || h < 0 || a < 0) return res.status(400).json({ error: 'Invalid scores' });
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  const user = data.users.find(u => u.id === req.params.userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (!user.predictions) user.predictions = {};
+  user.predictions[req.params.matchId] = { home: h, away: a };
+  user.lastUpdated = new Date().toISOString();
+  writeJSON(PREDICTIONS_FILE, data);
+  res.json({ success: true });
+});
+
 // ── Results (admin) ────────────────────────────────────────────────────────────
 
 app.get('/api/results', (req, res) => {

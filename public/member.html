@@ -626,6 +626,51 @@
     </div>
   </div>
 
+  <!-- Admin: Edit Predictions -->
+  <div class="profile-section" id="adminEditPredSection" style="display:none;">
+    <div class="section-hdr"><i class="fa-solid fa-pen-to-square" style="color:var(--accent);margin-right:6px;"></i>Edit Player Prediction</div>
+    <div class="section-body">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Override any player's score for any match, regardless of lock status.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="form-group" style="margin:0;">
+          <label>Player</label>
+          <select id="editPredPlayer" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;" onchange="onEditPredPlayerChange()">
+            <option value="">— select player —</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Group</label>
+          <select id="editPredGroup" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;" onchange="onEditPredGroupChange()">
+            <option value="">— select group —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Match</label>
+        <select id="editPredMatch" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;" onchange="onEditPredMatchChange()">
+          <option value="">— select match —</option>
+        </select>
+      </div>
+      <div id="editPredScoreRow" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr auto 1fr auto;gap:8px;align-items:center;margin-bottom:12px;">
+          <div>
+            <label id="editPredHomeName" style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px;">Home</label>
+            <input type="number" id="editPredHome" min="0" max="99" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:20px;text-align:center;">
+          </div>
+          <span style="font-size:18px;color:var(--muted);padding-top:18px;">–</span>
+          <div>
+            <label id="editPredAwayName" style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px;">Away</label>
+            <input type="number" id="editPredAway" min="0" max="99" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:20px;text-align:center;">
+          </div>
+          <div style="padding-top:18px;">
+            <button class="btn btn-primary" onclick="saveAdminPrediction()" style="white-space:nowrap;">Save Score</button>
+          </div>
+        </div>
+        <div id="editPredFeedback" style="font-size:13px;min-height:18px;"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Danger Zone -->
   <div class="danger-section">
     <div class="danger-hdr">Danger Zone</div>
@@ -731,10 +776,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const me = await API.me();
     if (me.isAdmin) {
       document.getElementById('adminSection').style.display = 'block';
+      document.getElementById('adminEditPredSection').style.display = 'block';
       document.getElementById('adminRemovePlayerItem').style.display = 'flex';
       document.getElementById('adminResetItem').style.display = 'flex';
       await loadAccessCodes();
       await loadRemovePlayerDropdown();
+      await initEditPredSection();
     }
   } catch {}
 });
@@ -1280,6 +1327,100 @@ function copyCode(code) {
 }
 
 // ── Admin: reset all user accounts ────────────────────────────────────────────
+// ── Admin: edit prediction ─────────────────────────────────────────────────────
+let editPredFixtures = null;
+let editPredUsers = [];
+let editPredAllPredictions = {};
+
+async function initEditPredSection() {
+  try {
+    const [fixtures, users, preds] = await Promise.all([API.fixtures(), API.users(), API.predictions()]);
+    editPredFixtures = fixtures;
+    editPredUsers = users;
+    editPredAllPredictions = {};
+    preds.forEach(p => { editPredAllPredictions[p.userId] = p.predictions || {}; });
+
+    const playerSel = document.getElementById('editPredPlayer');
+    playerSel.innerHTML = '<option value="">— select player —</option>';
+    users.forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id; opt.textContent = u.name;
+      playerSel.appendChild(opt);
+    });
+
+    const groupSel = document.getElementById('editPredGroup');
+    groupSel.innerHTML = '<option value="">— select group —</option>';
+    Object.keys(fixtures.groups).sort().forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g; opt.textContent = 'Group ' + g;
+      groupSel.appendChild(opt);
+    });
+  } catch { }
+}
+
+function onEditPredPlayerChange() {
+  document.getElementById('editPredScoreRow').style.display = 'none';
+  onEditPredMatchChange();
+}
+
+function onEditPredGroupChange() {
+  const g = document.getElementById('editPredGroup').value;
+  const matchSel = document.getElementById('editPredMatch');
+  matchSel.innerHTML = '<option value="">— select match —</option>';
+  document.getElementById('editPredScoreRow').style.display = 'none';
+  if (!g || !editPredFixtures) return;
+  editPredFixtures.groups[g].matches.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = `R${m.round}: ${m.home} vs ${m.away}`;
+    matchSel.appendChild(opt);
+  });
+}
+
+function onEditPredMatchChange() {
+  const userId = document.getElementById('editPredPlayer').value;
+  const matchId = document.getElementById('editPredMatch').value;
+  const row = document.getElementById('editPredScoreRow');
+  if (!userId || !matchId || !editPredFixtures) { row.style.display = 'none'; return; }
+
+  // Find match info
+  let match = null;
+  for (const g of Object.values(editPredFixtures.groups)) {
+    match = g.matches.find(m => m.id === matchId);
+    if (match) break;
+  }
+  if (!match) { row.style.display = 'none'; return; }
+
+  document.getElementById('editPredHomeName').textContent = match.home;
+  document.getElementById('editPredAwayName').textContent = match.away;
+
+  const existing = (editPredAllPredictions[userId] || {})[matchId];
+  document.getElementById('editPredHome').value = existing != null ? existing.home : '';
+  document.getElementById('editPredAway').value = existing != null ? existing.away : '';
+  document.getElementById('editPredFeedback').textContent = '';
+  row.style.display = 'block';
+}
+
+async function saveAdminPrediction() {
+  const userId  = document.getElementById('editPredPlayer').value;
+  const matchId = document.getElementById('editPredMatch').value;
+  const home    = document.getElementById('editPredHome').value;
+  const away    = document.getElementById('editPredAway').value;
+  const fb      = document.getElementById('editPredFeedback');
+  if (!userId || !matchId) { fb.textContent = 'Select a player and match first.'; fb.style.color = 'var(--danger)'; return; }
+  if (home === '' || away === '') { fb.textContent = 'Enter both scores.'; fb.style.color = 'var(--danger)'; return; }
+  fb.textContent = 'Saving…'; fb.style.color = 'var(--muted)';
+  try {
+    const r = await API.adminSetPrediction(userId, matchId, parseInt(home), parseInt(away));
+    if (r.error) { fb.textContent = r.error; fb.style.color = 'var(--danger)'; return; }
+    if (!editPredAllPredictions[userId]) editPredAllPredictions[userId] = {};
+    editPredAllPredictions[userId][matchId] = { home: parseInt(home), away: parseInt(away) };
+    fb.textContent = '✓ Saved'; fb.style.color = 'var(--ok, green)';
+  } catch {
+    fb.textContent = 'Failed — try again'; fb.style.color = 'var(--danger)';
+  }
+}
+
 async function loadRemovePlayerDropdown() {
   const sel = document.getElementById('removePlayerSelect');
   try {
