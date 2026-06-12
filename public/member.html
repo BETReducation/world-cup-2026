@@ -1334,11 +1334,11 @@ let editPredAllPredictions = {};
 
 async function initEditPredSection() {
   try {
-    const [fixtures, users, preds] = await Promise.all([API.fixtures(), API.users(), API.predictions()]);
+    const [fixtures, users, preds] = await Promise.all([API.fixtures(), API.users(), API.allPredictions()]);
     editPredFixtures = fixtures;
     editPredUsers = users;
     editPredAllPredictions = {};
-    preds.forEach(p => { editPredAllPredictions[p.userId] = p.predictions || {}; });
+    preds.forEach(p => { editPredAllPredictions[p.id] = p.predictions || {}; });
 
     const playerSel = document.getElementById('editPredPlayer');
     playerSel.innerHTML = '<option value="">— select player —</option>';
