@@ -626,6 +626,16 @@
     </div>
   </div>
 
+  <!-- Admin: Tournament Stats snapshot -->
+  <div class="profile-section" id="adminStatsSection" style="display:none;">
+    <div class="section-hdr"><i class="fa-solid fa-chart-bar" style="color:var(--accent);margin-right:6px;"></i>Tournament Stats</div>
+    <div class="section-body" style="padding:0;">
+      <div id="statsCard">
+        <p style="color:var(--muted);font-size:13px;padding:16px;">Loading stats…</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Admin: Edit Predictions -->
   <div class="profile-section" id="adminEditPredSection" style="display:none;">
     <div class="section-hdr"><i class="fa-solid fa-pen-to-square" style="color:var(--accent);margin-right:6px;"></i>Edit Player Prediction</div>
@@ -776,10 +786,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const me = await API.me();
     if (me.isAdmin) {
       document.getElementById('adminSection').style.display = 'block';
+      document.getElementById('adminStatsSection').style.display = 'block';
       document.getElementById('adminEditPredSection').style.display = 'block';
       document.getElementById('adminRemovePlayerItem').style.display = 'flex';
       document.getElementById('adminResetItem').style.display = 'flex';
       await loadAccessCodes();
+      await loadTournamentStats();
       await loadRemovePlayerDropdown();
       await initEditPredSection();
     }
@@ -1327,6 +1339,76 @@ function copyCode(code) {
 }
 
 // ── Admin: reset all user accounts ────────────────────────────────────────────
+// ── Admin: tournament stats ────────────────────────────────────────────────────
+async function loadTournamentStats() {
+  const el = document.getElementById('statsCard');
+  try {
+    const s = await fetch('/api/stats').then(r => r.json());
+    if (!s.gamesPlayed) {
+      el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:16px;">No results recorded yet.</p>';
+      return;
+    }
+
+    const flag = code => code ? `<span class="flag fi fi-${code.toLowerCase()}" style="margin-right:3px;"></span>` : '';
+
+    const teamFlags = {};
+    // build flag lookup from fixtures (already loaded globally)
+    if (window.fixtures) {
+      Object.values(window.fixtures.groups || {}).forEach(g =>
+        g.matches.forEach(m => { teamFlags[m.home] = m.home.toLowerCase(); teamFlags[m.away] = m.away.toLowerCase(); })
+      );
+    }
+
+    const teamLabel = (code, label) => label || code || '?';
+
+    const statBox = (icon, value, label) => `
+      <div class="stats-box">
+        <div class="stats-icon">${icon}</div>
+        <div class="stats-value">${value}</div>
+        <div class="stats-label">${label}</div>
+      </div>`;
+
+    const highlightRow = (icon, title, detail) => `
+      <div class="stats-highlight">
+        <span class="stats-hl-icon">${icon}</span>
+        <div>
+          <div class="stats-hl-title">${title}</div>
+          <div class="stats-hl-detail">${detail}</div>
+        </div>
+      </div>`;
+
+    const hl = s.highestGame;
+    const bw = s.biggestWin;
+
+    el.innerHTML = `
+      <div class="stats-card">
+        <div class="stats-card-hdr">
+          <span class="stats-card-title">⚽ World Cup 2026 · Live Stats</span>
+          <span class="stats-card-sub">${s.gamesPlayed} game${s.gamesPlayed !== 1 ? 's' : ''} played</span>
+        </div>
+
+        <div class="stats-grid">
+          ${statBox('⚽', s.totalGoals, 'Total Goals')}
+          ${statBox('📊', s.avgGoals, 'Goals / Game')}
+          ${statBox('🤝', s.draws, 'Draws')}
+          ${statBox('🧤', s.cleanSheets, 'Clean Sheets')}
+          ${s.overallPct !== null ? statBox('🎯', s.overallPct + '%', 'Prediction Accuracy') : ''}
+          ${s.perfectPredictions ? statBox('💎', s.perfectPredictions, 'Perfect Scores') : ''}
+        </div>
+
+        <div class="stats-highlights">
+          ${s.mostCommonScoreline ? highlightRow('🔁', 'Most Common Scoreline', `${s.mostCommonScoreline.scoreline} (${s.mostCommonScoreline.count}×)`) : ''}
+          ${hl ? highlightRow('🔥', 'Highest Scoring Game', `${teamLabel(hl.home)} ${hl.home} – ${hl.away} ${teamLabel(hl.away)} (${hl.home + hl.away} goals)`) : ''}
+          ${bw && bw.home !== bw.away ? highlightRow('💪', 'Biggest Win', `${teamLabel(bw.home)} ${bw.home} – ${bw.away} ${teamLabel(bw.away)}`) : ''}
+          ${s.easiest ? highlightRow('😌', 'Easiest to Predict', `${s.easiest.home} vs ${s.easiest.away} · ${s.easiest.pct}% got it right`) : ''}
+          ${s.hardest ? highlightRow('😬', 'Hardest to Predict', `${s.hardest.home} vs ${s.hardest.away} · only ${s.hardest.pct}% got it right`) : ''}
+        </div>
+      </div>`;
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:16px;">Could not load stats.</p>';
+  }
+}
+
 // ── Admin: edit prediction ─────────────────────────────────────────────────────
 let editPredFixtures = null;
 let editPredUsers = [];

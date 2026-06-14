@@ -904,6 +904,94 @@ function calcLeaderboard() {
 
 app.get('/api/leaderboard', (req, res) => res.json(calcLeaderboard()));
 
+// ── Tournament stats ───────────────────────────────────────────────────────────
+
+app.get('/api/stats', (req, res) => {
+  const fixtures  = readJSON(FIXTURES_FILE, { groups: {} });
+  const results   = readJSON(RESULTS_FILE,  { results: {} }).results || {};
+  const users     = readJSON(PREDICTIONS_FILE, { users: [] }).users;
+
+  // Build match lookup: id -> { home team, away team }
+  const matchInfo = {};
+  Object.values(fixtures.groups).forEach(g =>
+    g.matches.forEach(m => { matchInfo[m.id] = { home: m.home, away: m.away }; })
+  );
+  Object.values(fixtures.knockout || {}).forEach(r =>
+    (r.matches || []).forEach(m => { matchInfo[m.id] = { home: m.homeLabel || m.home || '?', away: m.awayLabel || m.away || '?' }; })
+  );
+
+  const played = Object.entries(results).filter(([, r]) => r.played);
+  if (!played.length) return res.json({ gamesPlayed: 0 });
+
+  // Goals
+  let totalGoals = 0, highestGoals = 0, highestGame = null, cleanSheets = 0;
+  const scorelines = {};
+  played.forEach(([id, r]) => {
+    const g = r.home + r.away;
+    totalGoals += g;
+    if (g > highestGoals) { highestGoals = g; highestGame = { id, ...r, ...matchInfo[id] }; }
+    if (r.home === 0 || r.away === 0) cleanSheets++;
+    const key = `${r.home}-${r.away}`;
+    scorelines[key] = (scorelines[key] || 0) + 1;
+  });
+  const avgGoals = (totalGoals / played.length).toFixed(2);
+  const mostCommonScoreline = Object.entries(scorelines).sort((a, b) => b[1] - a[1])[0];
+
+  // Biggest win (largest goal difference)
+  let biggestWin = null, biggestDiff = 0;
+  played.forEach(([id, r]) => {
+    const diff = Math.abs(r.home - r.away);
+    if (diff > biggestDiff) { biggestDiff = diff; biggestWin = { id, ...r, ...matchInfo[id] }; }
+  });
+
+  // Prediction accuracy per match
+  const matchAccuracy = {};
+  played.forEach(([matchId, result]) => {
+    let correct = 0, total = 0;
+    const actualSign = Math.sign(result.home - result.away);
+    users.forEach(u => {
+      const pred = (u.predictions || {})[matchId];
+      if (!pred) return;
+      total++;
+      if (Math.sign(pred.home - pred.away) === actualSign) correct++;
+    });
+    if (total > 0) matchAccuracy[matchId] = { correct, total, pct: Math.round(correct / total * 100), ...matchInfo[matchId] };
+  });
+  const accuracyList = Object.values(matchAccuracy).filter(m => m.total > 0);
+  const hardest = accuracyList.sort((a, b) => a.pct - b.pct)[0] || null;
+  const easiest = [...accuracyList].sort((a, b) => b.pct - a.pct)[0] || null;
+  const overallPct = accuracyList.length
+    ? Math.round(accuracyList.reduce((s, m) => s + m.pct, 0) / accuracyList.length)
+    : null;
+
+  // Perfect scores (exact scoreline predicted)
+  let perfectPredictions = 0;
+  played.forEach(([matchId, result]) => {
+    users.forEach(u => {
+      const pred = (u.predictions || {})[matchId];
+      if (pred && pred.home === result.home && pred.away === result.away) perfectPredictions++;
+    });
+  });
+
+  // Draws
+  const draws = played.filter(([, r]) => r.home === r.away).length;
+
+  res.json({
+    gamesPlayed: played.length,
+    totalGoals,
+    avgGoals,
+    cleanSheets,
+    draws,
+    highestGame,
+    biggestWin,
+    mostCommonScoreline: mostCommonScoreline ? { scoreline: mostCommonScoreline[0], count: mostCommonScoreline[1] } : null,
+    hardest,
+    easiest,
+    overallPct,
+    perfectPredictions,
+  });
+});
+
 // ── Profile ────────────────────────────────────────────────────────────────────
 
 app.get('/api/profile/:userId', (req, res) => {

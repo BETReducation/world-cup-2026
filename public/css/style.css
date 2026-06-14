@@ -785,6 +785,89 @@ nav.site-nav {
 }
 .pos-up   { color: #3dba6e; }
 .pos-down { color: #e05252; }
+
+/* ── Tournament Stats Card ───────────────────────────────────────────────── */
+.stats-card {
+  background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  color: #fff;
+}
+.stats-card-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.stats-card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+.stats-card-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  font-family: 'JetBrains Mono', monospace;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.stats-box {
+  background: rgba(255,255,255,0.03);
+  padding: 16px 12px;
+  text-align: center;
+}
+.stats-icon { font-size: 18px; margin-bottom: 6px; }
+.stats-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stats-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stats-highlights {
+  padding: 12px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.stats-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.stats-hl-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.stats-hl-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 2px;
+}
+.stats-hl-detail {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+}
+
 .leaderboard-table td.total-pts {
   font-family: 'JetBrains Mono', monospace;
   font-size: 18px;
