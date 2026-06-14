@@ -352,7 +352,11 @@ function renderActualTable(groupKey) {
 // ── Leaderboard ───────────────────────────────────────────────────────────────
 
 async function renderLeaderboard() {
-  const board = await API.leaderboard().catch(() => []);
+  const [board, prevData] = await Promise.all([
+    API.leaderboard().catch(() => []),
+    fetch('/api/leaderboard/previous').then(r => r.json()).catch(() => ({ positions: {} }))
+  ]);
+  const prevPos = prevData.positions || {};
   const el = $('leaderboardContent');
 
   if (!board.length) {
@@ -389,6 +393,17 @@ async function renderLeaderboard() {
     '<i class="fa-solid fa-medal" style="color:#c77d2e"></i>'
   ];
   const rows = board.map((p, i) => {
+    const currentPos = i + 1;
+    const oldPos = prevPos[p.id];
+    let moveBadge = '';
+    if (oldPos !== undefined && oldPos !== currentPos) {
+      const diff = oldPos - currentPos;
+      if (diff > 0) {
+        moveBadge = `<span class="pos-move pos-up">▲${diff}</span>`;
+      } else {
+        moveBadge = `<span class="pos-move pos-down">▼${Math.abs(diff)}</span>`;
+      }
+    }
     const preds = predsByUser[p.id] || {};
 
     const roundCounts = {};
@@ -419,7 +434,7 @@ async function renderLeaderboard() {
 
     return `
     <tr>
-      <td class="rank">${medals[i] || i + 1}</td>
+      <td class="rank">${medals[i] || i + 1}${moveBadge}</td>
       <td>${p.name}</td>
       <td class="total-pts">${p.totalPoints}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${p.correctResults}</td>

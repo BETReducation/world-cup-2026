@@ -773,7 +773,18 @@ nav.site-nav {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   color: var(--muted);
+  white-space: nowrap;
 }
+.pos-move {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+.pos-up   { color: #3dba6e; }
+.pos-down { color: #e05252; }
 .leaderboard-table td.total-pts {
   font-family: 'JetBrains Mono', monospace;
   font-size: 18px;

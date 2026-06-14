@@ -27,6 +27,7 @@ const RESULTS_FILE     = path.join(PERSISTENT_DIR, 'results.json');
 const ACCESS_CODES_FILE = path.join(PERSISTENT_DIR, 'access-codes.json');
 const SESSIONS_FILE     = path.join(PERSISTENT_DIR, 'sessions.json');
 const BONUS_FILE        = path.join(PERSISTENT_DIR, 'bonus-extras.json');
+const LEADERBOARD_PREV_FILE = path.join(PERSISTENT_DIR, 'leaderboard-prev.json');
 
 const ADMIN_EMAIL = 'gbyatt@gmail.com';
 
@@ -836,10 +837,22 @@ app.get('/api/results', (req, res) => {
   res.json(readJSON(RESULTS_FILE, { results: {} }));
 });
 
+function snapshotLeaderboard() {
+  const board = calcLeaderboard();
+  const positions = {};
+  board.forEach((p, i) => { positions[p.id] = i + 1; });
+  writeJSON(LEADERBOARD_PREV_FILE, { positions, snapshottedAt: new Date().toISOString() });
+}
+
+app.get('/api/leaderboard/previous', (req, res) => {
+  res.json(readJSON(LEADERBOARD_PREV_FILE, { positions: {} }));
+});
+
 app.post('/api/results', requireAdmin, (req, res) => {
   const { matchId, homeGoals, awayGoals } = req.body;
   if (!matchId || homeGoals === undefined || awayGoals === undefined)
     return res.status(400).json({ error: 'matchId, homeGoals, awayGoals required' });
+  snapshotLeaderboard();
   const data = readJSON(RESULTS_FILE, { results: {} });
   data.results[matchId] = {
     home: parseInt(homeGoals), away: parseInt(awayGoals),
@@ -850,6 +863,7 @@ app.post('/api/results', requireAdmin, (req, res) => {
 });
 
 app.delete('/api/results/:matchId', requireAdmin, (req, res) => {
+  snapshotLeaderboard();
   const data = readJSON(RESULTS_FILE, { results: {} });
   delete data.results[req.params.matchId];
   writeJSON(RESULTS_FILE, data);
