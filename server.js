@@ -923,13 +923,21 @@ app.get('/api/stats', (req, res) => {
   const played = Object.entries(results).filter(([, r]) => r.played);
   if (!played.length) return res.json({ gamesPlayed: 0 });
 
+  const gameEntry = (id, r) => ({
+    id,
+    homeTeam: matchInfo[id]?.home || id,
+    awayTeam: matchInfo[id]?.away || id,
+    homeGoals: r.home,
+    awayGoals: r.away,
+  });
+
   // Goals
   let totalGoals = 0, highestGoals = 0, highestGame = null, cleanSheets = 0;
   const scorelines = {};
   played.forEach(([id, r]) => {
     const g = r.home + r.away;
     totalGoals += g;
-    if (g > highestGoals) { highestGoals = g; highestGame = { id, ...r, ...matchInfo[id] }; }
+    if (g > highestGoals) { highestGoals = g; highestGame = gameEntry(id, r); }
     if (r.home === 0 || r.away === 0) cleanSheets++;
     const key = `${r.home}-${r.away}`;
     scorelines[key] = (scorelines[key] || 0) + 1;
@@ -941,7 +949,7 @@ app.get('/api/stats', (req, res) => {
   let biggestWin = null, biggestDiff = 0;
   played.forEach(([id, r]) => {
     const diff = Math.abs(r.home - r.away);
-    if (diff > biggestDiff) { biggestDiff = diff; biggestWin = { id, ...r, ...matchInfo[id] }; }
+    if (diff > biggestDiff) { biggestDiff = diff; biggestWin = gameEntry(id, r); }
   });
 
   // Prediction accuracy per match
@@ -955,7 +963,8 @@ app.get('/api/stats', (req, res) => {
       total++;
       if (Math.sign(pred.home - pred.away) === actualSign) correct++;
     });
-    if (total > 0) matchAccuracy[matchId] = { correct, total, pct: Math.round(correct / total * 100), ...matchInfo[matchId] };
+    const info = matchInfo[matchId] || {};
+    if (total > 0) matchAccuracy[matchId] = { correct, total, pct: Math.round(correct / total * 100), homeTeam: info.home, awayTeam: info.away };
   });
   const accuracyList = Object.values(matchAccuracy).filter(m => m.total > 0);
   const hardest = accuracyList.sort((a, b) => a.pct - b.pct)[0] || null;
