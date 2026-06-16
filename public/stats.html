@@ -493,19 +493,7 @@ function renderLiveTables(live) {
       </div>`;
   };
 
-  const topYellowTeam = topTeamByCount(live.yellowCards);
-  const topRedTeam    = topTeamByCount(live.redCards);
-
-  const teamBadge = (entry, color) => entry
-    ? `<div class="highlight-item" style="margin-bottom:8px;">
-        <span class="hl-icon">${color === 'yellow' ? '🟨' : '🟥'}</span>
-        <div><div class="hl-label">Most ${color === 'yellow' ? 'Yellow' : 'Red'} Cards (Team)</div>
-        <div class="hl-value">${entry[0]} &nbsp;·&nbsp; ${entry[1]} cards</div></div>
-      </div>`
-    : '';
-
   el.innerHTML = [
-    topYellowTeam || topRedTeam ? `<div style="margin-bottom:12px;">${teamBadge(topYellowTeam,'yellow')}${teamBadge(topRedTeam,'red')}</div>` : '',
     makeTable('<i class="fa-solid fa-futbol"></i>', 'Top Goalscorers',  live.topScorers  || [], 'Goals'),
     makeTable('<i class="fa-solid fa-square" style="color:#f5c518;"></i>', 'Most Yellow Cards', live.yellowCards || [], 'Cards'),
     makeTable('<i class="fa-solid fa-square" style="color:#e05252;"></i>', 'Most Red Cards',    live.redCards    || [], 'Cards'),
