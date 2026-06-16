@@ -311,12 +311,6 @@ function renderAll(s) {
     bw && bw.homeGoals !== bw.awayGoals
       ? ['💪', 'Biggest Win', `${flag(bw.homeTeam)}${bw.homeTeam} ${bw.homeGoals}–${bw.awayGoals} ${bw.awayTeam}${flag(bw.awayTeam)}`]
       : null,
-    s.easiest
-      ? ['😌', 'Easiest to Predict', `${flag(s.easiest.homeTeam)}${s.easiest.homeTeam} vs ${s.easiest.awayTeam}${flag(s.easiest.awayTeam)} &nbsp;·&nbsp; ${s.easiest.pct}% correct`]
-      : null,
-    s.hardest
-      ? ['😬', 'Hardest to Predict', `${flag(s.hardest.homeTeam)}${s.hardest.homeTeam} vs ${s.hardest.awayTeam}${flag(s.hardest.awayTeam)} &nbsp;·&nbsp; only ${s.hardest.pct}% correct`]
-      : null,
   ].filter(Boolean).map(([icon, lbl, val]) => `
     <div class="highlight-item">
       <span class="hl-icon">${icon}</span>
