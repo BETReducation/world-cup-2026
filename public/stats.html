@@ -301,12 +301,20 @@ function renderAll(s) {
 
   // ── Highlights ──────────────────────────────────────────────────────────────
   const hl = s.highestGame, bw = s.biggestWin;
+  const topYellow = topTeamByCount(_liveData.yellowCards);
+  const topRed    = topTeamByCount(_liveData.redCards);
   const highlights = [
     s.mostCommonScoreline
       ? ['🔁', 'Most Common Scoreline', `${s.mostCommonScoreline.scoreline} &nbsp;·&nbsp; ${s.mostCommonScoreline.count}× so far`]
       : null,
     hl
       ? ['🔥', 'Highest Scoring Game', `${flag(hl.homeTeam)}${hl.homeTeam} ${hl.homeGoals}–${hl.awayGoals} ${hl.awayTeam}${flag(hl.awayTeam)} &nbsp;·&nbsp; ${hl.homeGoals + hl.awayGoals} goals`]
+      : null,
+    topYellow
+      ? ['🟨', 'Most Yellow Cards (Team)', `${topYellow[0]} &nbsp;·&nbsp; ${topYellow[1]} cards`]
+      : null,
+    topRed
+      ? ['🟥', 'Most Red Cards (Team)', `${topRed[0]} &nbsp;·&nbsp; ${topRed[1]} cards`]
       : null,
   ].filter(Boolean).map(([icon, lbl, val]) => `
     <div class="highlight-item">
