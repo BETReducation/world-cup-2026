@@ -165,9 +165,13 @@
       border-radius: 4px;
       height: 6px;
       width: 100%;
+      max-width: 80px;
       overflow: hidden;
     }
     .acc-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.4s; }
+    @media (max-width: 600px) {
+      .acc-bar-col { display: none; }
+    }
     /* No data */
     .no-data {
       text-align: center;
@@ -334,7 +338,7 @@ function renderAll(s) {
       <td style="font-weight:600;">${i + 1}. ${p.name}</td>
       <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${p.correct}/${p.total}</td>
       <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${p.exact}</td>
-      <td style="min-width:120px;">
+      <td class="acc-bar-col">
         <div class="acc-bar-wrap"><div class="acc-bar" style="width:${p.pct}%"></div></div>
       </td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);text-align:right;">${p.pct}%</td>
@@ -400,7 +404,7 @@ function renderAll(s) {
       <div class="stats-section-hdr"><i class="fa-solid fa-trophy"></i> Player Prediction Accuracy</div>
       <div class="stats-section-body" style="padding:0;">
         <table class="acc-table">
-          <thead><tr><th>Player</th><th style="text-align:center;">Correct</th><th style="text-align:center;">Exact</th><th>Accuracy</th><th></th><th style="text-align:right;" title="Average goals off per match">Avg Variance</th></tr></thead>
+          <thead><tr><th>Player</th><th style="text-align:center;">Correct</th><th style="text-align:center;">Exact</th><th class="acc-bar-col">Accuracy</th><th></th><th style="text-align:right;" title="Average goals off per match">Avg Variance</th></tr></thead>
           <tbody>${playerRows}</tbody>
         </table>
       </div>
