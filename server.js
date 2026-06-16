@@ -504,6 +504,16 @@ function requireAdmin(req, res, next) {
 
 app.get('/api/admin/verify', requireAdmin, (req, res) => res.json({ ok: true }));
 
+app.get('/api/admin/user-lookup', requireAdmin, (req, res) => {
+  const q = (req.query.q || '').toLowerCase().trim();
+  const data = readData();
+  const results = data.users
+    .filter(u => !u.isAdmin)
+    .filter(u => !q || (u.name || '').toLowerCase().includes(q) || (u.displayName || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q))
+    .map(u => ({ id: u.id, name: u.displayName || u.name, email: u.email || '—', joinedAt: u.createdAt || null }));
+  res.json(results);
+});
+
 app.get('/api/admin/backup', requireAdmin, (req, res) => {
   const backup = {
     exportedAt:  new Date().toISOString(),

@@ -617,6 +617,19 @@
     </div>
   </div>
 
+  <!-- Admin: User Lookup -->
+  <div class="profile-section" id="adminUserLookupSection" style="display:none;">
+    <div class="section-hdr"><i class="fa-solid fa-magnifying-glass" style="color:var(--accent);margin-right:6px;"></i>User Lookup</div>
+    <div class="section-body">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">Search for a player by name or email address.</p>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <input type="text" id="userLookupInput" placeholder="Name or email…" style="flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;">
+        <button class="btn btn-outline btn-sm" onclick="runUserLookup()"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+      </div>
+      <div id="userLookupResults"></div>
+    </div>
+  </div>
+
   <!-- Admin: Access Codes (shown only for admin account) -->
   <div class="profile-section" id="adminSection" style="display:none;">
     <div class="section-hdr"><i class="fa-solid fa-shield-halved" style="color:var(--accent);margin-right:6px;"></i>Access Codes</div>
@@ -788,6 +801,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const me = await API.me();
     if (me.isAdmin) {
+      document.getElementById('adminUserLookupSection').style.display = 'block';
       document.getElementById('adminSection').style.display = 'block';
       document.getElementById('adminStatsSection').style.display = 'block';
       document.getElementById('adminEditPredSection').style.display = 'block';
@@ -1275,6 +1289,36 @@ async function runConfirmedAction() {
 }
 
 // ── Admin: load & render access codes ─────────────────────────────────────────
+async function runUserLookup() {
+  const q = document.getElementById('userLookupInput').value.trim();
+  const el = document.getElementById('userLookupResults');
+  el.innerHTML = '<p style="color:var(--muted);font-size:13px;">Searching…</p>';
+  try {
+    const { token } = Session.load();
+    const res = await fetch(`/api/admin/user-lookup?q=${encodeURIComponent(q)}`, {
+      headers: { 'x-session-token': token || '' }
+    });
+    const users = await res.json();
+    if (!users.length) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;">No players found.</p>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead><tr style="background:var(--surface2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">
+        <th style="padding:8px 12px;text-align:left;">Name</th>
+        <th style="padding:8px 12px;text-align:left;">Email</th>
+      </tr></thead>
+      <tbody>${users.map(u => `<tr style="border-top:1px solid var(--border);">
+        <td style="padding:8px 12px;font-weight:600;">${u.name}</td>
+        <td style="padding:8px 12px;font-family:'JetBrains Mono',monospace;color:var(--accent);">${u.email}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch {
+    el.innerHTML = '<p style="color:var(--danger);font-size:13px;">Failed — try again.</p>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('userLookupInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') runUserLookup(); });
+});
+
 async function loadAccessCodes() {
   const el = document.getElementById('accessCodesContent');
   try {
