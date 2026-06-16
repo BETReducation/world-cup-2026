@@ -308,9 +308,6 @@ function renderAll(s) {
     hl
       ? ['🔥', 'Highest Scoring Game', `${flag(hl.homeTeam)}${hl.homeTeam} ${hl.homeGoals}–${hl.awayGoals} ${hl.awayTeam}${flag(hl.awayTeam)} &nbsp;·&nbsp; ${hl.homeGoals + hl.awayGoals} goals`]
       : null,
-    bw && bw.homeGoals !== bw.awayGoals
-      ? ['💪', 'Biggest Win', `${flag(bw.homeTeam)}${bw.homeTeam} ${bw.homeGoals}–${bw.awayGoals} ${bw.awayTeam}${flag(bw.awayTeam)}`]
-      : null,
   ].filter(Boolean).map(([icon, lbl, val]) => `
     <div class="highlight-item">
       <span class="hl-icon">${icon}</span>
