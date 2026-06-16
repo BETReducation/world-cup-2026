@@ -984,6 +984,52 @@ app.get('/api/stats', (req, res) => {
 
   // Draws
   const draws = played.filter(([, r]) => r.home === r.away).length;
+  const homeWins = played.filter(([, r]) => r.home > r.away).length;
+  const awayWins = played.filter(([, r]) => r.away > r.home).length;
+
+  // Goals by group
+  const goalsByGroup = {};
+  const matchesByGroup = {};
+  Object.entries(fixtures.groups).forEach(([g, gData]) => {
+    goalsByGroup[g] = 0;
+    matchesByGroup[g] = 0;
+    gData.matches.forEach(m => {
+      const r = results[m.id];
+      if (r?.played) { goalsByGroup[g] += r.home + r.away; matchesByGroup[g]++; }
+    });
+  });
+
+  // Goals per match timeline (sorted by match id)
+  const goalsTimeline = played
+    .map(([id, r]) => ({ id, homeTeam: matchInfo[id]?.home || id, awayTeam: matchInfo[id]?.away || id, homeGoals: r.home, awayGoals: r.away, total: r.home + r.away }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+
+  // Scoreline distribution (top 10)
+  const scorelineDist = Object.entries(scorelines)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([s, c]) => ({ scoreline: s, count: c }));
+
+  // Accuracy per match (for chart)
+  const accuracyChart = Object.entries(matchAccuracy)
+    .map(([id, m]) => ({ id, label: `${m.homeTeam} v ${m.awayTeam}`, pct: m.pct }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+
+  // Per-player prediction accuracy
+  const playerAccuracy = users.map(u => {
+    let correct = 0, total = 0, exact = 0;
+    played.forEach(([matchId, result]) => {
+      const pred = (u.predictions || {})[matchId];
+      if (!pred) return;
+      total++;
+      const actualSign = Math.sign(result.home - result.away);
+      if (Math.sign(pred.home - pred.away) === actualSign) {
+        correct++;
+        if (pred.home === result.home && pred.away === result.away) exact++;
+      }
+    });
+    return { name: u.displayName || u.name, correct, total, exact, pct: total ? Math.round(correct / total * 100) : 0 };
+  }).sort((a, b) => b.pct - a.pct);
 
   res.json({
     gamesPlayed: played.length,
@@ -991,6 +1037,8 @@ app.get('/api/stats', (req, res) => {
     avgGoals,
     cleanSheets,
     draws,
+    homeWins,
+    awayWins,
     highestGame,
     biggestWin,
     mostCommonScoreline: mostCommonScoreline ? { scoreline: mostCommonScoreline[0], count: mostCommonScoreline[1] } : null,
@@ -998,6 +1046,12 @@ app.get('/api/stats', (req, res) => {
     easiest,
     overallPct,
     perfectPredictions,
+    goalsByGroup,
+    matchesByGroup,
+    goalsTimeline,
+    scorelineDist,
+    accuracyChart,
+    playerAccuracy,
   });
 });
 

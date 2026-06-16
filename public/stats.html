@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stats · World Cup 2026</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    .stats-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 1.5rem 80px;
+    }
+    .stats-page-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .stats-page-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    /* Summary number cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 14px;
+      text-align: center;
+    }
+    .summary-icon { font-size: 20px; margin-bottom: 6px; }
+    .summary-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .summary-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+    }
+    /* Section headers */
+    .stats-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .stats-section-hdr {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stats-section-body { padding: 18px; }
+    /* Highlight rows */
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .highlight-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .hl-icon { font-size: 20px; flex-shrink: 0; }
+    .hl-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .hl-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    /* Results breakdown */
+    .result-breakdown {
+      display: flex;
+      gap: 0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      height: 10px;
+      margin: 8px 0 12px;
+    }
+    .rb-home  { background: #3dba6e; }
+    .rb-draw  { background: var(--muted); }
+    .rb-away  { background: #e05252; }
+    .rb-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .rb-labels span { display: flex; align-items: center; gap: 5px; }
+    .rb-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    /* Chart containers */
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+    /* Player accuracy table */
+    .acc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .acc-table th {
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 10px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .acc-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border2);
+      color: var(--text);
+    }
+    .acc-table tr:last-child td { border-bottom: none; }
+    .acc-bar-wrap {
+      background: var(--surface2);
+      border-radius: 4px;
+      height: 6px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .acc-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.4s; }
+    /* No data */
+    .no-data {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .no-data-icon { font-size: 36px; margin-bottom: 12px; }
+    @media (max-width: 600px) {
+      .highlight-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">WC26 <span>Prediction League</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="predictions.html">Group Predictions</a>
+    <a href="knockout.html">Knockout Predictions</a>
+    <a href="bonus-extras.html">Tie Breakers</a>
+    <a href="results.html">Results</a>
+    <a href="stats.html" class="active">Stats</a>
+    <a href="member.html" id="navMemberLink" class="nav-member-link" style="display:none;"></a>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">☰</button>
+  </div>
+</nav>
+
+<div class="nav-drawer-overlay" id="navDrawerOverlay"></div>
+<nav class="nav-drawer" id="navDrawer" aria-label="Mobile navigation">
+  <div class="nav-drawer-head">
+    <a href="index.html" class="nav-drawer-logo">WC26</a>
+    <button class="nav-drawer-close" id="navDrawerClose" aria-label="Close menu">✕</button>
+  </div>
+  <div class="nav-drawer-links">
+    <a href="index.html">Home</a>
+    <a href="predictions.html">Group Predictions</a>
+    <a href="knockout.html">Knockout Predictions</a>
+    <a href="bonus-extras.html">Tie Breakers</a>
+    <a href="results.html">Results</a>
+    <a href="stats.html">Stats</a>
+  </div>
+  <div class="nav-drawer-footer" id="navDrawerUser"></div>
+</nav>
+
+<div class="stats-page" id="statsPage">
+  <div id="statsContent">
+    <div class="no-data"><div class="no-data-icon">⏳</div>Loading stats…</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// ── Theme ──────────────────────────────────────────────────────────────────────
+const themeToggle = $('themeToggle');
+const html = document.documentElement;
+const savedTheme = localStorage.getItem('wc26_theme') || 'dark';
+html.dataset.theme = savedTheme;
+themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-regular fa-sun"></i>';
+themeToggle.addEventListener('click', () => {
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  localStorage.setItem('wc26_theme', next);
+  themeToggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-regular fa-sun"></i>';
+  renderAll(window._statsData);
+});
+
+// ── Mobile nav ─────────────────────────────────────────────────────────────────
+const overlay = $('navDrawerOverlay');
+const drawer  = $('navDrawer');
+$('navHamburger').addEventListener('click', () => { drawer.classList.add('open'); overlay.classList.add('open'); });
+$('navDrawerClose').addEventListener('click', () => { drawer.classList.remove('open'); overlay.classList.remove('open'); });
+overlay.addEventListener('click', () => { drawer.classList.remove('open'); overlay.classList.remove('open'); });
+
+// ── Auth nav link ──────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const { Session } = await import('./js/auth.js').catch(() => ({}));
+    if (!Session) return;
+    const s = Session.load();
+    if (s?.name) {
+      const link = $('navMemberLink');
+      link.innerHTML = '<i class="fa-solid fa-user"></i> ' + s.name;
+      link.style.display = 'flex';
+    }
+  } catch {}
+})();
+
+// ── Chart theme helpers ────────────────────────────────────────────────────────
+function chartColors() {
+  const dark = html.dataset.theme !== 'light';
+  return {
+    text:    dark ? '#c8d0dc' : '#1a2a3a',
+    muted:   dark ? 'rgba(200,208,220,0.35)' : 'rgba(0,0,0,0.2)',
+    accent:  '#f47b20',
+    green:   '#3dba6e',
+    red:     '#e05252',
+    teal:    '#2ec4b6',
+    surface: dark ? '#1e2535' : '#ffffff',
+    grid:    dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
+  };
+}
+
+const activeCharts = [];
+function destroyCharts() { activeCharts.forEach(c => c.destroy()); activeCharts.length = 0; }
+
+function baseChartOpts(cc) {
+  return {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: cc.grid } },
+      y: { ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: cc.grid }, beginAtZero: true },
+    },
+  };
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function renderAll(s) {
+  destroyCharts();
+  const el = $('statsContent');
+  if (!s || !s.gamesPlayed) {
+    el.innerHTML = `<div class="no-data"><div class="no-data-icon">⚽</div><p>No results recorded yet — check back once games kick off.</p></div>`;
+    return;
+  }
+  const cc = chartColors();
+  const flag = code => code ? `<span class="flag fi fi-${code.toLowerCase()}" style="vertical-align:middle;margin-right:3px;"></span>` : '';
+
+  const total = s.homeWins + s.draws + s.awayWins;
+  const hwPct = Math.round(s.homeWins / total * 100);
+  const dwPct = Math.round(s.draws    / total * 100);
+  const awPct = 100 - hwPct - dwPct;
+
+  // ── Summary cards ──────────────────────────────────────────────────────────
+  const summaryCards = [
+    ['⚽', s.totalGoals,             'Total Goals'],
+    ['📊', s.avgGoals,               'Goals / Game'],
+    ['🎮', s.gamesPlayed,            'Games Played'],
+    ['🤝', s.draws,                  'Draws'],
+    ['🧤', s.cleanSheets,            'Clean Sheets'],
+    ['💪', s.homeWins,               'Home Wins'],
+    ['✈️',  s.awayWins,               'Away Wins'],
+    ['🎯', s.overallPct != null ? s.overallPct + '%' : '—', 'Prediction Accuracy'],
+    ['💎', s.perfectPredictions,     'Perfect Scores'],
+  ].map(([icon, val, lbl]) => `
+    <div class="summary-card">
+      <div class="summary-icon">${icon}</div>
+      <div class="summary-value">${val}</div>
+      <div class="summary-label">${lbl}</div>
+    </div>`).join('');
+
+  // ── Highlights ──────────────────────────────────────────────────────────────
+  const hl = s.highestGame, bw = s.biggestWin;
+  const highlights = [
+    s.mostCommonScoreline
+      ? ['🔁', 'Most Common Scoreline', `${s.mostCommonScoreline.scoreline} &nbsp;·&nbsp; ${s.mostCommonScoreline.count}× so far`]
+      : null,
+    hl
+      ? ['🔥', 'Highest Scoring Game', `${flag(hl.homeTeam)}${hl.homeTeam} ${hl.homeGoals}–${hl.awayGoals} ${hl.awayTeam}${flag(hl.awayTeam)} &nbsp;·&nbsp; ${hl.homeGoals + hl.awayGoals} goals`]
+      : null,
+    bw && bw.homeGoals !== bw.awayGoals
+      ? ['💪', 'Biggest Win', `${flag(bw.homeTeam)}${bw.homeTeam} ${bw.homeGoals}–${bw.awayGoals} ${bw.awayTeam}${flag(bw.awayTeam)}`]
+      : null,
+    s.easiest
+      ? ['😌', 'Easiest to Predict', `${flag(s.easiest.homeTeam)}${s.easiest.homeTeam} vs ${s.easiest.awayTeam}${flag(s.easiest.awayTeam)} &nbsp;·&nbsp; ${s.easiest.pct}% correct`]
+      : null,
+    s.hardest
+      ? ['😬', 'Hardest to Predict', `${flag(s.hardest.homeTeam)}${s.hardest.homeTeam} vs ${s.hardest.awayTeam}${flag(s.hardest.awayTeam)} &nbsp;·&nbsp; only ${s.hardest.pct}% correct`]
+      : null,
+  ].filter(Boolean).map(([icon, lbl, val]) => `
+    <div class="highlight-item">
+      <span class="hl-icon">${icon}</span>
+      <div><div class="hl-label">${lbl}</div><div class="hl-value">${val}</div></div>
+    </div>`).join('');
+
+  // ── Player accuracy table ───────────────────────────────────────────────────
+  const playerRows = (s.playerAccuracy || []).map((p, i) => `
+    <tr>
+      <td style="font-weight:600;">${i + 1}. ${p.name}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${p.correct}/${p.total}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${p.exact}</td>
+      <td style="min-width:120px;">
+        <div class="acc-bar-wrap"><div class="acc-bar" style="width:${p.pct}%"></div></div>
+      </td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);text-align:right;">${p.pct}%</td>
+    </tr>`).join('');
+
+  el.innerHTML = `
+    <div class="stats-page-title">Tournament Stats</div>
+    <div class="stats-page-sub" id="statsSub">Loading…</div>
+
+    <div class="summary-grid">${summaryCards}</div>
+
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-star"></i> Highlights</div>
+      <div class="stats-section-body">
+        <div class="highlight-grid">${highlights}</div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-chart-simple"></i> Result Breakdown</div>
+      <div class="stats-section-body">
+        <div class="result-breakdown">
+          <div class="rb-home" style="width:${hwPct}%"></div>
+          <div class="rb-draw" style="width:${dwPct}%"></div>
+          <div class="rb-away" style="width:${awPct}%"></div>
+        </div>
+        <div class="rb-labels">
+          <span><span class="rb-dot" style="background:#3dba6e"></span>Home Wins ${s.homeWins} (${hwPct}%)</span>
+          <span><span class="rb-dot" style="background:var(--muted)"></span>Draws ${s.draws} (${dwPct}%)</span>
+          <span><span class="rb-dot" style="background:#e05252"></span>Away Wins ${s.awayWins} (${awPct}%)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-futbol"></i> Goals Per Match</div>
+      <div class="stats-section-body">
+        <div class="chart-wrap" style="height:240px;"><canvas id="chartGoals"></canvas></div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-layer-group"></i> Goals by Group</div>
+      <div class="stats-section-body">
+        <div class="chart-wrap" style="height:220px;"><canvas id="chartGroups"></canvas></div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-list-ol"></i> Most Common Scorelines</div>
+      <div class="stats-section-body">
+        <div class="chart-wrap" style="height:${Math.max(180, (s.scorelineDist || []).length * 36)}px;"><canvas id="chartScorelines"></canvas></div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-bullseye"></i> Prediction Accuracy per Match</div>
+      <div class="stats-section-body">
+        <div class="chart-wrap" style="height:240px;"><canvas id="chartAccuracy"></canvas></div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-trophy"></i> Player Prediction Accuracy</div>
+      <div class="stats-section-body" style="padding:0;">
+        <table class="acc-table">
+          <thead><tr><th>Player</th><th style="text-align:center;">Correct</th><th style="text-align:center;">Exact</th><th>Accuracy</th><th></th></tr></thead>
+          <tbody>${playerRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  // ── Sub heading ────────────────────────────────────────────────────────────
+  $('statsSub').textContent = `${s.gamesPlayed} game${s.gamesPlayed !== 1 ? 's' : ''} played · ${s.totalGoals} goals scored · updated live`;
+
+  // ── Chart: Goals per match ─────────────────────────────────────────────────
+  const timeline = s.goalsTimeline || [];
+  if (timeline.length) {
+    const ctx = $('chartGoals').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: timeline.map(m => `${m.homeTeam} v ${m.awayTeam}`),
+        datasets: [
+          { label: 'Home', data: timeline.map(m => m.homeGoals), backgroundColor: cc.green, borderRadius: 3, stack: 'g' },
+          { label: 'Away', data: timeline.map(m => m.awayGoals), backgroundColor: cc.accent, borderRadius: 3, stack: 'g' },
+        ],
+      },
+      options: {
+        ...baseChartOpts(cc),
+        plugins: { legend: { display: true, labels: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 } } }, tooltip: { callbacks: { title: items => items[0].label } } },
+        scales: {
+          x: { stacked: true, ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 9 }, maxRotation: 45 }, grid: { color: cc.grid } },
+          y: { stacked: true, ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 }, stepSize: 1 }, grid: { color: cc.grid }, beginAtZero: true },
+        },
+      },
+    });
+    activeCharts.push(chart);
+  }
+
+  // ── Chart: Goals by group ──────────────────────────────────────────────────
+  const groupKeys   = Object.keys(s.goalsByGroup || {}).sort();
+  const groupGoals  = groupKeys.map(g => s.goalsByGroup[g]);
+  const groupPlayed = groupKeys.map(g => s.matchesByGroup[g]);
+  if (groupKeys.length) {
+    const ctx = $('chartGroups').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: groupKeys.map(g => 'Group ' + g),
+        datasets: [
+          { label: 'Goals', data: groupGoals, backgroundColor: cc.teal, borderRadius: 4 },
+          { label: 'Games', data: groupPlayed, backgroundColor: cc.muted, borderRadius: 4 },
+        ],
+      },
+      options: {
+        ...baseChartOpts(cc),
+        plugins: { legend: { display: true, labels: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 } } } },
+      },
+    });
+    activeCharts.push(chart);
+  }
+
+  // ── Chart: Scoreline distribution (horizontal bar) ─────────────────────────
+  const dist = s.scorelineDist || [];
+  if (dist.length) {
+    const ctx = $('chartScorelines').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: dist.map(d => d.scoreline),
+        datasets: [{ label: 'Times', data: dist.map(d => d.count), backgroundColor: cc.accent, borderRadius: 4 }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 }, stepSize: 1 }, grid: { color: cc.grid }, beginAtZero: true },
+          y: { ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 12 } }, grid: { display: false } },
+        },
+      },
+    });
+    activeCharts.push(chart);
+  }
+
+  // ── Chart: Prediction accuracy per match ───────────────────────────────────
+  const accData = s.accuracyChart || [];
+  if (accData.length) {
+    const ctx = $('chartAccuracy').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: accData.map(m => m.label),
+        datasets: [{
+          label: '% Correct',
+          data: accData.map(m => m.pct),
+          backgroundColor: accData.map(m => m.pct >= 50 ? cc.green : cc.red),
+          borderRadius: 3,
+        }],
+      },
+      options: {
+        ...baseChartOpts(cc),
+        scales: {
+          x: { ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 9 }, maxRotation: 45 }, grid: { color: cc.grid } },
+          y: { ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: cc.grid }, beginAtZero: true, max: 100 },
+        },
+      },
+    });
+    activeCharts.push(chart);
+  }
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const s = await fetch('/api/stats').then(r => r.json());
+    window._statsData = s;
+    renderAll(s);
+  } catch {
+    $('statsContent').innerHTML = '<div class="no-data"><div class="no-data-icon">⚠️</div><p>Could not load stats — try refreshing.</p></div>';
+  }
+})();
+</script>
+<script src="js/auth.js"></script>
+</body>
+</html>
