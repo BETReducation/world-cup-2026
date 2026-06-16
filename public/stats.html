@@ -316,6 +316,9 @@ function renderAll(s) {
     topRed
       ? ['🟥', 'Most Red Cards (Team)', `${topRed[0]} &nbsp;·&nbsp; ${topRed[1]} cards`]
       : null,
+    s.goalsPerDay != null
+      ? ['📅', 'Goals Per Day', `${s.goalsPerDay} goals`]
+      : null,
   ].filter(Boolean).map(([icon, lbl, val]) => `
     <div class="highlight-item">
       <span class="hl-icon">${icon}</span>
@@ -332,6 +335,7 @@ function renderAll(s) {
         <div class="acc-bar-wrap"><div class="acc-bar" style="width:${p.pct}%"></div></div>
       </td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);text-align:right;">${p.pct}%</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--muted);text-align:right;" title="Average goals off per match">${p.avgVariance != null ? '±' + p.avgVariance : '—'}</td>
     </tr>`).join('');
 
   el.innerHTML = `
@@ -375,7 +379,7 @@ function renderAll(s) {
       <div class="stats-section-hdr"><i class="fa-solid fa-trophy"></i> Player Prediction Accuracy</div>
       <div class="stats-section-body" style="padding:0;">
         <table class="acc-table">
-          <thead><tr><th>Player</th><th style="text-align:center;">Correct</th><th style="text-align:center;">Exact</th><th>Accuracy</th><th></th></tr></thead>
+          <thead><tr><th>Player</th><th style="text-align:center;">Correct</th><th style="text-align:center;">Exact</th><th>Accuracy</th><th></th><th style="text-align:right;" title="Average goals off per match">Avg Variance</th></tr></thead>
           <tbody>${playerRows}</tbody>
         </table>
       </div>

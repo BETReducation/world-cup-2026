@@ -918,10 +918,10 @@ app.get('/api/stats', (req, res) => {
     (g.teams || []).forEach(t => { if (t.id && t.name) teamName[t.id] = t.name; })
   );
 
-  // Build match lookup: id -> { home team, away team }
+  // Build match lookup: id -> { home, away, date }
   const matchInfo = {};
   Object.values(fixtures.groups).forEach(g =>
-    g.matches.forEach(m => { matchInfo[m.id] = { home: teamName[m.home] || m.home, away: teamName[m.away] || m.away }; })
+    g.matches.forEach(m => { matchInfo[m.id] = { home: teamName[m.home] || m.home, away: teamName[m.away] || m.away, date: m.date }; })
   );
   Object.values(fixtures.knockout || {}).forEach(r =>
     (r.matches || []).forEach(m => { matchInfo[m.id] = { home: m.homeLabel || teamName[m.home] || m.home || '?', away: m.awayLabel || teamName[m.away] || m.away || '?' }; })
@@ -950,6 +950,8 @@ app.get('/api/stats', (req, res) => {
     scorelines[key] = (scorelines[key] || 0) + 1;
   });
   const avgGoals = (totalGoals / played.length).toFixed(2);
+  const distinctDays = new Set(played.map(([id]) => matchInfo[id]?.date).filter(Boolean)).size;
+  const goalsPerDay = distinctDays > 0 ? (totalGoals / distinctDays).toFixed(1) : null;
   const mostCommonScoreline = Object.entries(scorelines).sort((a, b) => b[1] - a[1])[0];
 
   // Biggest win (largest goal difference)
@@ -1024,11 +1026,14 @@ app.get('/api/stats', (req, res) => {
     .map(([id, m]) => ({ id, label: `${m.homeTeam} v ${m.awayTeam}`, pct: m.pct }))
     .sort((a, b) => a.id.localeCompare(b.id));
 
-  // Per-player prediction accuracy
+  // Per-player prediction accuracy + variance
   const playerAccuracy = users.map(u => {
-    let correct = 0, total = 0, exact = 0;
+    let correct = 0, total = 0, exact = 0, totalVariance = 0;
     played.forEach(([matchId, result]) => {
       const pred = (u.predictions || {})[matchId];
+      totalVariance += pred
+        ? Math.abs((pred.home || 0) - result.home) + Math.abs((pred.away || 0) - result.away)
+        : Math.abs(result.home) + Math.abs(result.away); // no prediction = max off
       if (!pred) return;
       total++;
       const actualSign = Math.sign(result.home - result.away);
@@ -1037,13 +1042,15 @@ app.get('/api/stats', (req, res) => {
         if (pred.home === result.home && pred.away === result.away) exact++;
       }
     });
-    return { name: u.displayName || u.name, correct, total, exact, pct: total ? Math.round(correct / total * 100) : 0 };
+    const avgVariance = played.length > 0 ? (totalVariance / played.length).toFixed(2) : null;
+    return { name: u.displayName || u.name, correct, total, exact, pct: total ? Math.round(correct / total * 100) : 0, avgVariance };
   }).sort((a, b) => b.pct - a.pct);
 
   res.json({
     gamesPlayed: played.length,
     totalGoals,
     avgGoals,
+    goalsPerDay,
     cleanSheets,
     draws,
     homeWins,
