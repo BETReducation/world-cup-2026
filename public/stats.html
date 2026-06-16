@@ -556,7 +556,7 @@ function collectLiveTable(key) {
   const rows = [];
   document.querySelectorAll(`#liveTable_${key} tbody tr`).forEach(tr => {
     const name  = tr.querySelector('[data-field="name"]')?.value.trim();
-    const team  = tr.querySelector('[data-field="team"]')?.value.trim().toUpperCase();
+    const team  = tr.querySelector('[data-field="team"]')?.value.trim();
     const count = parseInt(tr.querySelector('[data-field="count"]')?.value);
     if (name) rows.push({ name, team, count: isNaN(count) ? 0 : count });
   });
