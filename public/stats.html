@@ -367,12 +367,7 @@ function renderAll(s) {
     </div>
 
 
-    <div class="stats-section">
-      <div class="stats-section-hdr"><i class="fa-solid fa-futbol"></i> Goals Per Match</div>
-      <div class="stats-section-body">
-        <div class="chart-wrap" style="height:240px;"><canvas id="chartGoals"></canvas></div>
-      </div>
-    </div>
+
 
     <div class="stats-section">
       <div class="stats-section-hdr"><i class="fa-solid fa-layer-group"></i> Goals by Group</div>
@@ -410,31 +405,6 @@ function renderAll(s) {
 
   // ── Sub heading ────────────────────────────────────────────────────────────
   $('statsSub').textContent = `${s.gamesPlayed} game${s.gamesPlayed !== 1 ? 's' : ''} played · ${s.totalGoals} goals scored`;
-
-  // ── Chart: Goals per match ─────────────────────────────────────────────────
-  const timeline = s.goalsTimeline || [];
-  if (timeline.length) {
-    const ctx = $('chartGoals').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: timeline.map(m => `${m.homeTeam} v ${m.awayTeam}`),
-        datasets: [
-          { label: 'Home', data: timeline.map(m => m.homeGoals), backgroundColor: cc.green, borderRadius: 3, stack: 'g' },
-          { label: 'Away', data: timeline.map(m => m.awayGoals), backgroundColor: cc.accent, borderRadius: 3, stack: 'g' },
-        ],
-      },
-      options: {
-        ...baseChartOpts(cc),
-        plugins: { legend: { display: true, labels: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 } } }, tooltip: { callbacks: { title: items => items[0].label } } },
-        scales: {
-          x: { stacked: true, ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 9 }, maxRotation: 45 }, grid: { color: cc.grid } },
-          y: { stacked: true, ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 }, stepSize: 1 }, grid: { color: cc.grid }, beginAtZero: true },
-        },
-      },
-    });
-    activeCharts.push(chart);
-  }
 
   // ── Chart: Goals by group ──────────────────────────────────────────────────
   const groupKeys   = Object.keys(s.goalsByGroup || {}).sort();
