@@ -954,6 +954,15 @@ app.get('/api/stats', (req, res) => {
   const goalsPerDay = distinctDays > 0 ? (totalGoals / distinctDays).toFixed(1) : null;
   const mostCommonScoreline = Object.entries(scorelines).sort((a, b) => b[1] - a[1])[0];
 
+  // Highest scoring draw
+  let highestDraw = null, highestDrawGoals = 0;
+  played.forEach(([id, r]) => {
+    if (r.home === r.away && r.home + r.away > highestDrawGoals) {
+      highestDrawGoals = r.home + r.away;
+      highestDraw = gameEntry(id, r);
+    }
+  });
+
   // Biggest win (largest goal difference)
   let biggestWin = null, biggestDiff = 0;
   played.forEach(([id, r]) => {
@@ -1056,6 +1065,7 @@ app.get('/api/stats', (req, res) => {
     homeWins,
     awayWins,
     highestGame,
+    highestDraw,
     biggestWin,
     mostCommonScoreline: mostCommonScoreline ? { scoreline: mostCommonScoreline[0], count: mostCommonScoreline[1] } : null,
     hardest,

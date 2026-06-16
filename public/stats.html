@@ -310,6 +310,9 @@ function renderAll(s) {
     hl
       ? ['🔥', 'Highest Scoring Game', `${hl.homeTeam} ${hl.homeGoals}–${hl.awayGoals} ${hl.awayTeam} &nbsp;·&nbsp; ${hl.homeGoals + hl.awayGoals} goals`]
       : null,
+    s.highestDraw
+      ? ['🤝', 'Highest Scoring Draw', `${s.highestDraw.homeTeam} ${s.highestDraw.homeGoals}–${s.highestDraw.awayGoals} ${s.highestDraw.awayTeam}`]
+      : null,
     topYellow
       ? ['🟨', 'Most Yellow Cards (Team)', `${topYellow[0]} &nbsp;·&nbsp; ${topYellow[1]} cards`]
       : null,
