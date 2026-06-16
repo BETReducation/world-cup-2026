@@ -291,7 +291,7 @@ function renderAll(s) {
     ['🤝', s.draws,                  'Draws'],
     ['🧤', s.cleanSheets,            'Clean Sheets'],
     ['🎯', s.overallPct != null ? s.overallPct + '%' : '—', 'Prediction Accuracy'],
-    ['💎', s.perfectPredictions,     'Perfect Scores'],
+    ['💎', s.perfectPct != null ? s.perfectPct + '%' : '—', 'Perfect Scores'],
   ].map(([icon, val, lbl]) => `
     <div class="summary-card">
       <div class="summary-icon">${icon}</div>

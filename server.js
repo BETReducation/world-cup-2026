@@ -982,6 +982,8 @@ app.get('/api/stats', (req, res) => {
       if (pred && pred.home === result.home && pred.away === result.away) perfectPredictions++;
     });
   });
+  const totalOpportunities = played.length * users.length;
+  const perfectPct = totalOpportunities > 0 ? Math.round((perfectPredictions / totalOpportunities) * 100) : null;
 
   // Draws
   const draws = played.filter(([, r]) => r.home === r.away).length;
@@ -1047,6 +1049,7 @@ app.get('/api/stats', (req, res) => {
     easiest,
     overallPct,
     perfectPredictions,
+    perfectPct,
     goalsByGroup,
     matchesByGroup,
     goalsTimeline,
