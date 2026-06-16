@@ -27,7 +27,8 @@ const RESULTS_FILE     = path.join(PERSISTENT_DIR, 'results.json');
 const ACCESS_CODES_FILE = path.join(PERSISTENT_DIR, 'access-codes.json');
 const SESSIONS_FILE     = path.join(PERSISTENT_DIR, 'sessions.json');
 const BONUS_FILE        = path.join(PERSISTENT_DIR, 'bonus-extras.json');
-const LEADERBOARD_PREV_FILE = path.join(PERSISTENT_DIR, 'leaderboard-prev.json');
+const LEADERBOARD_PREV_FILE  = path.join(PERSISTENT_DIR, 'leaderboard-prev.json');
+const TOURNAMENT_LIVE_FILE   = path.join(PERSISTENT_DIR, 'tournament-live.json');
 
 const ADMIN_EMAIL = 'gbyatt@gmail.com';
 
@@ -1053,6 +1054,26 @@ app.get('/api/stats', (req, res) => {
     accuracyChart,
     playerAccuracy,
   });
+});
+
+// ── Tournament live data (scorers / cards) ─────────────────────────────────────
+
+const LIVE_SEED = { topScorers: [], yellowCards: [], redCards: [] };
+
+app.get('/api/tournament-live', (req, res) => {
+  res.json(readJSON(TOURNAMENT_LIVE_FILE, LIVE_SEED));
+});
+
+app.post('/api/admin/tournament-live', requireAdmin, (req, res) => {
+  const { topScorers, yellowCards, redCards } = req.body;
+  const data = {
+    topScorers:  Array.isArray(topScorers)  ? topScorers  : [],
+    yellowCards: Array.isArray(yellowCards) ? yellowCards : [],
+    redCards:    Array.isArray(redCards)    ? redCards    : [],
+    updatedAt: new Date().toISOString(),
+  };
+  writeJSON(TOURNAMENT_LIVE_FILE, data);
+  res.json({ success: true });
 });
 
 // ── Profile ────────────────────────────────────────────────────────────────────

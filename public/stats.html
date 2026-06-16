@@ -403,7 +403,10 @@ function renderAll(s) {
           <tbody>${playerRows}</tbody>
         </table>
       </div>
-    </div>`;
+    </div>
+
+    <div id="liveTablesSection"></div>
+    <div id="adminLiveSection" style="display:none;"></div>`;
 
   // ── Sub heading ────────────────────────────────────────────────────────────
   $('statsSub').textContent = `${s.gamesPlayed} game${s.gamesPlayed !== 1 ? 's' : ''} played · ${s.totalGoals} goals scored · updated live`;
@@ -507,12 +510,148 @@ function renderAll(s) {
   }
 }
 
+// ── Live tables (scorers / cards) ──────────────────────────────────────────────
+function renderLiveTables(live) {
+  const el = $('liveTablesSection');
+  if (!el) return;
+
+  const makeTable = (icon, title, rows, colHeader) => {
+    if (!rows.length) return '';
+    const trs = rows.map((r, i) => `
+      <tr>
+        <td style="font-family:'JetBrains Mono',monospace;color:var(--muted);width:28px;">${i + 1}</td>
+        <td style="font-weight:600;">${r.name}</td>
+        <td><span class="flag fi fi-${(r.team||'').toLowerCase()}" style="vertical-align:middle;"></span> <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">${r.team||''}</span></td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);text-align:right;">${r.count}</td>
+      </tr>`).join('');
+    return `
+      <div class="stats-section">
+        <div class="stats-section-hdr">${icon} ${title}</div>
+        <div class="stats-section-body" style="padding:0;">
+          <table class="acc-table">
+            <thead><tr><th>#</th><th>Player</th><th>Team</th><th style="text-align:right;">${colHeader}</th></tr></thead>
+            <tbody>${trs}</tbody>
+          </table>
+        </div>
+      </div>`;
+  };
+
+  el.innerHTML = [
+    makeTable('<i class="fa-solid fa-futbol"></i>', 'Top Goalscorers',  live.topScorers  || [], 'Goals'),
+    makeTable('<i class="fa-solid fa-square" style="color:#f5c518;"></i>', 'Most Yellow Cards', live.yellowCards || [], 'Cards'),
+    makeTable('<i class="fa-solid fa-square" style="color:#e05252;"></i>', 'Most Red Cards',    live.redCards    || [], 'Cards'),
+  ].join('');
+}
+
+// ── Admin live editor ──────────────────────────────────────────────────────────
+let _liveData = { topScorers: [], yellowCards: [], redCards: [] };
+
+function renderAdminLive() {
+  const el = $('adminLiveSection');
+  if (!el) return;
+
+  const buildRows = (list) => list.map((r, i) => `
+    <tr data-idx="${i}">
+      <td><input class="live-input" data-field="name"  value="${r.name  ||''}" placeholder="Player name" style="width:100%;"></td>
+      <td><input class="live-input" data-field="team"  value="${r.team  ||''}" placeholder="e.g. ARG"    style="width:60px;text-transform:uppercase;"></td>
+      <td><input class="live-input" data-field="count" value="${r.count ?? ''}" placeholder="0"          style="width:48px;" type="number" min="0"></td>
+      <td><button onclick="removeLiveRow(this)" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button></td>
+    </tr>`).join('');
+
+  const section = (key, label) => `
+    <div style="margin-bottom:20px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${label}</div>
+      <table class="acc-table" id="liveTable_${key}" style="margin-bottom:6px;">
+        <thead><tr><th>Player</th><th>Team</th><th>Count</th><th></th></tr></thead>
+        <tbody>${buildRows(_liveData[key] || [])}</tbody>
+      </table>
+      <button onclick="addLiveRow('${key}')" class="btn btn-outline" style="font-size:12px;padding:4px 12px;">+ Add Row</button>
+    </div>`;
+
+  el.innerHTML = `
+    <div class="stats-section" style="margin-bottom:16px;">
+      <div class="stats-section-hdr"><i class="fa-solid fa-pen-to-square" style="color:var(--accent);"></i> Edit Live Tables (Admin)</div>
+      <div class="stats-section-body">
+        ${section('topScorers',  '⚽ Top Goalscorers')}
+        ${section('yellowCards', '🟨 Yellow Cards')}
+        ${section('redCards',    '🟥 Red Cards')}
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="btn btn-primary" onclick="saveLiveData()">Save All</button>
+          <span id="liveSaveFeedback" style="font-size:13px;color:var(--muted);"></span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function collectLiveTable(key) {
+  const rows = [];
+  document.querySelectorAll(`#liveTable_${key} tbody tr`).forEach(tr => {
+    const name  = tr.querySelector('[data-field="name"]')?.value.trim();
+    const team  = tr.querySelector('[data-field="team"]')?.value.trim().toUpperCase();
+    const count = parseInt(tr.querySelector('[data-field="count"]')?.value);
+    if (name) rows.push({ name, team, count: isNaN(count) ? 0 : count });
+  });
+  return rows.sort((a, b) => b.count - a.count);
+}
+
+function addLiveRow(key) {
+  _liveData[key] = collectLiveTable(key);
+  _liveData[key].push({ name: '', team: '', count: 0 });
+  renderAdminLive();
+}
+
+function removeLiveRow(btn) {
+  btn.closest('tr').remove();
+}
+
+async function saveLiveData() {
+  const fb = $('liveSaveFeedback');
+  const payload = {
+    topScorers:  collectLiveTable('topScorers'),
+    yellowCards: collectLiveTable('yellowCards'),
+    redCards:    collectLiveTable('redCards'),
+  };
+  fb.textContent = 'Saving…';
+  try {
+    const { Session } = await import('./js/auth.js');
+    const { token } = Session.load();
+    const r = await fetch('/api/admin/tournament-live', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token || '' },
+      body: JSON.stringify(payload),
+    });
+    const d = await r.json();
+    if (d.success) {
+      _liveData = payload;
+      fb.textContent = '✓ Saved';
+      fb.style.color = 'var(--ok, #3dba6e)';
+      renderLiveTables(_liveData);
+    } else {
+      fb.textContent = d.error || 'Failed';
+      fb.style.color = 'var(--danger)';
+    }
+  } catch {
+    fb.textContent = 'Failed — try again';
+    fb.style.color = 'var(--danger)';
+  }
+}
+
 // ── Boot ───────────────────────────────────────────────────────────────────────
 (async () => {
   try {
-    const s = await fetch('/api/stats').then(r => r.json());
+    const [s, live, me] = await Promise.all([
+      fetch('/api/stats').then(r => r.json()),
+      fetch('/api/tournament-live').then(r => r.json()),
+      fetch('/api/me').then(r => r.json()).catch(() => ({})),
+    ]);
     window._statsData = s;
+    _liveData = live;
     renderAll(s);
+    renderLiveTables(live);
+    if (me.isAdmin) {
+      const adminEl = $('adminLiveSection');
+      if (adminEl) { adminEl.style.display = 'block'; renderAdminLive(); }
+    }
   } catch {
     $('statsContent').innerHTML = '<div class="no-data"><div class="no-data-icon">⚠️</div><p>Could not load stats — try refreshing.</p></div>';
   }
