@@ -1047,7 +1047,10 @@ app.get('/api/stats', (req, res) => {
   });
   const groupsWithMatches = Object.entries(pointsByGroup).filter(([g]) => matchesByGroup[g] > 0);
   const easiestGroup = groupsWithMatches.length
-    ? groupsWithMatches.sort((a, b) => b[1] - a[1])[0]
+    ? [...groupsWithMatches].sort((a, b) => b[1] - a[1])[0]
+    : null;
+  const hardestGroup = groupsWithMatches.length
+    ? [...groupsWithMatches].sort((a, b) => a[1] - b[1])[0]
     : null;
 
   // Goals per match timeline (sorted by match id)
@@ -1107,6 +1110,7 @@ app.get('/api/stats', (req, res) => {
     goalsByGroup,
     matchesByGroup,
     easiestGroup: easiestGroup ? { group: easiestGroup[0], pts: easiestGroup[1] } : null,
+    hardestGroup: hardestGroup ? { group: hardestGroup[0], pts: hardestGroup[1] } : null,
     goalsTimeline,
     scorelineDist,
     accuracyChart,
