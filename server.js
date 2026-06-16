@@ -912,13 +912,19 @@ app.get('/api/stats', (req, res) => {
   const results   = readJSON(RESULTS_FILE,  { results: {} }).results || {};
   const users     = readJSON(PREDICTIONS_FILE, { users: [] }).users;
 
+  // Build team code -> full name lookup
+  const teamName = {};
+  Object.values(fixtures.groups).forEach(g =>
+    (g.teams || []).forEach(t => { if (t.id && t.name) teamName[t.id] = t.name; })
+  );
+
   // Build match lookup: id -> { home team, away team }
   const matchInfo = {};
   Object.values(fixtures.groups).forEach(g =>
-    g.matches.forEach(m => { matchInfo[m.id] = { home: m.home, away: m.away }; })
+    g.matches.forEach(m => { matchInfo[m.id] = { home: teamName[m.home] || m.home, away: teamName[m.away] || m.away }; })
   );
   Object.values(fixtures.knockout || {}).forEach(r =>
-    (r.matches || []).forEach(m => { matchInfo[m.id] = { home: m.homeLabel || m.home || '?', away: m.awayLabel || m.away || '?' }; })
+    (r.matches || []).forEach(m => { matchInfo[m.id] = { home: m.homeLabel || teamName[m.home] || m.home || '?', away: m.awayLabel || teamName[m.away] || m.away || '?' }; })
   );
 
   const played = Object.entries(results).filter(([, r]) => r.played);
