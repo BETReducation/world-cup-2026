@@ -308,9 +308,6 @@ function renderAll(s) {
   const topYellow = topTeamByCount(_liveData.yellowCards);
   const topRed    = topTeamByCount(_liveData.redCards);
   const highlights = [
-    s.mostCommonScoreline
-      ? ['🔁', 'Most Common Scoreline', `${s.mostCommonScoreline.scoreline} &nbsp;·&nbsp; ${s.mostCommonScoreline.count}× so far`]
-      : null,
     hl
       ? ['🔥', 'Highest Scoring Game', `${hl.homeTeam} ${hl.homeGoals}–${hl.awayGoals} ${hl.awayTeam} &nbsp;·&nbsp; ${hl.homeGoals + hl.awayGoals} goals`]
       : null,
@@ -325,6 +322,9 @@ function renderAll(s) {
       : null,
     s.goalsPerDay != null
       ? ['📅', 'Goals Per Day', `${s.goalsPerDay} goals`]
+      : null,
+    s.mostCommonScoreline
+      ? ['🔁', 'Most Common Scoreline', `${s.mostCommonScoreline.scoreline} &nbsp;·&nbsp; ${s.mostCommonScoreline.count}× so far`]
       : null,
     s.easiestGroup
       ? ['🎯', 'Easiest Group to Predict', `Group ${s.easiestGroup.group} &nbsp;·&nbsp; ${s.easiestGroup.pts} pts scored`]
