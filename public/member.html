@@ -905,9 +905,10 @@ async function loadPredictions() {
       const matches = group.matches || [];
       const label   = group.name || ('Group ' + groupKey);
 
-      const enteredCount = matches.filter(m => myPreds[m.id] !== undefined).length;
-      const ptsForGroup  = matches.reduce((sum, m) => sum + (matchPoints[m.id] || 0), 0);
-      const ptsBadge     = ptsForGroup > 0
+      const enteredCount   = matches.filter(m => myPreds[m.id] !== undefined).length;
+      const ptsForGroup    = matches.reduce((sum, m) => sum + (matchPoints[m.id] || 0), 0);
+      const anyPlayed      = matches.some(m => actualResults[m.id]?.played);
+      const ptsBadge       = anyPlayed
         ? `<span class="pts-badge pts-${ptsForGroup >= 5 ? 5 : ptsForGroup >= 3 ? 3 : 0}">${ptsForGroup} pts</span>` : '';
 
       const accordion = document.createElement('div');
@@ -957,7 +958,8 @@ async function loadPredictions() {
 
         const enteredCount = matches.filter(m => myPreds[m.id] !== undefined).length;
         const ptsForRound  = matches.reduce((sum, m) => sum + (matchPoints[m.id] || 0), 0);
-        const ptsBadge     = ptsForRound > 0
+        const anyPlayed    = matches.some(m => actualResults[m.id]?.played);
+        const ptsBadge     = anyPlayed
           ? `<span class="pts-badge pts-${ptsForRound >= 5 ? 5 : ptsForRound >= 3 ? 3 : 0}">${ptsForRound} pts</span>` : '';
 
         const accordion = document.createElement('div');
