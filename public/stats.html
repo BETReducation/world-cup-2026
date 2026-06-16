@@ -409,7 +409,7 @@ function renderAll(s) {
     <div id="adminLiveSection" style="display:none;"></div>`;
 
   // ── Sub heading ────────────────────────────────────────────────────────────
-  $('statsSub').textContent = `${s.gamesPlayed} game${s.gamesPlayed !== 1 ? 's' : ''} played · ${s.totalGoals} goals scored · updated live`;
+  $('statsSub').textContent = `${s.gamesPlayed} game${s.gamesPlayed !== 1 ? 's' : ''} played · ${s.totalGoals} goals scored`;
 
   // ── Chart: Goals per match ─────────────────────────────────────────────────
   const timeline = s.goalsTimeline || [];
