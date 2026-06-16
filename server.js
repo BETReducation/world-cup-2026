@@ -1021,17 +1021,34 @@ app.get('/api/stats', (req, res) => {
   const homeWins = played.filter(([, r]) => r.home > r.away).length;
   const awayWins = played.filter(([, r]) => r.away > r.home).length;
 
-  // Goals by group
+  // Goals by group + prediction points by group
   const goalsByGroup = {};
   const matchesByGroup = {};
+  const pointsByGroup = {};
   Object.entries(fixtures.groups).forEach(([g, gData]) => {
     goalsByGroup[g] = 0;
     matchesByGroup[g] = 0;
+    pointsByGroup[g] = 0;
     gData.matches.forEach(m => {
       const r = results[m.id];
-      if (r?.played) { goalsByGroup[g] += r.home + r.away; matchesByGroup[g]++; }
+      if (!r?.played) return;
+      goalsByGroup[g] += r.home + r.away;
+      matchesByGroup[g]++;
+      const actualSign = Math.sign(r.home - r.away);
+      users.forEach(u => {
+        const pred = (u.predictions || {})[m.id];
+        if (!pred) return;
+        if (Math.sign(pred.home - pred.away) === actualSign) {
+          pointsByGroup[g] += 3;
+          if (pred.home === r.home && pred.away === r.away) pointsByGroup[g] += 2;
+        }
+      });
     });
   });
+  const groupsWithMatches = Object.entries(pointsByGroup).filter(([g]) => matchesByGroup[g] > 0);
+  const easiestGroup = groupsWithMatches.length
+    ? groupsWithMatches.sort((a, b) => b[1] - a[1])[0]
+    : null;
 
   // Goals per match timeline (sorted by match id)
   const goalsTimeline = played
@@ -1089,6 +1106,7 @@ app.get('/api/stats', (req, res) => {
     perfectPct,
     goalsByGroup,
     matchesByGroup,
+    easiestGroup: easiestGroup ? { group: easiestGroup[0], pts: easiestGroup[1] } : null,
     goalsTimeline,
     scorelineDist,
     accuracyChart,

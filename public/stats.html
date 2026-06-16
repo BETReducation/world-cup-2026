@@ -326,6 +326,9 @@ function renderAll(s) {
     s.goalsPerDay != null
       ? ['📅', 'Goals Per Day', `${s.goalsPerDay} goals`]
       : null,
+    s.easiestGroup
+      ? ['🎯', 'Easiest Group to Predict', `Group ${s.easiestGroup.group} &nbsp;·&nbsp; ${s.easiestGroup.pts} pts scored`]
+      : null,
   ].filter(Boolean).map(([icon, lbl, val]) => `
     <div class="highlight-item">
       <span class="hl-icon">${icon}</span>
