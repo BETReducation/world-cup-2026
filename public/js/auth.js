@@ -1,6 +1,9 @@
 // Shared auth + mobile drawer — runs on every page
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (window._authInitialized) return;
+  window._authInitialized = true;
+
   const userId = localStorage.getItem('wc2026_userId');
   const name   = localStorage.getItem('wc2026_name');
 

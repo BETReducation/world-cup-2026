@@ -589,11 +589,12 @@ async function saveLiveData() {
 // ── Boot ───────────────────────────────────────────────────────────────────────
 (async () => {
   try {
-    const [s, live, me] = await Promise.all([
+    const [s, live] = await Promise.all([
       fetch('/api/stats').then(r => r.json()),
       fetch('/api/tournament-live').then(r => r.json()),
-      fetch('/api/me').then(r => r.json()).catch(() => ({})),
     ]);
+    // API and Session are available now (api.js loaded before DOMContentLoaded)
+    const me = await API.me();
     window._statsData = s;
     _liveData = live;
     renderAll(s);
