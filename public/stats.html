@@ -301,11 +301,6 @@ function renderAll(s) {
   const cc = chartColors();
   const flag = code => code ? `<span class="flag fi fi-${code.toLowerCase()}" style="vertical-align:middle;margin-right:3px;"></span>` : '';
 
-  const total = s.homeWins + s.draws + s.awayWins;
-  const hwPct = Math.round(s.homeWins / total * 100);
-  const dwPct = Math.round(s.draws    / total * 100);
-  const awPct = 100 - hwPct - dwPct;
-
   // ── Summary cards ──────────────────────────────────────────────────────────
   const summaryCards = [
     ['⚽', s.totalGoals,             'Total Goals'],
@@ -313,8 +308,6 @@ function renderAll(s) {
     ['🎮', s.gamesPlayed,            'Games Played'],
     ['🤝', s.draws,                  'Draws'],
     ['🧤', s.cleanSheets,            'Clean Sheets'],
-    ['💪', s.homeWins,               'Home Wins'],
-    ['✈️',  s.awayWins,               'Away Wins'],
     ['🎯', s.overallPct != null ? s.overallPct + '%' : '—', 'Prediction Accuracy'],
     ['💎', s.perfectPredictions,     'Perfect Scores'],
   ].map(([icon, val, lbl]) => `
@@ -373,21 +366,6 @@ function renderAll(s) {
       </div>
     </div>
 
-    <div class="stats-section">
-      <div class="stats-section-hdr"><i class="fa-solid fa-chart-simple"></i> Result Breakdown</div>
-      <div class="stats-section-body">
-        <div class="result-breakdown">
-          <div class="rb-home" style="width:${hwPct}%"></div>
-          <div class="rb-draw" style="width:${dwPct}%"></div>
-          <div class="rb-away" style="width:${awPct}%"></div>
-        </div>
-        <div class="rb-labels">
-          <span><span class="rb-dot" style="background:#3dba6e"></span>Home Wins ${s.homeWins} (${hwPct}%)</span>
-          <span><span class="rb-dot" style="background:var(--muted)"></span>Draws ${s.draws} (${dwPct}%)</span>
-          <span><span class="rb-dot" style="background:#e05252"></span>Away Wins ${s.awayWins} (${awPct}%)</span>
-        </div>
-      </div>
-    </div>
 
     <div class="stats-section">
       <div class="stats-section-hdr"><i class="fa-solid fa-futbol"></i> Goals Per Match</div>
