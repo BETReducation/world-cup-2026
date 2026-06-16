@@ -641,15 +641,6 @@
     </div>
   </div>
 
-  <!-- Admin: Tournament Stats snapshot -->
-  <div class="profile-section" id="adminStatsSection" style="display:none;">
-    <div class="section-hdr"><i class="fa-solid fa-chart-bar" style="color:var(--accent);margin-right:6px;"></i>Tournament Stats</div>
-    <div class="section-body" style="padding:0;">
-      <div id="statsCard">
-        <p style="color:var(--muted);font-size:13px;padding:16px;">Loading stats…</p>
-      </div>
-    </div>
-  </div>
 
   <!-- Admin: Edit Predictions -->
   <div class="profile-section" id="adminEditPredSection" style="display:none;">
@@ -764,7 +755,7 @@
     html.dataset.theme = next;
     localStorage.setItem('wc26_theme', next);
     toggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-regular fa-sun"></i>';
-    if (_statsData) renderStatsCard(_statsData);
+
   });
 </script>
 <script src="js/auth.js"></script>
@@ -803,12 +794,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (me.isAdmin) {
       document.getElementById('adminUserLookupSection').style.display = 'block';
       document.getElementById('adminSection').style.display = 'block';
-      document.getElementById('adminStatsSection').style.display = 'block';
       document.getElementById('adminEditPredSection').style.display = 'block';
       document.getElementById('adminRemovePlayerItem').style.display = 'flex';
       document.getElementById('adminResetItem').style.display = 'flex';
       await loadAccessCodes();
-      await loadTournamentStats();
       await loadRemovePlayerDropdown();
       await initEditPredSection();
     }
@@ -1386,114 +1375,6 @@ function copyCode(code) {
 }
 
 // ── Admin: reset all user accounts ────────────────────────────────────────────
-// ── Admin: tournament stats ────────────────────────────────────────────────────
-let _statsData = null;
-
-function renderStatsCard(s) {
-  const el = document.getElementById('statsCard');
-  if (!el) return;
-  if (!s || !s.gamesPlayed) {
-    el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:16px 20px;">No results recorded yet — check back once games are played.</p>';
-    return;
-  }
-
-  const dark = document.documentElement.dataset.theme !== 'light';
-  const flag = code => code ? `<span class="flag fi fi-${code.toLowerCase()}" style="vertical-align:middle;margin-right:4px;font-size:15px;"></span>` : '';
-
-  const C = dark ? {
-    bg:     '#0d1b2a',
-    card:   'rgba(255,255,255,0.05)',
-    border: 'rgba(255,255,255,0.08)',
-    text:   '#ffffff',
-    muted:  'rgba(255,255,255,0.45)',
-  } : {
-    bg:     '#f0f4f8',
-    card:   '#ffffff',
-    border: 'rgba(0,0,0,0.08)',
-    text:   '#1a2a3a',
-    muted:  'rgba(0,0,0,0.45)',
-  };
-
-    const statBox = (icon, value, label) =>
-      `<div style="background:${C.card};border-radius:10px;padding:16px 12px;text-align:center;border:1px solid ${C.border};">
-        <div style="font-size:22px;margin-bottom:6px;">${icon}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:${C.text};line-height:1;margin-bottom:5px;">${value}</div>
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:${C.muted};">${label}</div>
-      </div>`;
-
-    const hlRow = (icon, label, detail) =>
-      `<div style="display:flex;align-items:center;gap:12px;background:${C.card};border:1px solid ${C.border};border-radius:10px;padding:12px 14px;">
-        <span style="font-size:22px;flex-shrink:0;">${icon}</span>
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:${C.muted};margin-bottom:3px;">${label}</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:${C.text};">${detail}</div>
-        </div>
-      </div>`;
-
-    const hl = s.highestGame;
-    const bw = s.biggestWin;
-
-    const statBoxes = [
-      statBox('⚽', s.totalGoals,  'Total Goals'),
-      statBox('📊', s.avgGoals,    'Goals / Game'),
-      statBox('🤝', s.draws,       'Draws'),
-      statBox('🧤', s.cleanSheets, 'Clean Sheets'),
-      s.overallPct !== null ? statBox('🎯', s.overallPct + '%', 'Prediction Accuracy') : '',
-      s.perfectPredictions  ? statBox('💎', s.perfectPredictions, 'Perfect Scores') : '',
-    ].filter(Boolean).join('');
-
-    const hlRows = [
-      s.mostCommonScoreline
-        ? hlRow('🔁', 'Most Common Scoreline', `${s.mostCommonScoreline.scoreline} &nbsp;·&nbsp; ${s.mostCommonScoreline.count}× so far`)
-        : '',
-      hl
-        ? hlRow('🔥', 'Highest Scoring Game',
-            `${flag(hl.homeTeam)}${hl.homeTeam} &nbsp;${hl.homeGoals} – ${hl.awayGoals}&nbsp; ${hl.awayTeam}${flag(hl.awayTeam)} &nbsp;·&nbsp; ${hl.homeGoals + hl.awayGoals} goals`)
-        : '',
-      bw && bw.homeGoals !== bw.awayGoals
-        ? hlRow('💪', 'Biggest Win',
-            `${flag(bw.homeTeam)}${bw.homeTeam} &nbsp;${bw.homeGoals} – ${bw.awayGoals}&nbsp; ${bw.awayTeam}${flag(bw.awayTeam)}`)
-        : '',
-      s.easiest
-        ? hlRow('😌', 'Easiest to Predict',
-            `${flag(s.easiest.homeTeam)}${s.easiest.homeTeam} vs ${s.easiest.awayTeam}${flag(s.easiest.awayTeam)} &nbsp;·&nbsp; ${s.easiest.pct}% correct`)
-        : '',
-      s.hardest
-        ? hlRow('😬', 'Hardest to Predict',
-            `${flag(s.hardest.homeTeam)}${s.hardest.homeTeam} vs ${s.hardest.awayTeam}${flag(s.hardest.awayTeam)} &nbsp;·&nbsp; only ${s.hardest.pct}% correct`)
-        : '',
-    ].filter(Boolean).join('');
-
-  const pillBg = dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
-  el.innerHTML = `
-    <div style="background:${C.bg};border-radius:12px;overflow:hidden;color:${C.text};font-family:system-ui,sans-serif;">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 14px;border-bottom:1px solid ${C.border};">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;letter-spacing:0.02em;">
-          ⚽ World Cup 2026 &nbsp;·&nbsp; Live Stats
-        </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${C.muted};background:${pillBg};padding:3px 10px;border-radius:20px;">
-          ${s.gamesPlayed} game${s.gamesPlayed !== 1 ? 's' : ''} played
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 16px 0;">
-        ${statBoxes}
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px 18px;">
-        ${hlRows}
-      </div>
-    </div>`;
-}
-
-async function loadTournamentStats() {
-  try {
-    _statsData = await fetch('/api/stats').then(r => r.json());
-    renderStatsCard(_statsData);
-  } catch (e) {
-    const el = document.getElementById('statsCard');
-    if (el) el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:16px;">Could not load stats.</p>';
-  }
-}
-
 // ── Admin: edit prediction ─────────────────────────────────────────────────────
 let editPredFixtures = null;
 let editPredUsers = [];
