@@ -241,26 +241,6 @@ themeToggle.addEventListener('click', () => {
   renderAll(window._statsData);
 });
 
-// ── Mobile nav ─────────────────────────────────────────────────────────────────
-const overlay = $('navDrawerOverlay');
-const drawer  = $('navDrawer');
-$('navHamburger').addEventListener('click', () => { drawer.classList.add('open'); overlay.classList.add('open'); });
-$('navDrawerClose').addEventListener('click', () => { drawer.classList.remove('open'); overlay.classList.remove('open'); });
-overlay.addEventListener('click', () => { drawer.classList.remove('open'); overlay.classList.remove('open'); });
-
-// ── Auth nav link ──────────────────────────────────────────────────────────────
-(async () => {
-  try {
-    const { Session } = await import('./js/auth.js').catch(() => ({}));
-    if (!Session) return;
-    const s = Session.load();
-    if (s?.name) {
-      const link = $('navMemberLink');
-      link.innerHTML = '<i class="fa-solid fa-user"></i> ' + s.name;
-      link.style.display = 'flex';
-    }
-  } catch {}
-})();
 
 // ── Chart theme helpers ────────────────────────────────────────────────────────
 function chartColors() {
@@ -584,7 +564,6 @@ async function saveLiveData() {
   };
   fb.textContent = 'Saving…';
   try {
-    const { Session } = await import('./js/auth.js');
     const { token } = Session.load();
     const r = await fetch('/api/admin/tournament-live', {
       method: 'POST',
