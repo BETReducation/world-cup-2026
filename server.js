@@ -1119,18 +1119,21 @@ app.get('/api/stats', (req, res) => {
 
 // ── Tournament live data (scorers / cards) ─────────────────────────────────────
 
-const LIVE_SEED = { topScorers: [], yellowCards: [], redCards: [] };
+const LIVE_SEED = { topScorers: [], yellowCards: [], redCards: [], ownGoals: [] };
 
 app.get('/api/tournament-live', (req, res) => {
-  res.json(readJSON(TOURNAMENT_LIVE_FILE, LIVE_SEED));
+  const data = readJSON(TOURNAMENT_LIVE_FILE, LIVE_SEED);
+  if (!data.ownGoals) data.ownGoals = [];
+  res.json(data);
 });
 
 app.post('/api/admin/tournament-live', requireAdmin, (req, res) => {
-  const { topScorers, yellowCards, redCards } = req.body;
+  const { topScorers, yellowCards, redCards, ownGoals } = req.body;
   const data = {
     topScorers:  Array.isArray(topScorers)  ? topScorers  : [],
     yellowCards: Array.isArray(yellowCards) ? yellowCards : [],
     redCards:    Array.isArray(redCards)    ? redCards    : [],
+    ownGoals:    Array.isArray(ownGoals)    ? ownGoals    : [],
     updatedAt: new Date().toISOString(),
   };
   writeJSON(TOURNAMENT_LIVE_FILE, data);

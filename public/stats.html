@@ -307,6 +307,7 @@ function renderAll(s) {
   // ── Summary cards ──────────────────────────────────────────────────────────
   const topScorer    = (_liveData.topScorers || [])[0];
   const topPredictor = (s.playerAccuracy || [])[0];
+  const totalOwnGoals = (_liveData.ownGoals || []).reduce((sum, r) => sum + (r.count || 0), 0);
   const summaryCards = [
     ['⚽', s.totalGoals,             'Total Goals'],
     ['📊', s.avgGoals,               'Goals / Game'],
@@ -315,6 +316,7 @@ function renderAll(s) {
     ['🧤', s.cleanSheets,            'Clean Sheets'],
     ['🎯', s.overallPct != null ? s.overallPct + '%' : '—', 'Prediction Accuracy'],
     ['💎', s.perfectPct != null ? s.perfectPct + '%' : '—', 'Perfect Scores'],
+    ['🔴', totalOwnGoals > 0 ? totalOwnGoals : '—', 'Own Goals'],
   ].map(([icon, val, lbl]) => `
     <div class="summary-card">
       <div class="summary-icon">${icon}</div>
@@ -534,6 +536,7 @@ function renderLiveTables(live) {
 
   el.innerHTML = [
     makeTable('<i class="fa-solid fa-futbol"></i>', 'Top Goalscorers',  live.topScorers  || [], 'Goals', 'sectionTopScorers'),
+    makeTable('<i class="fa-solid fa-circle" style="color:#e05252;"></i>', 'Own Goals', live.ownGoals || [], 'Goals'),
     makeTable('<i class="fa-solid fa-square" style="color:#f5c518;"></i>', 'Most Yellow Cards', live.yellowCards || [], 'Cards'),
     makeTable('<i class="fa-solid fa-square" style="color:#e05252;"></i>', 'Most Red Cards',    live.redCards    || [], 'Cards'),
   ].join('');
@@ -584,6 +587,7 @@ function renderAdminLive() {
       <div class="stats-section-hdr"><i class="fa-solid fa-pen-to-square" style="color:var(--accent);"></i> Edit Live Tables (Admin)</div>
       <div class="stats-section-body">
         ${section('topScorers',  '⚽ Top Goalscorers')}
+        ${section('ownGoals',    '🔴 Own Goals')}
         ${section('yellowCards', '🟨 Yellow Cards')}
         ${section('redCards',    '🟥 Red Cards')}
         <div style="display:flex;align-items:center;gap:12px;">
@@ -625,6 +629,7 @@ async function saveLiveData() {
   const fb = $('liveSaveFeedback');
   const payload = {
     topScorers:  collectLiveTable('topScorers'),
+    ownGoals:    collectLiveTable('ownGoals'),
     yellowCards: collectLiveTable('yellowCards'),
     redCards:    collectLiveTable('redCards'),
   };
