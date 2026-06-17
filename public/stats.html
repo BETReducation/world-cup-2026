@@ -577,9 +577,15 @@ function collectLiveTable(key) {
 }
 
 function addLiveRow(key) {
-  _liveData[key] = collectLiveTable(key);
-  _liveData[key].push({ name: '', team: '', count: 0 });
-  renderAdminLive();
+  const tbody = document.querySelector(`#liveTable_${key} tbody`);
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input class="live-input" data-field="name" value="" placeholder="Player name" style="width:100%;"></td>
+    <td>${teamSelect('')}</td>
+    <td><input class="live-input" data-field="count" value="" placeholder="0" style="width:48px;" type="number" min="0"></td>
+    <td><button onclick="removeLiveRow(this)" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button></td>`;
+  tbody.appendChild(tr);
 }
 
 function removeLiveRow(btn) {
