@@ -305,6 +305,8 @@ function renderAll(s) {
   const flag = code => code ? `<span class="flag fi fi-${code.toLowerCase()}" style="vertical-align:middle;margin-right:3px;"></span>` : '';
 
   // ── Summary cards ──────────────────────────────────────────────────────────
+  const topScorer    = (_liveData.topScorers || [])[0];
+  const topPredictor = (s.playerAccuracy || [])[0];
   const summaryCards = [
     ['⚽', s.totalGoals,             'Total Goals'],
     ['📊', s.avgGoals,               'Goals / Game'],
@@ -318,35 +320,17 @@ function renderAll(s) {
       <div class="summary-icon">${icon}</div>
       <div class="summary-value">${val}</div>
       <div class="summary-label">${lbl}</div>
-    </div>`).join('');
-
-  // ── Quick-link feature cards ───────────────────────────────────────────────
-  const topScorer    = (_liveData.topScorers || [])[0];
-  const topPredictor = (s.playerAccuracy || [])[0];
-  const featureCards = [
-    topScorer
-      ? `<a class="highlight-item highlight-item--link" onclick="document.getElementById('sectionTopScorers')?.scrollIntoView({behavior:'smooth',block:'start'})" href="javascript:void(0)">
-           <span class="hl-icon">⚽</span>
-           <div>
-             <div class="hl-label">Top Goal Scorer</div>
-             <div class="hl-value">${topScorer.name}</div>
-             <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);margin-top:2px;">${topScorer.count} goal${topScorer.count !== 1 ? 's' : ''}</div>
-           </div>
-           <span class="hl-link-arrow"><i class="fa-solid fa-arrow-down"></i></span>
-         </a>`
-      : '',
-    topPredictor
-      ? `<a class="highlight-item highlight-item--link" onclick="document.getElementById('sectionPlayerAccuracy')?.scrollIntoView({behavior:'smooth',block:'start'})" href="javascript:void(0)">
-           <span class="hl-icon">🎯</span>
-           <div>
-             <div class="hl-label">Top Predictor</div>
-             <div class="hl-value">${topPredictor.name}</div>
-             <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);margin-top:2px;">${topPredictor.pct}% accuracy</div>
-           </div>
-           <span class="hl-link-arrow"><i class="fa-solid fa-arrow-down"></i></span>
-         </a>`
-      : '',
-  ].filter(Boolean).join('');
+    </div>`).join('') + (topScorer ? `
+    <div class="summary-card" style="cursor:pointer;" onclick="document.getElementById('sectionTopScorers')?.scrollIntoView({behavior:'smooth',block:'start'})">
+      <div class="summary-icon">🏅</div>
+      <div class="summary-value" style="font-size:14px;line-height:1.2;padding-top:2px;">${topScorer.name}</div>
+      <div class="summary-label" style="margin-top:4px;">Top Scorer · ${topScorer.count} goal${topScorer.count !== 1 ? 's' : ''}</div>
+    </div>` : '') + (topPredictor ? `
+    <div class="summary-card" style="cursor:pointer;" onclick="document.getElementById('sectionPlayerAccuracy')?.scrollIntoView({behavior:'smooth',block:'start'})">
+      <div class="summary-icon">🎯</div>
+      <div class="summary-value" style="font-size:14px;line-height:1.2;padding-top:2px;">${topPredictor.name}</div>
+      <div class="summary-label" style="margin-top:4px;">Top Predictor · ${topPredictor.pct}%</div>
+    </div>` : '');
 
   // ── Highlights ──────────────────────────────────────────────────────────────
   const hl = s.highestGame, bw = s.biggestWin;
@@ -401,8 +385,6 @@ function renderAll(s) {
     <div class="stats-page-sub" id="statsSub">Loading…</div>
 
     <div class="summary-grid">${summaryCards}</div>
-
-    ${featureCards ? `<div class="highlight-grid" style="margin-bottom:16px;">${featureCards}</div>` : ''}
 
     <div class="stats-section">
       <div class="stats-section-hdr"><i class="fa-solid fa-star"></i> Highlights</div>
