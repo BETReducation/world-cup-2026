@@ -1290,7 +1290,7 @@ async function loadUserLookup() {
     const res = await fetch('/api/admin/user-lookup?q=', {
       headers: { 'x-session-token': token || '' }
     });
-    if (!res.ok) { sel.innerHTML = '<option value="">Not authorised</option>'; return; }
+    if (!res.ok) { sel.innerHTML = `<option value="">Error ${res.status} — try reloading</option>`; return; }
     _lookupUsers = await res.json();
     _lookupUsers.sort((a, b) => a.name.localeCompare(b.name));
     sel.innerHTML = '<option value="">— Select a player —</option>' +

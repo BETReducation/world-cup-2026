@@ -506,7 +506,7 @@ app.get('/api/admin/verify', requireAdmin, (req, res) => res.json({ ok: true }))
 
 app.get('/api/admin/user-lookup', requireAdmin, (req, res) => {
   const tokens = (req.query.q || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
-  const data = readData();
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
   const results = data.users
     .filter(u => !u.isAdmin)
     .filter(u => {
