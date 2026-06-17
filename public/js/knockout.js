@@ -173,8 +173,12 @@ async function loadAndRender() {
     try {
       const saved = await API.myPredictions(userId);
       koPredictions = saved.predictions || {};
-    } catch {
-      Session.clear(); location.reload(); return;
+    } catch (e) {
+      const msg = e.message || '';
+      if (msg.includes('401') || msg.includes('Unauthorized')) {
+        Session.clear(); location.reload(); return;
+      }
+      koPredictions = {};
     }
   }
 

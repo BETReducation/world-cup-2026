@@ -120,11 +120,16 @@ async function loadAndRender() {
     try {
       const saved = await API.myPredictions(userId);
       userPredictions = saved.predictions || {};
-    } catch {
-      // User not found — session is stale (e.g. server redeployed). Clear and re-register.
-      Session.clear();
-      location.reload();
-      return;
+    } catch (e) {
+      const msg = e.message || '';
+      // Only clear the session on a definitive auth rejection, not transient errors.
+      if (msg.includes('401') || msg.includes('Unauthorized')) {
+        Session.clear();
+        location.reload();
+        return;
+      }
+      // Network error or 404 — keep session, continue with empty predictions.
+      userPredictions = {};
     }
   }
 

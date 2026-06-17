@@ -97,6 +97,23 @@
       gap: 10px;
       align-items: flex-start;
     }
+    .highlight-item--link {
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .highlight-item--link:hover {
+      border-color: var(--accent);
+      background: var(--surface);
+    }
+    .highlight-item--link .hl-link-arrow {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--accent);
+      align-self: center;
+      flex-shrink: 0;
+    }
     .hl-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
     .hl-label {
       font-size: 10px;
@@ -303,6 +320,34 @@ function renderAll(s) {
       <div class="summary-label">${lbl}</div>
     </div>`).join('');
 
+  // ── Quick-link feature cards ───────────────────────────────────────────────
+  const topScorer    = (_liveData.topScorers || [])[0];
+  const topPredictor = (s.playerAccuracy || [])[0];
+  const featureCards = [
+    topScorer
+      ? `<a class="highlight-item highlight-item--link" onclick="document.getElementById('sectionTopScorers')?.scrollIntoView({behavior:'smooth',block:'start'})" href="javascript:void(0)">
+           <span class="hl-icon">⚽</span>
+           <div>
+             <div class="hl-label">Top Goal Scorer</div>
+             <div class="hl-value">${topScorer.name}</div>
+             <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);margin-top:2px;">${topScorer.count} goal${topScorer.count !== 1 ? 's' : ''}</div>
+           </div>
+           <span class="hl-link-arrow"><i class="fa-solid fa-arrow-down"></i></span>
+         </a>`
+      : '',
+    topPredictor
+      ? `<a class="highlight-item highlight-item--link" onclick="document.getElementById('sectionPlayerAccuracy')?.scrollIntoView({behavior:'smooth',block:'start'})" href="javascript:void(0)">
+           <span class="hl-icon">🎯</span>
+           <div>
+             <div class="hl-label">Top Predictor</div>
+             <div class="hl-value">${topPredictor.name}</div>
+             <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);margin-top:2px;">${topPredictor.pct}% accuracy</div>
+           </div>
+           <span class="hl-link-arrow"><i class="fa-solid fa-arrow-down"></i></span>
+         </a>`
+      : '',
+  ].filter(Boolean).join('');
+
   // ── Highlights ──────────────────────────────────────────────────────────────
   const hl = s.highestGame, bw = s.biggestWin;
   const topYellow = topTeamByCount(_liveData.yellowCards);
@@ -357,6 +402,8 @@ function renderAll(s) {
 
     <div class="summary-grid">${summaryCards}</div>
 
+    ${featureCards ? `<div class="highlight-grid" style="margin-bottom:16px;">${featureCards}</div>` : ''}
+
     <div class="stats-section">
       <div class="stats-section-hdr"><i class="fa-solid fa-star"></i> Highlights</div>
       <div class="stats-section-body">
@@ -388,7 +435,7 @@ function renderAll(s) {
       </div>
     </div>
 
-    <div class="stats-section">
+    <div class="stats-section" id="sectionPlayerAccuracy">
       <div class="stats-section-hdr"><i class="fa-solid fa-trophy"></i> Player Prediction Accuracy</div>
       <div class="stats-section-body" style="padding:0;">
         <table class="acc-table">
@@ -482,7 +529,7 @@ function renderLiveTables(live) {
   const el = $('liveTablesSection');
   if (!el) return;
 
-  const makeTable = (icon, title, rows, colHeader) => {
+  const makeTable = (icon, title, rows, colHeader, sectionId='') => {
     if (!rows.length) return '';
     const trs = rows.map((r, i) => `
       <tr>
@@ -492,7 +539,7 @@ function renderLiveTables(live) {
         <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);text-align:right;">${r.count}</td>
       </tr>`).join('');
     return `
-      <div class="stats-section">
+      <div class="stats-section"${sectionId ? ` id="${sectionId}"` : ''}>
         <div class="stats-section-hdr">${icon} ${title}</div>
         <div class="stats-section-body" style="padding:0;">
           <table class="acc-table">
@@ -504,7 +551,7 @@ function renderLiveTables(live) {
   };
 
   el.innerHTML = [
-    makeTable('<i class="fa-solid fa-futbol"></i>', 'Top Goalscorers',  live.topScorers  || [], 'Goals'),
+    makeTable('<i class="fa-solid fa-futbol"></i>', 'Top Goalscorers',  live.topScorers  || [], 'Goals', 'sectionTopScorers'),
     makeTable('<i class="fa-solid fa-square" style="color:#f5c518;"></i>', 'Most Yellow Cards', live.yellowCards || [], 'Cards'),
     makeTable('<i class="fa-solid fa-square" style="color:#e05252;"></i>', 'Most Red Cards',    live.redCards    || [], 'Cards'),
   ].join('');

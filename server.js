@@ -1058,10 +1058,9 @@ app.get('/api/stats', (req, res) => {
     .map(([id, r]) => ({ id, homeTeam: matchInfo[id]?.home || id, awayTeam: matchInfo[id]?.away || id, homeGoals: r.home, awayGoals: r.away, total: r.home + r.away }))
     .sort((a, b) => a.id.localeCompare(b.id));
 
-  // Scoreline distribution (top 10)
+  // Scoreline distribution (all unique scorelines)
   const scorelineDist = Object.entries(scorelines)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
     .map(([s, c]) => ({ scoreline: s, count: c }));
 
   // Accuracy per match (for chart)
