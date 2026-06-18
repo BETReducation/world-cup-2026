@@ -327,6 +327,11 @@ function renderAll(s) {
       <div class="summary-icon">🏅</div>
       <div class="summary-value" style="font-size:14px;line-height:1.2;padding-top:2px;">${topScorer.name}</div>
       <div class="summary-label" style="margin-top:4px;">Top Scorer · ${topScorer.count} goal${topScorer.count !== 1 ? 's' : ''}</div>
+    </div>` : '') + (s.mostPredictedScoreline ? `
+    <div class="summary-card">
+      <div class="summary-icon">🗳️</div>
+      <div class="summary-value" style="font-size:20px;">${s.mostPredictedScoreline.scoreline}</div>
+      <div class="summary-label">Most Predicted · ${s.mostPredictedScoreline.count}×</div>
     </div>` : '') + (topPredictor ? `
     <div class="summary-card" style="cursor:pointer;" onclick="document.getElementById('sectionPlayerAccuracy')?.scrollIntoView({behavior:'smooth',block:'start'})">
       <div class="summary-icon">🎯</div>

@@ -1058,6 +1058,21 @@ app.get('/api/stats', (req, res) => {
     .map(([id, r]) => ({ id, homeTeam: matchInfo[id]?.home || id, awayTeam: matchInfo[id]?.away || id, homeGoals: r.home, awayGoals: r.away, total: r.home + r.away }))
     .sort((a, b) => a.id.localeCompare(b.id));
 
+  // Most predicted scoreline (across all players for all played matches)
+  const predictedScorelines = {};
+  played.forEach(([matchId]) => {
+    users.forEach(u => {
+      const pred = (u.predictions || {})[matchId];
+      if (!pred) return;
+      const key = `${pred.home || 0}-${pred.away || 0}`;
+      predictedScorelines[key] = (predictedScorelines[key] || 0) + 1;
+    });
+  });
+  const mostPredictedScorelineEntry = Object.entries(predictedScorelines).sort((a, b) => b[1] - a[1])[0];
+  const mostPredictedScoreline = mostPredictedScorelineEntry
+    ? { scoreline: mostPredictedScorelineEntry[0], count: mostPredictedScorelineEntry[1] }
+    : null;
+
   // Scoreline distribution (all unique scorelines)
   const scorelineDist = Object.entries(scorelines)
     .sort((a, b) => b[1] - a[1])
@@ -1101,6 +1116,7 @@ app.get('/api/stats', (req, res) => {
     highestDraw,
     biggestWin,
     mostCommonScoreline: mostCommonScoreline ? { scoreline: mostCommonScoreline[0], count: mostCommonScoreline[1] } : null,
+    mostPredictedScoreline,
     hardest,
     easiest,
     overallPct,
