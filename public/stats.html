@@ -548,15 +548,18 @@ function renderLiveTables(live) {
 }
 
 // ── Admin live editor ──────────────────────────────────────────────────────────
-let _liveData = { topScorers: [], yellowCards: [], redCards: [] };
-let _allTeams  = [];
+let _liveData      = { topScorers: [], ownGoals: [], yellowCards: [], redCards: [] };
+let _allTeams      = [];
+let _allTeamsMeta  = {};   // name → { flagCode }
+let _activeCategory = 'topScorers';
+let _activeTeam     = '';
 
-function teamSelect(selected) {
-  const opts = _allTeams.map(t =>
-    `<option value="${t}"${t === selected ? ' selected' : ''}>${t}</option>`
-  ).join('');
-  return `<select class="live-input" data-field="team" style="width:130px;"><option value="">— Team —</option>${opts}</select>`;
-}
+const LIVE_CATS = [
+  { key: 'topScorers',  label: '⚽ Goalscorers', col: 'Goals' },
+  { key: 'ownGoals',    label: '🔴 Own Goals',   col: 'Goals' },
+  { key: 'yellowCards', label: '🟨 Yellow Cards', col: 'Cards' },
+  { key: 'redCards',    label: '🟥 Red Cards',    col: 'Cards' },
+];
 
 function topTeamByCount(arr) {
   const totals = {};
@@ -569,86 +572,150 @@ function renderAdminLive() {
   const el = $('adminLiveSection');
   if (!el) return;
 
-  const buildRows = (list) => list.map((r, i) => `
-    <tr data-idx="${i}">
-      <td><input class="live-input" data-field="name"  value="${r.name  ||''}" placeholder="Player name" style="width:100%;"></td>
-      <td>${teamSelect(r.team || '')}</td>
-      <td><input class="live-input" data-field="count" value="${r.count ?? ''}" placeholder="0"          style="width:48px;" type="number" min="0"></td>
-      <td><button onclick="removeLiveRow(this)" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button></td>
-    </tr>`).join('');
+  const catTabs = LIVE_CATS.map(c => `
+    <button class="tab-btn${c.key === _activeCategory ? ' active' : ''}"
+            style="font-size:13px;padding:6px 14px;"
+            onclick="setLiveCategory('${c.key}')">${c.label}</button>`).join('');
 
-  const section = (key, label) => `
-    <div style="margin-bottom:20px;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${label}</div>
-      <table class="acc-table" id="liveTable_${key}" style="margin-bottom:6px;">
-        <thead><tr><th>Player</th><th>Team</th><th>Count</th><th></th></tr></thead>
-        <tbody>${buildRows(_liveData[key] || [])}</tbody>
-      </table>
-      <button onclick="addLiveRow('${key}')" class="btn btn-outline" style="font-size:12px;padding:4px 12px;">+ Add Row</button>
-    </div>`;
+  const teamOpts = _allTeams.map(t => {
+    const fc = _allTeamsMeta[t]?.flagCode || '';
+    return `<option value="${t}"${t === _activeTeam ? ' selected' : ''}>${t}</option>`;
+  }).join('');
 
   el.innerHTML = `
     <div class="stats-section" style="margin-bottom:16px;">
       <div class="stats-section-hdr"><i class="fa-solid fa-pen-to-square" style="color:var(--accent);"></i> Edit Live Tables (Admin)</div>
       <div class="stats-section-body">
-        ${section('topScorers',  '⚽ Top Goalscorers')}
-        ${section('ownGoals',    '🔴 Own Goals')}
-        ${section('yellowCards', '🟨 Yellow Cards')}
-        ${section('redCards',    '🟥 Red Cards')}
-        <div style="display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">${catTabs}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <label style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;">Team</label>
+          <select id="liveTeamSelect" class="live-input" onchange="setLiveTeam(this.value)" style="width:220px;">
+            <option value="">— Select a team —</option>${teamOpts}
+          </select>
+        </div>
+        <div id="livePlayerRows"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
           <button class="btn btn-primary" onclick="saveLiveData()">Save All</button>
           <span id="liveSaveFeedback" style="font-size:13px;color:var(--muted);"></span>
         </div>
       </div>
     </div>`;
+
+  renderLivePlayerRows();
 }
 
-function collectLiveTable(key) {
-  const rows = [];
-  document.querySelectorAll(`#liveTable_${key} tbody tr`).forEach(tr => {
-    const name  = tr.querySelector('[data-field="name"]')?.value.trim();
-    const team  = tr.querySelector('[data-field="team"]')?.value.trim();
-    const count = parseInt(tr.querySelector('[data-field="count"]')?.value);
-    if (name) rows.push({ name, team, count: isNaN(count) ? 0 : count });
-  });
-  return rows.sort((a, b) => b.count - a.count);
+function setLiveCategory(key) {
+  _activeCategory = key;
+  renderAdminLive();
 }
 
-function addLiveRow(key) {
-  const tbody = document.querySelector(`#liveTable_${key} tbody`);
-  if (!tbody) return;
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td><input class="live-input" data-field="name" value="" placeholder="Player name" style="width:100%;"></td>
-    <td>${teamSelect('')}</td>
-    <td><input class="live-input" data-field="count" value="" placeholder="0" style="width:48px;" type="number" min="0"></td>
-    <td><button onclick="removeLiveRow(this)" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button></td>`;
-  tbody.appendChild(tr);
+function setLiveTeam(team) {
+  _activeTeam = team;
+  renderLivePlayerRows();
 }
 
-function removeLiveRow(btn) {
-  btn.closest('tr').remove();
+function renderLivePlayerRows() {
+  const el = $('livePlayerRows');
+  if (!el) return;
+
+  if (!_activeTeam) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px;">Select a team above to view and edit players.</p>';
+    return;
+  }
+
+  const fc   = (_allTeamsMeta[_activeTeam]?.flagCode || '').toLowerCase();
+  const flag = fc ? `<span class="flag fi fi-${fc}" style="margin-right:6px;vertical-align:middle;"></span>` : '';
+  const list = (_liveData[_activeCategory] || []).filter(r => r.team === _activeTeam);
+  const cat  = LIVE_CATS.find(c => c.key === _activeCategory);
+
+  let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-family:'JetBrains Mono',monospace;">${flag}${_activeTeam}</div>`;
+
+  if (list.length) {
+    html += `<table class="acc-table" style="margin-bottom:16px;">
+      <thead><tr>
+        <th style="text-align:left;">Player</th>
+        <th style="text-align:center;width:120px;">${cat?.col || 'Count'}</th>
+        <th style="width:36px;"></th>
+      </tr></thead>
+      <tbody>`;
+    list.forEach(r => {
+      const esc = r.name.replace(/'/g, "\\'");
+      html += `<tr>
+        <td style="font-weight:600;">${r.name}</td>
+        <td style="text-align:center;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+            <button onclick="adjustLiveCount('${_activeCategory}','${esc}','${_activeTeam}',-1)"
+                    style="width:28px;height:28px;background:none;border:1px solid var(--border);border-radius:4px;color:var(--text);cursor:pointer;font-size:16px;line-height:1;">−</button>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--accent);min-width:20px;text-align:center;">${r.count}</span>
+            <button onclick="adjustLiveCount('${_activeCategory}','${esc}','${_activeTeam}',1)"
+                    style="width:28px;height:28px;background:none;border:1px solid var(--border);border-radius:4px;color:var(--accent);cursor:pointer;font-size:16px;line-height:1;">+</button>
+          </div>
+        </td>
+        <td style="text-align:center;">
+          <button onclick="removeLiveEntry('${_activeCategory}','${esc}','${_activeTeam}')"
+                  style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;line-height:1;">✕</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += `<p style="color:var(--muted);font-size:13px;margin-bottom:16px;">No entries for this team yet.</p>`;
+  }
+
+  html += `
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);">
+      <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;">New player</span>
+      <input id="newPlayerName" class="live-input" placeholder="Player name" style="flex:1;min-width:140px;">
+      <input id="newPlayerCount" class="live-input" type="number" min="1" value="1" style="width:60px;">
+      <button class="btn btn-outline" onclick="addNewLivePlayer()" style="font-size:12px;padding:5px 14px;">+ Add</button>
+    </div>`;
+
+  el.innerHTML = html;
+  $('newPlayerName')?.focus();
+}
+
+function adjustLiveCount(key, name, team, delta) {
+  const list  = _liveData[key] || [];
+  const entry = list.find(r => r.name === name && r.team === team);
+  if (!entry) return;
+  entry.count = Math.max(0, (entry.count || 0) + delta);
+  if (entry.count === 0) _liveData[key] = list.filter(r => !(r.name === name && r.team === team));
+  renderLivePlayerRows();
+}
+
+function removeLiveEntry(key, name, team) {
+  _liveData[key] = (_liveData[key] || []).filter(r => !(r.name === name && r.team === team));
+  renderLivePlayerRows();
+}
+
+function addNewLivePlayer() {
+  const name  = $('newPlayerName')?.value.trim();
+  const count = parseInt($('newPlayerCount')?.value) || 1;
+  if (!name || !_activeTeam) return;
+  if (!_liveData[_activeCategory]) _liveData[_activeCategory] = [];
+  const existing = _liveData[_activeCategory].find(r => r.name === name && r.team === _activeTeam);
+  if (existing) {
+    existing.count += count;
+  } else {
+    _liveData[_activeCategory].push({ name, team: _activeTeam, count });
+  }
+  _liveData[_activeCategory].sort((a, b) => b.count - a.count);
+  renderLivePlayerRows();
 }
 
 async function saveLiveData() {
   const fb = $('liveSaveFeedback');
-  const payload = {
-    topScorers:  collectLiveTable('topScorers'),
-    ownGoals:    collectLiveTable('ownGoals'),
-    yellowCards: collectLiveTable('yellowCards'),
-    redCards:    collectLiveTable('redCards'),
-  };
   fb.textContent = 'Saving…';
+  fb.style.color = 'var(--muted)';
   try {
     const { token } = Session.load();
     const r = await fetch('/api/admin/tournament-live', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-session-token': token || '' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(_liveData),
     });
     const d = await r.json();
     if (d.success) {
-      _liveData = payload;
       fb.textContent = '✓ Saved';
       fb.style.color = 'var(--ok, #3dba6e)';
       renderLiveTables(_liveData);
@@ -671,9 +738,10 @@ async function saveLiveData() {
       fetch('/api/fixtures').then(r => r.json()),
     ]);
     // Populate team list from all groups
-    _allTeams = Object.values(fixtures.groups || {})
-      .flatMap(g => (g.teams || []).map(t => t.name))
-      .sort();
+    Object.values(fixtures.groups || {}).flatMap(g => g.teams || []).forEach(t => {
+      _allTeamsMeta[t.name] = { flagCode: t.flagCode || '' };
+    });
+    _allTeams = Object.keys(_allTeamsMeta).sort();
     const me = await API.me().catch(() => ({}));
     window._statsData = s;
     _liveData = live;
