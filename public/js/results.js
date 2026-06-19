@@ -172,15 +172,17 @@ function showGroup(groupKey) {
       const result = results.results?.[m.id];
       const played = result?.played;
 
+      const hasComparison = played || isAdmin;
       html += `
-        <div class="result-row ${played ? '' : 'not-played'}">
+        <div class="result-row ${played ? '' : 'not-played'}${hasComparison ? ' has-predictions' : ''}"${hasComparison ? ` onclick="toggleComparison('cmp_${m.id}', this)"` : ''}>
           <div class="match-meta">${fmtDate(m.date, m.time)}${m.note ? `<span class="match-note">(${m.note})</span>` : ''}</div>
           <div class="team-name"><span class="flag fi fi-${home.flagCode}"></span>${home.name}</div>
           <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
           <div class="team-name right">${away.name}<span class="flag fi fi-${away.flagCode}"></span></div>
+          ${hasComparison ? `<span class="pred-chevron">▶</span>` : ''}
         </div>`;
 
-      if (played || isAdmin) {
+      if (hasComparison) {
         html += buildComparisonBlock(m, result, played);
       }
 
@@ -255,8 +257,9 @@ function showKoRound(roundKey) {
     const result     = results.results?.[m.id];
     const played     = result?.played;
 
+    const hasComparison = played || isAdmin;
     html += `
-      <div class="result-row ${played ? '' : 'not-played'}" id="row_${m.id}">
+      <div class="result-row ${played ? '' : 'not-played'}${hasComparison ? ' has-predictions' : ''}" id="row_${m.id}"${hasComparison ? ` onclick="toggleComparison('cmp_${m.id}', this)"` : ''}>
         <div class="match-meta">${fmtKoMatchDate(m.date, m.time)}</div>
         <div class="team-name">
           ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
@@ -265,9 +268,10 @@ function showKoRound(roundKey) {
         <div class="team-name right">
           ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
+        ${hasComparison ? `<span class="pred-chevron">▶</span>` : ''}
       </div>`;
 
-    if (played || isAdmin) {
+    if (hasComparison) {
       html += buildComparisonBlock(m, result, played);
     }
 
@@ -291,6 +295,17 @@ function showKoRound(roundKey) {
 
   html += `</div></div>`;
   panels.innerHTML = html;
+}
+
+// ── Comparison toggle ─────────────────────────────────────────────────────────
+
+function toggleComparison(panelId, row) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : '';
+  const chevron = row.querySelector('.pred-chevron');
+  if (chevron) chevron.textContent = open ? '▶' : '▼';
 }
 
 // ── Comparison block ──────────────────────────────────────────────────────────
@@ -323,8 +338,9 @@ function buildComparisonBlock(match, result, played) {
     </tr>`;
   }).join('');
 
+  const panelId = `cmp_${match.id}`;
   return `
-    <div class="comparison-panel">
+    <div class="comparison-panel" id="${panelId}" style="display:none;">
       <table>
         <thead><tr>
           <th>Player</th>

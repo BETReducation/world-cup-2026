@@ -674,6 +674,16 @@ nav.site-nav {
   transition: border-color 0.15s;
 }
 .result-row:hover { border-color: var(--border2); }
+.result-row.has-predictions { cursor: pointer; }
+.result-row.has-predictions:hover { border-color: var(--accent); }
+
+.pred-chevron {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
 
 .scoreline {
   flex: 0 0 76px;
@@ -1492,6 +1502,7 @@ footer span {
   .result-row .team-name:not(.right) { order: 1; }
   .result-row .scoreline             { order: 2; flex: none; }
   .result-row .team-name.right       { order: 3; }
+  .result-row .pred-chevron          { order: 4; width: 100%; text-align: center; margin-left: 0; }
 
   /* Slightly larger touch targets for score inputs */
   .score-input input[type="text"] {
