@@ -1080,8 +1080,8 @@ app.get('/api/stats', (req, res) => {
 
   // Accuracy per match (for chart)
   const accuracyChart = Object.entries(matchAccuracy)
-    .map(([id, m]) => ({ id, label: `${m.homeTeam} v ${m.awayTeam}`, pct: m.pct }))
-    .sort((a, b) => a.id.localeCompare(b.id));
+    .map(([id, m]) => ({ id, label: `${m.homeTeam} v ${m.awayTeam}`, pct: m.pct, date: matchInfo[id]?.date || '' }))
+    .sort((a, b) => a.date !== b.date ? a.date.localeCompare(b.date) : a.id.localeCompare(b.id));
 
   // Per-player prediction accuracy + variance
   const playerAccuracy = users.map(u => {
