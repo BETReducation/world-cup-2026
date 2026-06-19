@@ -357,6 +357,9 @@ function renderAll(s) {
 
   // ── Summary cards ──────────────────────────────────────────────────────────
   const topScorer    = (_liveData.topScorers || [])[0];
+  const topScorerNames = topScorer
+    ? (_liveData.topScorers || []).filter(r => r.count === topScorer.count).map(r => r.name).join(' & ')
+    : null;
   const topPredictor = (s.playerAccuracy || [])[0];
   const totalOwnGoals = (_liveData.ownGoals || []).reduce((sum, r) => sum + (r.count || 0), 0);
   const summaryCards = [
@@ -376,7 +379,7 @@ function renderAll(s) {
     </div>`).join('') + (topScorer ? `
     <div class="summary-card" style="cursor:pointer;" onclick="document.getElementById('sectionTopScorers')?.scrollIntoView({behavior:'smooth',block:'start'})">
       <div class="summary-icon">🏅</div>
-      <div class="summary-value" style="font-size:14px;line-height:1.2;padding-top:2px;">${topScorer.name}</div>
+      <div class="summary-value" style="font-size:14px;line-height:1.2;padding-top:2px;">${topScorerNames}</div>
       <div class="summary-label" style="margin-top:4px;">Top Scorer · ${topScorer.count} goal${topScorer.count !== 1 ? 's' : ''}</div>
     </div>` : '') + (s.mostPredictedScoreline ? `
     <div class="summary-card">
