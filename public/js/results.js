@@ -100,6 +100,19 @@ $('adminPwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('
 
 // ── Clear Results ─────────────────────────────────────────────────────────────
 
+$('downloadBackupBtn').addEventListener('click', async () => {
+  const pwd = adminPassword || '';
+  const res = await fetch('/api/admin/backup', { headers: { 'x-admin-password': pwd } });
+  if (!res.ok) { alert('Backup failed — are you logged in as admin?'); return; }
+  const blob = await res.blob();
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = res.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1] || 'wc2026-backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
 $('clearResultsBtn').addEventListener('click', async () => {
   if (!confirm('Clear ALL results? This cannot be undone.')) return;
   const status = $('restoreStatus');
