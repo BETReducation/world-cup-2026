@@ -201,6 +201,57 @@
       .highlight-grid { grid-template-columns: 1fr; }
       .summary-grid { grid-template-columns: repeat(3, 1fr); }
     }
+    /* Live leaderboard tabs */
+    .live-tab-bar {
+      display: flex;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .live-tab-bar::-webkit-scrollbar { display: none; }
+    .live-tab-btn {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      padding: 11px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .live-tab-btn:hover { color: var(--text); }
+    .live-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .live-tab-count {
+      display: inline-block;
+      margin-left: 5px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1px 6px;
+      font-size: 9px;
+      vertical-align: middle;
+    }
+    .live-tab-btn.active .live-tab-count {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    /* Live table rows */
+    .live-rank-medal { font-size: 16px; }
+    .live-count-cell {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--accent);
+      text-align: right;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
@@ -514,37 +565,79 @@ function renderAll(s) {
 }
 
 // ── Live tables (scorers / cards) ──────────────────────────────────────────────
+let _activeLiveTab = 'topScorers';
+
 function renderLiveTables(live) {
   const el = $('liveTablesSection');
   if (!el) return;
 
-  const makeTable = (icon, title, rows, colHeader, sectionId='') => {
-    if (!rows.length) return '';
-    const trs = rows.map((r, i) => `
-      <tr>
-        <td style="font-family:'JetBrains Mono',monospace;color:var(--muted);width:28px;">${i + 1}</td>
+  const cats = [
+    { key: 'topScorers',  label: '⚽ Goalscorers',  col: 'Goals' },
+    { key: 'ownGoals',    label: '🔴 Own Goals',    col: 'Goals' },
+    { key: 'yellowCards', label: '🟨 Yellow Cards', col: 'Cards' },
+    { key: 'redCards',    label: '🟥 Red Cards',    col: 'Cards' },
+  ];
+
+  const hasAny = cats.some(c => (live[c.key] || []).length > 0);
+  if (!hasAny) { el.innerHTML = ''; return; }
+
+  // If active tab is empty, switch to first tab with data
+  if (!(live[_activeLiveTab] || []).length) {
+    _activeLiveTab = cats.find(c => (live[c.key] || []).length > 0)?.key || 'topScorers';
+  }
+
+  const medals = ['🥇', '🥈', '🥉'];
+
+  const makeRows = (cat) => {
+    const rows = live[cat.key] || [];
+    if (!rows.length) return `<p style="padding:24px 18px;color:var(--muted);font-size:13px;">No data recorded yet.</p>`;
+    const trs = rows.map((r, i) => {
+      const fc   = (_allTeamsMeta[r.team]?.flagCode || r.team || '').toLowerCase();
+      const flag = fc ? `<span class="flag fi fi-${fc}" style="vertical-align:middle;margin-right:5px;"></span>` : '';
+      const rank = i < 3
+        ? `<span class="live-rank-medal">${medals[i]}</span>`
+        : `<span style="font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:12px;">${i + 1}</span>`;
+      return `<tr>
+        <td style="width:36px;text-align:center;">${rank}</td>
         <td style="font-weight:600;">${r.name}</td>
-        <td><span class="flag fi fi-${(r.team||'').toLowerCase()}" style="vertical-align:middle;"></span> <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">${r.team||''}</span></td>
-        <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);text-align:right;">${r.count}</td>
-      </tr>`).join('');
-    return `
-      <div class="stats-section"${sectionId ? ` id="${sectionId}"` : ''}>
-        <div class="stats-section-hdr">${icon} ${title}</div>
-        <div class="stats-section-body" style="padding:0;">
-          <table class="acc-table">
-            <thead><tr><th>#</th><th>Player</th><th>Team</th><th style="text-align:right;">${colHeader}</th></tr></thead>
-            <tbody>${trs}</tbody>
-          </table>
-        </div>
-      </div>`;
+        <td>${flag}<span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">${r.team || ''}</span></td>
+        <td class="live-count-cell">${r.count}</td>
+      </tr>`;
+    }).join('');
+    return `<table class="acc-table">
+      <thead><tr><th>#</th><th>Player</th><th>Team</th><th style="text-align:right;">${cat.col}</th></tr></thead>
+      <tbody>${trs}</tbody>
+    </table>`;
   };
 
-  el.innerHTML = [
-    makeTable('<i class="fa-solid fa-futbol"></i>', 'Top Goalscorers',  live.topScorers  || [], 'Goals', 'sectionTopScorers'),
-    makeTable('<i class="fa-solid fa-circle" style="color:#e05252;"></i>', 'Own Goals', live.ownGoals || [], 'Goals'),
-    makeTable('<i class="fa-solid fa-square" style="color:#f5c518;"></i>', 'Most Yellow Cards', live.yellowCards || [], 'Cards'),
-    makeTable('<i class="fa-solid fa-square" style="color:#e05252;"></i>', 'Most Red Cards',    live.redCards    || [], 'Cards'),
-  ].join('');
+  const tabBar = cats.map(c => {
+    const count = (live[c.key] || []).length;
+    if (!count) return '';
+    return `<button class="live-tab-btn${c.key === _activeLiveTab ? ' active' : ''}"
+              onclick="switchLiveTab('${c.key}')">${c.label}<span class="live-tab-count">${count}</span></button>`;
+  }).join('');
+
+  const panels = cats.map(c => `
+    <div id="livePanel_${c.key}" style="display:${c.key === _activeLiveTab ? 'block' : 'none'};">
+      ${makeRows(c)}
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="stats-section" id="sectionTopScorers">
+      <div class="live-tab-bar">${tabBar}</div>
+      <div style="padding:0;">${panels}</div>
+    </div>`;
+}
+
+function switchLiveTab(key) {
+  _activeLiveTab = key;
+  document.querySelectorAll('.live-tab-btn').forEach(b => {
+    const active = b.getAttribute('onclick')?.includes(`'${key}'`);
+    b.classList.toggle('active', !!active);
+  });
+  document.querySelectorAll('[id^="livePanel_"]').forEach(p => {
+    p.style.display = p.id === `livePanel_${key}` ? 'block' : 'none';
+  });
 }
 
 // ── Admin live editor ──────────────────────────────────────────────────────────
