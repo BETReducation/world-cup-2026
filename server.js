@@ -960,7 +960,7 @@ app.get('/api/stats', (req, res) => {
     totalGoals += g;
     if (g > highestGoals) { highestGoals = g; highestGame = gameEntry(id, r); }
     if (r.home === 0 || r.away === 0) cleanSheets++;
-    const key = `${r.home}-${r.away}`;
+    const key = `${Math.max(r.home, r.away)}-${Math.min(r.home, r.away)}`;
     scorelines[key] = (scorelines[key] || 0) + 1;
   });
   const avgGoals = (totalGoals / played.length).toFixed(2);
