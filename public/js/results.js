@@ -270,6 +270,15 @@ function showKoRound(roundKey) {
     const result     = results.results?.[m.id];
     const played     = result?.played;
 
+    const fmtKoSlot = s => {
+      if (!s) return '?';
+      const m3 = s.match(/^3rd_([A-L]{2,})$/);
+      if (m3) return `3rd(${m3[1]})`;
+      if (/^[12][A-L]$/.test(s)) return s;
+      const mWL = s.match(/^([WL]):(.+)$/);
+      if (mWL) return `${mWL[1]}${mWL[2].replace('_', '-')}`;
+      return s;
+    };
     const hasComparison = played || isAdmin;
     html += `
       <div class="result-row ${played ? '' : 'not-played'}${hasComparison ? ' has-predictions' : ''}" id="row_${m.id}"${hasComparison ? ` onclick="toggleComparison('cmp_${m.id}', this)"` : ''}>
@@ -282,6 +291,7 @@ function showKoRound(roundKey) {
           ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
         ${hasComparison ? `<span class="pred-chevron">▶</span>` : ''}
+        <div class="slot-hint">${fmtKoSlot(m.homeSlot)} vs ${fmtKoSlot(m.awaySlot)}</div>
       </div>`;
 
     if (hasComparison) {

@@ -667,6 +667,7 @@ nav.site-nav {
 .result-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   background: var(--surface2);
   border: 1px solid var(--border);
