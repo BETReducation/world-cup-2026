@@ -424,9 +424,28 @@ function isPositionGuaranteed(pos, standings, matches, results) {
     if (maxPts[m.home] !== undefined) maxPts[m.home] += 3;
     if (maxPts[m.away] !== undefined) maxPts[m.away] += 3;
   });
-  // pos 0 = guaranteed 1st: no other team can reach target pts
-  // pos 1 = guaranteed 2nd: teams at pos 2+ cannot reach target pts
-  return standings.filter((_, i) => i > pos).every(s => maxPts[s.team.id] < target.pts);
+
+  // Teams below pos that could reach or exceed target's pts
+  const challengers = standings.filter((s, i) => i > pos && maxPts[s.team.id] >= target.pts);
+  if (challengers.length === 0) return true; // pure pts dominance
+
+  // For 1st place: also guaranteed if every challenger has already played target and lost H2H
+  // (target wins any pts tie via head-to-head)
+  if (pos === 0) {
+    return challengers.every(ch => {
+      const h2hMatch = matches.find(m =>
+        (m.home === target.team.id && m.away === ch.team.id) ||
+        (m.home === ch.team.id   && m.away === target.team.id)
+      );
+      if (!h2hMatch) return false;
+      const r = results[h2hMatch.id];
+      if (!r?.played) return false;
+      // Target must have won the H2H
+      return h2hMatch.home === target.team.id ? r.home > r.away : r.away > r.home;
+    });
+  }
+
+  return false;
 }
 
 function findTeamById(fixtures, id) {
