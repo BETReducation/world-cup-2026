@@ -9,6 +9,104 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+  <style>
+    .live-dashboard {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .live-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .live-card-hdr {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .fixture-row {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border2);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .fixture-row:last-child { border-bottom: none; }
+    .fixture-stage {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .fixture-teams {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .fixture-team { display: flex; align-items: center; gap: 5px; }
+    .fixture-team.home { flex: 1; }
+    .fixture-team.away { flex: 1; justify-content: flex-end; }
+    .fixture-vs {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .fixture-times {
+      display: flex;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .fixture-tz { color: var(--accent); }
+    .deadline-item {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .deadline-round {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .deadline-note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .deadline-times {
+      display: flex;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+    @media (max-width: 600px) {
+      .fixture-teams { font-size: 13px; }
+      .live-dashboard { padding: 16px 1rem 0; }
+    }
+  </style>
 </head>
 <body>
 
@@ -45,14 +143,36 @@
   <div class="nav-drawer-footer" id="navDrawerUser"></div>
 </nav>
 
+<!-- Live Dashboard -->
+<div id="liveDashboard" class="live-dashboard" style="display:none;">
+
+  <!-- Section 1: Next Fixtures -->
+  <div id="nextFixturesCard" class="live-card" style="display:none;">
+    <div class="live-card-hdr"><i class="fa-regular fa-clock"></i> Next Fixtures</div>
+    <div id="nextFixturesList"></div>
+  </div>
+
+  <!-- Section 2: Next Lock Deadline -->
+  <div id="nextDeadlineCard" class="live-card" style="display:none;">
+    <div class="live-card-hdr"><i class="fa-solid fa-lock"></i> Next Prediction Deadline</div>
+    <div id="nextDeadlineContent"></div>
+  </div>
+
+  <!-- Section 3: Confirmed Knockout Fixtures -->
+  <div id="confirmedKOCard" class="live-card" style="display:none;">
+    <div class="live-card-hdr"><i class="fa-solid fa-shield-halved"></i> Confirmed Knockout Fixtures</div>
+    <div id="confirmedKOList"></div>
+  </div>
+
+</div>
+
 <div class="hero">
   <div class="hero-tag"><i class="fa-regular fa-futbol"></i> USA · Canada · Mexico · June / July 2026</div>
   <h1>Pick your scores.<br><span>Top the table.</span></h1>
-  <p>Enter predicted scores for the World Cup 2026 matches. Your group tables update live as you type, and a full leaderboard on the results pagetracks who's closest when the real results come in. The knockout stages open up when the teams have been decided for each fixture.</p>
-  <p>Change your predictions as many times as you want, until the respective rounds are locked.</p>
   <div class="hero-cta">
     <a href="predictions.html" class="btn btn-primary">My Predictions →</a>
     <a href="results.html" class="btn btn-outline">View Results</a>
+    <a href="stats.html" class="btn btn-outline">Stats</a>
   </div>
 </div>
 
@@ -221,6 +341,146 @@
 </script>
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
+
+<script>
+(async () => {
+  try {
+    const res = await fetch('/api/fixtures');
+    if (!res.ok) return;
+    const fixtures = await res.json();
+
+    // Build teamById map
+    const teamById = {};
+    Object.values(fixtures.groups || {}).forEach(g => {
+      (g.teams || []).forEach(t => { teamById[t.id] = t; });
+    });
+
+    const KO_LABELS = {
+      R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarter-final',
+      SF: 'Semi-final', '3P': 'Third-place Play-off', F: 'Final'
+    };
+
+    const fmtTime = (dt, tz, refDate) => {
+      const t = dt.toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+      const d = dt.toLocaleDateString('en-CA', { timeZone: tz });
+      return d > refDate ? `${t}<sup>+1</sup>` : t;
+    };
+    const fmtDay = dt => dt.toLocaleDateString('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' });
+
+    const flagHtml = code => code ? `<span class="fi fi-${code.toLowerCase()}"></span>` : '';
+
+    const makeTeamInfo = (id) => {
+      const t = teamById[id] || {};
+      return { name: t.name || id || 'TBD', flagCode: t.flag || '' };
+    };
+
+    // Build flat match list
+    const allMatches = [];
+
+    // Group matches
+    Object.entries(fixtures.groups || {}).forEach(([groupKey, g]) => {
+      (g.matches || []).forEach(m => {
+        if (!m.date || !m.time) return;
+        const kickoff = new Date(`${m.date}T${m.time}:00-04:00`);
+        const ht = makeTeamInfo(m.home);
+        const at = makeTeamInfo(m.away);
+        allMatches.push({ kickoff, ht, at, label: `Group ${groupKey} · Round ${m.round}`, isKO: false, date: m.date });
+      });
+    });
+
+    // KO matches
+    (fixtures.knockout || []).forEach(m => {
+      if (!m.date || !m.time) return;
+      const kickoff = new Date(`${m.date}T${m.time}:00-04:00`);
+      const ht = m.home ? makeTeamInfo(m.home) : { name: 'TBD', flagCode: '' };
+      const at = m.away ? makeTeamInfo(m.away) : { name: 'TBD', flagCode: '' };
+      allMatches.push({ kickoff, ht, at, label: KO_LABELS[m.round] || m.round, isKO: true, date: m.date,
+        homeResolved: !!m.home, awayResolved: !!m.away, raw: m });
+    });
+
+    allMatches.sort((a, b) => a.kickoff - b.kickoff);
+
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - 10 * 60 * 1000);
+
+    // Section 1: Next 4 upcoming fixtures
+    const upcoming = allMatches.filter(m => m.kickoff > cutoff).slice(0, 4);
+    if (upcoming.length) {
+      document.getElementById('nextFixturesList').innerHTML = upcoming.map(m => `
+        <div class="fixture-row">
+          <div class="fixture-stage">${m.label}</div>
+          <div class="fixture-teams">
+            <div class="fixture-team home">${flagHtml(m.ht.flagCode)} ${m.ht.name}</div>
+            <div class="fixture-vs">vs</div>
+            <div class="fixture-team away">${m.at.name} ${flagHtml(m.at.flagCode)}</div>
+          </div>
+          <div class="fixture-times">
+            <span>${fmtDay(m.kickoff)}</span>
+            <span><span class="fixture-tz">UK</span> ${fmtTime(m.kickoff, 'Europe/London', m.date)}</span>
+            <span><span class="fixture-tz">VN</span> ${fmtTime(m.kickoff, 'Asia/Ho_Chi_Minh', m.date)}</span>
+          </div>
+        </div>`).join('');
+      document.getElementById('nextFixturesCard').style.display = '';
+    }
+
+    // Section 2: Next deadline
+    const DEADLINES = [
+      { stage: 'Group Stage — Round 1', iso: '2026-06-11T19:00:00Z', note: 'Before Mexico vs South Africa' },
+      { stage: 'Group Stage — Round 2', iso: '2026-06-18T16:00:00Z', note: 'Before Czechia vs South Africa' },
+      { stage: 'Group Stage — Round 3', iso: '2026-06-24T19:00:00Z', note: 'Before Switzerland vs Canada' },
+      { stage: 'Round of 32',           iso: '2026-06-28T19:00:00Z', note: 'Before first Last-32 match' },
+      { stage: 'Round of 16',           iso: '2026-07-04T17:00:00Z', note: 'Before first Last-16 match' },
+      { stage: 'Quarter-finals',        iso: '2026-07-09T20:00:00Z', note: 'Before first quarter-final' },
+      { stage: 'Semi-finals',           iso: '2026-07-14T19:00:00Z', note: 'Before first semi-final' },
+      { stage: 'Third-place Play-off',  iso: '2026-07-18T21:00:00Z', note: 'Before match #103' },
+      { stage: 'Final',                 iso: '2026-07-19T19:00:00Z', note: 'Before match #104' },
+    ];
+    const nextDl = DEADLINES.find(d => new Date(d.iso) > now);
+    if (nextDl) {
+      const dt = new Date(nextDl.iso);
+      const refDate = dt.toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
+      document.getElementById('nextDeadlineContent').innerHTML = `
+        <div class="deadline-item">
+          <div class="deadline-round">${nextDl.stage}</div>
+          <div class="deadline-note">${nextDl.note}</div>
+          <div class="deadline-times">
+            <span>${fmtDay(dt)}</span>
+            <span><span class="fixture-tz">UK</span> ${fmtTime(dt, 'Europe/London', refDate)}</span>
+            <span><span class="fixture-tz">VN</span> ${fmtTime(dt, 'Asia/Ho_Chi_Minh', refDate)}</span>
+          </div>
+        </div>`;
+      document.getElementById('nextDeadlineCard').style.display = '';
+    }
+
+    // Section 3: Confirmed KO fixtures
+    const confirmedKO = allMatches.filter(m => m.isKO && m.homeResolved && m.awayResolved);
+    if (confirmedKO.length) {
+      document.getElementById('confirmedKOList').innerHTML = confirmedKO.map(m => `
+        <div class="fixture-row">
+          <div class="fixture-stage">${m.label}</div>
+          <div class="fixture-teams">
+            <div class="fixture-team home">${flagHtml(m.ht.flagCode)} ${m.ht.name}</div>
+            <div class="fixture-vs">vs</div>
+            <div class="fixture-team away">${m.at.name} ${flagHtml(m.at.flagCode)}</div>
+          </div>
+          <div class="fixture-times">
+            <span>${fmtDay(m.kickoff)}</span>
+            <span><span class="fixture-tz">UK</span> ${fmtTime(m.kickoff, 'Europe/London', m.date)}</span>
+            <span><span class="fixture-tz">VN</span> ${fmtTime(m.kickoff, 'Asia/Ho_Chi_Minh', m.date)}</span>
+          </div>
+        </div>`).join('');
+      document.getElementById('confirmedKOCard').style.display = '';
+    }
+
+    // Show dashboard if any card is visible
+    if (upcoming.length || nextDl || confirmedKO.length) {
+      document.getElementById('liveDashboard').style.display = '';
+    }
+  } catch (e) {
+    // Server down or error — dashboard stays hidden
+  }
+})();
+</script>
 
 </body>
 </html>
