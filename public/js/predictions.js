@@ -1,6 +1,7 @@
 let fixtures = null;
 let lockStatus = {};
 let userPredictions = {};
+let allPredictions = [];
 let userId = null;
 let browseMode = false;
 let isSaved = false;
@@ -133,6 +134,12 @@ async function loadAndRender() {
     }
   }
 
+  // Fetch all players' predictions for any round that is already locked
+  const anyLocked = Object.values(lockStatus).some(s => s.locked);
+  if (anyLocked) {
+    try { allPredictions = await API.allPredictions(); } catch { allPredictions = []; }
+  }
+
   $('loadingState').style.display = 'none';
   $('predictionsApp').style.display = 'block';
   $('allTablesSection').style.display = 'block';
@@ -213,8 +220,9 @@ function showGroup(groupKey) {
       const dis  = locked ? 'disabled' : '';
       const cls  = locked ? 'round-locked' : '';
 
+      const hasComparison = locked && allPredictions.length > 0;
       html += `
-        <div class="match-row ${cls}">
+        <div class="match-row ${cls}${hasComparison ? ' has-predictions' : ''}"${hasComparison ? ` onclick="togglePredComparison('cmp_${m.id}', this)"` : ''}>
           <div class="match-meta">${fmtDate(m.date, m.time)}${m.note ? `<span class="match-note">(${m.note})</span>` : ''}</div>
           <div class="team-name">
             <span class="flag fi fi-${home.flagCode}"></span>${home.name}
@@ -232,7 +240,24 @@ function showGroup(groupKey) {
             ${away.name}<span class="flag fi fi-${away.flagCode}"></span>
           </div>
           ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
+          ${hasComparison ? '<span class="pred-chevron">▶</span>' : ''}
         </div>`;
+
+      if (hasComparison) {
+        const rows = allPredictions.map(user => {
+          const p = user.predictions?.[m.id];
+          if (p == null)
+            return `<tr><td>${user.name}</td><td class="pred-score" colspan="2" style="color:var(--muted);">—</td></tr>`;
+          return `<tr><td>${user.name}</td><td class="pred-score">${p.home} – ${p.away}</td><td>—</td></tr>`;
+        }).join('');
+        html += `
+          <div class="comparison-panel" id="cmp_${m.id}" style="display:none;">
+            <table>
+              <thead><tr><th>Player</th><th>Prediction</th><th>Points</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
+      }
     });
 
     html += `</div>`;
@@ -428,5 +453,16 @@ $('clearBtn').addEventListener('click', async () => {
     $('clearBtn').textContent = 'Reset All';
   }
 });
+
+// ── All-predictions comparison toggle ─────────────────────────────────────────
+
+function togglePredComparison(panelId, row) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : '';
+  const chevron = row.querySelector('.pred-chevron');
+  if (chevron) chevron.textContent = open ? '▶' : '▼';
+}
 
 init();

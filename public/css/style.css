@@ -456,6 +456,8 @@ nav.site-nav {
 }
 .match-row:hover { border-color: var(--border2); }
 .match-row.round-locked .score-input { opacity: 0.45; }
+.match-row.has-predictions { cursor: pointer; }
+.match-row.has-predictions:hover { border-color: var(--accent); }
 
 .match-meta {
   flex: 0 0 110px;
@@ -1529,6 +1531,7 @@ footer span {
   .match-row .team-name.right       { order: 3; }
   .match-row .lock-badge,
   .match-row .tbd-badge             { order: 4; }
+  .match-row .pred-chevron          { order: 5; width: 100%; text-align: center; margin-left: 0; }
 
   /* Result rows: same stacking */
   .result-row {
