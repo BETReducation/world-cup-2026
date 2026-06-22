@@ -1073,6 +1073,23 @@ app.get('/api/stats', (req, res) => {
     ? { scoreline: mostPredictedScorelineEntry[0], count: mostPredictedScorelineEntry[1] }
     : null;
 
+  // Most common accurate prediction (scoreline predicted correctly, most often)
+  const accuratePredScorelines = {};
+  played.forEach(([matchId, result]) => {
+    users.forEach(u => {
+      const pred = (u.predictions || {})[matchId];
+      if (!pred) return;
+      if (pred.home === result.home && pred.away === result.away) {
+        const key = `${result.home}-${result.away}`;
+        accuratePredScorelines[key] = (accuratePredScorelines[key] || 0) + 1;
+      }
+    });
+  });
+  const mostAccuratePredEntry = Object.entries(accuratePredScorelines).sort((a, b) => b[1] - a[1])[0];
+  const mostAccuratePredScoreline = mostAccuratePredEntry
+    ? { scoreline: mostAccuratePredEntry[0], count: mostAccuratePredEntry[1] }
+    : null;
+
   // Scoreline distribution (all unique scorelines)
   const scorelineDist = Object.entries(scorelines)
     .sort((a, b) => b[1] - a[1])
@@ -1117,6 +1134,7 @@ app.get('/api/stats', (req, res) => {
     biggestWin,
     mostCommonScoreline: mostCommonScoreline ? { scoreline: mostCommonScoreline[0], count: mostCommonScoreline[1] } : null,
     mostPredictedScoreline,
+    mostAccuratePredScoreline,
     hardest,
     easiest,
     overallPct,
