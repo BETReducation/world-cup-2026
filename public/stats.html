@@ -365,6 +365,7 @@ function renderAll(s) {
   const summaryCards = [
     ['⚽', s.totalGoals,             'Total Goals'],
     ['📊', s.avgGoals,               'Goals / Game'],
+    ['📅', s.goalsPerDay != null ? s.goalsPerDay : '—', 'Goals / Day'],
     ['🎮', s.gamesPlayed,            'Games Played'],
     ['🤝', s.draws,                  'Draws'],
     ['🧤', s.cleanSheets,            'Clean Sheets'],
@@ -385,7 +386,12 @@ function renderAll(s) {
     <div class="summary-card">
       <div class="summary-icon">🗳️</div>
       <div class="summary-value" style="font-size:20px;">${s.mostPredictedScoreline.scoreline}</div>
-      <div class="summary-label">Most Predicted · ${s.mostPredictedScoreline.count}×</div>
+      <div class="summary-label">Most Common Prediction · ${s.mostPredictedScoreline.count}×</div>
+    </div>` : '') + (s.mostCommonScoreline ? `
+    <div class="summary-card">
+      <div class="summary-icon">🔁</div>
+      <div class="summary-value" style="font-size:20px;">${s.mostCommonScoreline.scoreline}</div>
+      <div class="summary-label">Most Common Result · ${s.mostCommonScoreline.count}×</div>
     </div>` : '') + (topPredictor ? `
     <div class="summary-card" style="cursor:pointer;" onclick="document.getElementById('sectionPlayerAccuracy')?.scrollIntoView({behavior:'smooth',block:'start'})">
       <div class="summary-icon">🎯</div>
@@ -409,12 +415,6 @@ function renderAll(s) {
       : null,
     topRed
       ? ['🟥', 'Most Red Cards (Team)', `${topRed[0]} &nbsp;·&nbsp; ${topRed[1]} cards`]
-      : null,
-    s.goalsPerDay != null
-      ? ['📅', 'Goals Per Day', `${s.goalsPerDay} goals`]
-      : null,
-    s.mostCommonScoreline
-      ? ['🔁', 'Most Common Scoreline', `${s.mostCommonScoreline.scoreline} &nbsp;·&nbsp; ${s.mostCommonScoreline.count}× so far`]
       : null,
     s.easiestGroup
       ? ['🎯', 'Easiest Group to Predict', `Group ${s.easiestGroup.group} &nbsp;·&nbsp; ${s.easiestGroup.pts} pts scored`]
