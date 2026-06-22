@@ -479,7 +479,9 @@ function renderAll(s) {
     <div class="stats-section">
       <div class="stats-section-hdr"><i class="fa-solid fa-bullseye"></i> Prediction Accuracy per Match</div>
       <div class="stats-section-body">
-        <div class="chart-wrap" id="chartAccuracyWrap" style="height:240px;"><canvas id="chartAccuracy"></canvas></div>
+        <div id="chartAccuracyScroll" style="overflow-x:auto;width:100%;">
+          <div class="chart-wrap" id="chartAccuracyWrap" style="height:240px;"><canvas id="chartAccuracy"></canvas></div>
+        </div>
       </div>
     </div>
 
@@ -548,7 +550,11 @@ function renderAll(s) {
   // ── Chart: Prediction accuracy per match ───────────────────────────────────
   const accData = s.accuracyChart || [];
   if (accData.length) {
-    $('chartAccuracyWrap').style.height = Math.max(240, accData.length * 11) + 'px';
+    const barWidth = 28;
+    const minWidth = $('chartAccuracyScroll').offsetWidth;
+    const canvasWidth = Math.max(minWidth, accData.length * barWidth);
+    $('chartAccuracyWrap').style.width = canvasWidth + 'px';
+    $('chartAccuracyWrap').style.height = '240px';
     const ctx = $('chartAccuracy').getContext('2d');
     const chart = new Chart(ctx, {
       type: 'bar',
@@ -571,6 +577,8 @@ function renderAll(s) {
       },
     });
     activeCharts.push(chart);
+    const scroll = $('chartAccuracyScroll');
+    scroll.scrollLeft = scroll.scrollWidth;
   }
 }
 
