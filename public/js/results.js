@@ -286,12 +286,14 @@ function showKoRound(roundKey) {
         <div class="team-name">
           ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
         </div>
-        <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
+        <div class="ko-score-col">
+          <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
+          <div class="slot-hint">${fmtKoSlot(m.homeSlot)} vs ${fmtKoSlot(m.awaySlot)}</div>
+        </div>
         <div class="team-name right">
           ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
         ${hasComparison ? `<span class="pred-chevron">▶</span>` : ''}
-        <div class="slot-hint">${fmtKoSlot(m.homeSlot)} vs ${fmtKoSlot(m.awaySlot)}</div>
       </div>`;
 
     if (hasComparison) {

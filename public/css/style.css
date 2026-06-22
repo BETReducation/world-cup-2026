@@ -510,14 +510,20 @@ nav.site-nav {
   flex-shrink: 0;
 }
 .slot-hint {
-  flex-basis: 100%;
+  width: 100%;
   text-align: center;
   font-size: 10px;
   font-family: 'JetBrains Mono', monospace;
   color: var(--muted);
   opacity: 0.6;
   letter-spacing: 0.04em;
-  margin-top: -4px;
+  margin-top: 2px;
+}
+.ko-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .score-input input[type="text"] {
