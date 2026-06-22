@@ -204,6 +204,43 @@
       margin-top: 2px;
     }
 
+    /* ── Round points breakdown ───────────────────────────────────────────── */
+    .round-pts-bar {
+      display: flex;
+      align-items: stretch;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .round-pts-box {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .round-pts-box .rpb-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .round-pts-box .rpb-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    .round-pts-total {
+      margin-left: 10px;
+      border-color: rgba(77,201,122,0.35);
+      background: rgba(77,201,122,0.06);
+    }
+    .round-pts-total .rpb-label { color: rgba(77,201,122,0.7); }
+    .round-pts-total .rpb-value { font-size: 22px; color: #2a9e52; font-weight: 700; }
+
     /* ── Predictions table ────────────────────────────────────────────────── */
     .group-accordion {
       border: 1px solid var(--border);
@@ -899,6 +936,35 @@ async function loadPredictions() {
     Object.values(groups).forEach(g => g.teams.forEach(t => { allTeams[t.id] = t; }));
 
     body.innerHTML = '';
+
+    // ── Round points breakdown bar ─────────────────────────────────────
+    const roundPts = { R1: 0, R2: 0, R3: 0 };
+    Object.entries(groups).forEach(([, group]) => {
+      (group.matches || []).forEach(m => {
+        const pts = matchPoints[m.id] || 0;
+        const n = parseInt(m.id.slice(-1));
+        const r = n <= 2 ? 'R1' : n <= 4 ? 'R2' : 'R3';
+        roundPts[r] += pts;
+      });
+    });
+    const anyRoundPlayed = Object.values(groups).some(g =>
+      (g.matches || []).some(m => actualResults[m.id]?.played)
+    );
+    if (anyRoundPlayed) {
+      const total = roundPts.R1 + roundPts.R2 + roundPts.R3;
+      const bar = document.createElement('div');
+      bar.className = 'round-pts-bar';
+      bar.innerHTML = ['R1', 'R2', 'R3'].map(r => `
+        <div class="round-pts-box">
+          <div class="rpb-label">Round ${r.slice(1)}</div>
+          <div class="rpb-value">${roundPts[r]}</div>
+        </div>`).join('') + `
+        <div class="round-pts-box round-pts-total">
+          <div class="rpb-label">Total</div>
+          <div class="rpb-value">${total}</div>
+        </div>`;
+      body.appendChild(bar);
+    }
 
     // ── Group stage ────────────────────────────────────────────────────
     for (const [groupKey, group] of Object.entries(groups)) {
