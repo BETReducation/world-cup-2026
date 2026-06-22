@@ -397,6 +397,7 @@ nav.site-nav {
   transition: all 0.15s;
 }
 .tab-btn:hover { color: var(--text); border-color: var(--accent); }
+.tab-label-short { display: none; }
 .tab-btn.active {
   background: var(--accent);
   color: var(--accent-text);
@@ -1409,30 +1410,23 @@ footer span {
     z-index: 100;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-    padding: 8px 12px 8px;
+    padding: 8px 12px;
     margin: 0 -1rem;
     gap: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.18);
   }
 
-  /* Shorten "Group X" to just "X" on mobile */
-  #groupTabs .tab-btn[data-group]::before {
-    content: attr(data-group);
-  }
-  #groupTabs .tab-btn[data-group] {
+  /* Show short label only on mobile */
+  .tab-label-long  { display: none; }
+  .tab-label-short { display: inline; }
+
+  /* Compact square buttons */
+  #groupTabs .tab-btn {
+    padding: 6px 0;
+    width: 34px;
+    text-align: center;
     font-size: 13px;
     font-weight: 600;
-    padding: 7px 0;
-    width: 36px;
-    text-align: center;
-    overflow: hidden;
-    color: transparent;
-  }
-  #groupTabs .tab-btn[data-group]::before {
-    color: var(--muted);
-  }
-  #groupTabs .tab-btn[data-group].active::before {
-    color: var(--accent-text);
   }
 
   /* Hide intro description on predictions page on mobile */

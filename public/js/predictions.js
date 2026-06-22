@@ -164,7 +164,7 @@ function buildTabs() {
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (key === activeGroup ? ' active' : '');
     btn.dataset.group = key;
-    btn.textContent = `Group ${key}`;
+    btn.innerHTML = `<span class="tab-label-long">Group ${key}</span><span class="tab-label-short">${key}</span>`;
     btn.addEventListener('click', () => {
       activeGroup = key;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
