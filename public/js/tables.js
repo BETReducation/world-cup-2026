@@ -24,12 +24,43 @@ function calcGroupTable(teams, matches, scores) {
     else            { hs.d++; hs.pts++; as.d++; as.pts++; }
   });
 
-  return Object.values(stats).sort((a, b) => {
-    if (b.pts !== a.pts) return b.pts - a.pts;
-    const gdB = b.gf - b.ga, gdA = a.gf - a.ga;
-    if (gdB !== gdA) return gdB - gdA;
-    return b.gf - a.gf;
-  });
+  const rows = Object.values(stats).sort((a, b) => b.pts - a.pts);
+
+  let i = 0;
+  while (i < rows.length) {
+    let j = i + 1;
+    while (j < rows.length && rows[j].pts === rows[i].pts) j++;
+    if (j - i > 1) {
+      const tiedIds = new Set(rows.slice(i, j).map(r => r.team.id));
+      const h2h = {};
+      rows.slice(i, j).forEach(r => { h2h[r.team.id] = { pts: 0, gf: 0, ga: 0 }; });
+      matches.forEach(m => {
+        const s = scores[m.id];
+        if (s === undefined || s.home === '' || s.away === '') return;
+        const h = parseInt(s.home), a = parseInt(s.away);
+        if (isNaN(h) || isNaN(a) || !tiedIds.has(m.home) || !tiedIds.has(m.away)) return;
+        h2h[m.home].gf += h; h2h[m.home].ga += a;
+        h2h[m.away].gf += a; h2h[m.away].ga += h;
+        if (h > a)      { h2h[m.home].pts += 3; }
+        else if (h < a) { h2h[m.away].pts += 3; }
+        else            { h2h[m.home].pts += 1; h2h[m.away].pts += 1; }
+      });
+      rows.slice(i, j).sort((a, b) => {
+        const ha = h2h[a.team.id], hb = h2h[b.team.id];
+        if (hb.pts !== ha.pts) return hb.pts - ha.pts;
+        const hgdA = ha.gf - ha.ga, hgdB = hb.gf - hb.ga;
+        if (hgdB !== hgdA) return hgdB - hgdA;
+        if (hb.gf !== ha.gf) return hb.gf - ha.gf;
+        const gdA = a.gf - a.ga, gdB = b.gf - b.ga;
+        if (gdB !== gdA) return gdB - gdA;
+        if (b.gf !== a.gf) return b.gf - a.gf;
+        return 0;
+      }).forEach((r, k) => { rows[i + k] = r; });
+    }
+    i = j;
+  }
+
+  return rows;
 }
 
 // Render a group standings table into a DOM element

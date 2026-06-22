@@ -373,12 +373,60 @@ function calcGroupStandings(teams, matches, results) {
     else if (h < a) { as.w++; as.pts += 3; hs.l++; }
     else            { hs.d++; hs.pts++;    as.d++; as.pts++; }
   });
-  return Object.values(stats).sort((a, b) => {
-    if (b.pts !== a.pts) return b.pts - a.pts;
-    const gdB = b.gf - b.ga, gdA = a.gf - a.ga;
-    if (gdB !== gdA) return gdB - gdA;
-    return b.gf - a.gf;
+
+  // Sort by points, then apply FIFA tiebreaker rules within each points group
+  const rows = Object.values(stats).sort((a, b) => b.pts - a.pts);
+
+  let i = 0;
+  while (i < rows.length) {
+    let j = i + 1;
+    while (j < rows.length && rows[j].pts === rows[i].pts) j++;
+    if (j - i > 1) {
+      const tiedIds = new Set(rows.slice(i, j).map(r => r.team.id));
+      // Compute head-to-head stats among only the tied teams
+      const h2h = {};
+      rows.slice(i, j).forEach(r => { h2h[r.team.id] = { pts: 0, gf: 0, ga: 0 }; });
+      matches.forEach(m => {
+        const r = results[m.id];
+        if (!r?.played || !tiedIds.has(m.home) || !tiedIds.has(m.away)) return;
+        h2h[m.home].gf += r.home; h2h[m.home].ga += r.away;
+        h2h[m.away].gf += r.away; h2h[m.away].ga += r.home;
+        if (r.home > r.away)      { h2h[m.home].pts += 3; }
+        else if (r.home < r.away) { h2h[m.away].pts += 3; }
+        else                      { h2h[m.home].pts += 1; h2h[m.away].pts += 1; }
+      });
+      rows.slice(i, j).sort((a, b) => {
+        const ha = h2h[a.team.id], hb = h2h[b.team.id];
+        if (hb.pts !== ha.pts) return hb.pts - ha.pts;                    // H2H points
+        const hgdA = ha.gf - ha.ga, hgdB = hb.gf - hb.ga;
+        if (hgdB !== hgdA) return hgdB - hgdA;                           // H2H goal difference
+        if (hb.gf !== ha.gf) return hb.gf - ha.gf;                       // H2H goals scored
+        const gdA = a.gf - a.ga, gdB = b.gf - b.ga;
+        if (gdB !== gdA) return gdB - gdA;                                // Overall goal difference
+        if (b.gf !== a.gf) return b.gf - a.gf;                           // Overall goals scored
+        return 0;                                                          // Drawing of lots
+      }).forEach((r, k) => { rows[i + k] = r; });
+    }
+    i = j;
+  }
+
+  return rows;
+}
+
+// Returns true when the team currently at `pos` (0-indexed) cannot be displaced by remaining matches
+function isPositionGuaranteed(pos, standings, matches, results) {
+  const target = standings[pos];
+  if (!target) return false;
+  const maxPts = {};
+  standings.forEach(s => { maxPts[s.team.id] = s.pts; });
+  matches.forEach(m => {
+    if (results[m.id]?.played) return;
+    if (maxPts[m.home] !== undefined) maxPts[m.home] += 3;
+    if (maxPts[m.away] !== undefined) maxPts[m.away] += 3;
   });
+  // pos 0 = guaranteed 1st: no other team can reach target pts
+  // pos 1 = guaranteed 2nd: teams at pos 2+ cannot reach target pts
+  return standings.filter((_, i) => i > pos).every(s => maxPts[s.team.id] < target.pts);
 }
 
 function findTeamById(fixtures, id) {
@@ -424,11 +472,12 @@ function resolveKnockoutFixtures(fixtures, results) {
 
   for (const [groupKey, group] of Object.entries(fixtures.groups || {})) {
     const groupComplete = group.matches.every(m => results[m.id]?.played);
-    if (!groupComplete) continue;
     const rows = calcGroupStandings(group.teams, group.matches, results);
-    if (rows[0]) slotMap[`1${groupKey}`] = rows[0].team.id;
-    if (rows[1]) slotMap[`2${groupKey}`] = rows[1].team.id;
-    if (rows[2]) thirdPlaceTeams.push({
+    if (rows[0] && (groupComplete || isPositionGuaranteed(0, rows, group.matches, results)))
+      slotMap[`1${groupKey}`] = rows[0].team.id;
+    if (rows[1] && (groupComplete || isPositionGuaranteed(1, rows, group.matches, results)))
+      slotMap[`2${groupKey}`] = rows[1].team.id;
+    if (groupComplete && rows[2]) thirdPlaceTeams.push({
       team: rows[2].team, pts: rows[2].pts,
       gd: rows[2].gf - rows[2].ga, gf: rows[2].gf, groupKey
     });
