@@ -1118,7 +1118,11 @@ app.get('/api/stats', (req, res) => {
     });
     const avgVariance = played.length > 0 ? (totalVariance / played.length).toFixed(2) : null;
     return { name: u.displayName || u.name, correct, total, exact, pct: total ? Math.round(correct / total * 100) : 0, avgVariance };
-  }).sort((a, b) => b.pct - a.pct);
+  }).sort((a, b) =>
+    b.correct - a.correct ||
+    b.exact - a.exact ||
+    (parseFloat(a.avgVariance) || 0) - (parseFloat(b.avgVariance) || 0)
+  );
 
   res.json({
     gamesPlayed: played.length,
