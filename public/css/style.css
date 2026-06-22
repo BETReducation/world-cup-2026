@@ -513,10 +513,12 @@ nav.site-nav {
   text-align: center;
   font-size: 10px;
   font-family: 'JetBrains Mono', monospace;
-  color: var(--text-muted);
+  color: var(--muted);
   opacity: 0.55;
   letter-spacing: 0.04em;
-  margin-top: -2px;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  padding: 0 4px;
 }
 
 .score-input input[type="text"] {

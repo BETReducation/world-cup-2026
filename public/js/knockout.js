@@ -282,13 +282,13 @@ function showRound(roundKey) {
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.away}" ${dis}
             data-match="${m.id}" data-side="away" class="ko-pred-input"
             autocomplete="off" aria-label="${awayName} goals">
-          <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>
         </div>
         <div class="team-name right">
           ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
         ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
-      </div>`;
+      </div>
+      <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>`;
   }
 
   html += `</div></div>`;
