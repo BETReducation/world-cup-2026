@@ -387,16 +387,16 @@ function renderAll(s) {
       <div class="summary-icon">🗳️</div>
       <div class="summary-value" style="font-size:20px;">${s.mostPredictedScoreline.scoreline}</div>
       <div class="summary-label">Most Common Prediction · ${s.mostPredictedScoreline.count}×</div>
-    </div>` : '') + (s.mostCommonScoreline ? `
-    <div class="summary-card">
-      <div class="summary-icon">🔁</div>
-      <div class="summary-value" style="font-size:20px;">${s.mostCommonScoreline.scoreline}</div>
-      <div class="summary-label">Most Common Result · ${s.mostCommonScoreline.count}×</div>
     </div>` : '') + (s.mostAccuratePredScoreline ? `
     <div class="summary-card">
       <div class="summary-icon">✅</div>
       <div class="summary-value" style="font-size:20px;">${s.mostAccuratePredScoreline.scoreline}</div>
       <div class="summary-label">Most Accurate Prediction · ${s.mostAccuratePredScoreline.count}×</div>
+    </div>` : '') + (s.mostCommonScoreline ? `
+    <div class="summary-card">
+      <div class="summary-icon">🔁</div>
+      <div class="summary-value" style="font-size:20px;">${s.mostCommonScoreline.scoreline}</div>
+      <div class="summary-label">Most Common Result · ${s.mostCommonScoreline.count}×</div>
     </div>` : '') + (topPredictor ? `
     <div class="summary-card" style="cursor:pointer;" onclick="document.getElementById('sectionPlayerAccuracy')?.scrollIntoView({behavior:'smooth',block:'start'})">
       <div class="summary-icon">🎯</div>
