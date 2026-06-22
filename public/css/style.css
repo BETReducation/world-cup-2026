@@ -446,6 +446,7 @@ nav.site-nav {
 .match-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -509,16 +510,14 @@ nav.site-nav {
   flex-shrink: 0;
 }
 .slot-hint {
-  width: 100%;
+  flex-basis: 100%;
   text-align: center;
   font-size: 10px;
   font-family: 'JetBrains Mono', monospace;
   color: var(--muted);
-  opacity: 0.55;
+  opacity: 0.6;
   letter-spacing: 0.04em;
-  margin-top: 2px;
-  margin-bottom: 4px;
-  padding: 0 4px;
+  margin-top: -4px;
 }
 
 .score-input input[type="text"] {

@@ -287,8 +287,8 @@ function showRound(roundKey) {
           ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
         </div>
         ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
-      </div>
-      <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>`;
+        <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>
+      </div>`;
   }
 
   html += `</div></div>`;
