@@ -163,6 +163,7 @@ function buildTabs() {
   Object.keys(fixtures.groups).forEach(key => {
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (key === activeGroup ? ' active' : '');
+    btn.dataset.group = key;
     btn.textContent = `Group ${key}`;
     btn.addEventListener('click', () => {
       activeGroup = key;

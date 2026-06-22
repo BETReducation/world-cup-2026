@@ -1402,6 +1402,42 @@ footer span {
   .tab-bar::-webkit-scrollbar { display: none; }
   .tab-btn { flex-shrink: 0; }
 
+  /* Sticky group tab bar on predictions page */
+  #groupTabs {
+    position: sticky;
+    top: 56px;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 12px 8px;
+    margin: 0 -1rem;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  }
+
+  /* Shorten "Group X" to just "X" on mobile */
+  #groupTabs .tab-btn[data-group]::before {
+    content: attr(data-group);
+  }
+  #groupTabs .tab-btn[data-group] {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 0;
+    width: 36px;
+    text-align: center;
+    overflow: hidden;
+    color: transparent;
+  }
+  #groupTabs .tab-btn[data-group]::before {
+    color: var(--muted);
+  }
+  #groupTabs .tab-btn[data-group].active::before {
+    color: var(--accent-text);
+  }
+
+  /* Hide intro description on predictions page on mobile */
+  .predictions-intro-desc { display: none; }
+
   /* Match meta */
   .match-meta { display: none; }
 
