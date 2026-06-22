@@ -371,7 +371,7 @@
 
     const makeTeamInfo = (id) => {
       const t = teamById[id] || {};
-      return { name: t.name || id || 'TBD', flagCode: t.flag || '' };
+      return { name: t.name || id || 'TBD', flagCode: t.flagCode || '' };
     };
 
     // Build flat match list
@@ -389,13 +389,15 @@
     });
 
     // KO matches
-    (fixtures.knockout || []).forEach(m => {
-      if (!m.date || !m.time) return;
-      const kickoff = new Date(`${m.date}T${m.time}:00-04:00`);
-      const ht = m.home ? makeTeamInfo(m.home) : { name: 'TBD', flagCode: '' };
-      const at = m.away ? makeTeamInfo(m.away) : { name: 'TBD', flagCode: '' };
-      allMatches.push({ kickoff, ht, at, label: KO_LABELS[m.round] || m.round, isKO: true, date: m.date,
-        homeResolved: !!m.home, awayResolved: !!m.away, raw: m });
+    Object.entries(fixtures.knockout || {}).forEach(([roundKey, round]) => {
+      (round.matches || []).forEach(m => {
+        if (!m.date || !m.time) return;
+        const kickoff = new Date(`${m.date}T${m.time}:00-04:00`);
+        const ht = m.home ? makeTeamInfo(m.home) : { name: m.homeLabel || m.homeSlot || 'TBD', flagCode: '' };
+        const at = m.away ? makeTeamInfo(m.away) : { name: m.awayLabel || m.awaySlot || 'TBD', flagCode: '' };
+        allMatches.push({ kickoff, ht, at, label: KO_LABELS[roundKey] || roundKey, isKO: true, date: m.date,
+          homeResolved: !!m.home, awayResolved: !!m.away });
+      });
     });
 
     allMatches.sort((a, b) => a.kickoff - b.kickoff);
