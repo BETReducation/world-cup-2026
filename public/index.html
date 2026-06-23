@@ -382,7 +382,7 @@
       const d = dt.toLocaleDateString('en-CA', { timeZone: tz });
       return d > refDate ? `${t}<sup>+1</sup>` : t;
     };
-    const fmtDay = dt => dt.toLocaleDateString('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' });
+    const fmtDay = dt => dt.toLocaleDateString('en-GB', { timeZone: 'America/New_York', weekday: 'short', day: 'numeric', month: 'short' });
 
     const flagHtml = code => code ? `<span class="fi fi-${code.toLowerCase()}"></span>` : '';
 
