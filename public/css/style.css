@@ -588,6 +588,12 @@ nav.site-nav {
   gap: 20px;
   align-items: start;
 }
+/* predictions page: single-column after table removal — centre the card */
+.group-layout.predictions-layout {
+  grid-template-columns: 1fr;
+  max-width: 640px;
+  margin: 0 auto;
+}
 @media (max-width: 900px) {
   .group-layout { grid-template-columns: 1fr; }
   .table-scroll-wrap {

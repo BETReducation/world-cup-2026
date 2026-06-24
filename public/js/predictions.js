@@ -191,7 +191,7 @@ function showGroup(groupKey) {
   const rounds = {};
   group.matches.forEach(m => (rounds[m.round] = rounds[m.round] || []).push(m));
 
-  let html = `<div class="card"><div class="group-layout">`;
+  let html = `<div class="card"><div class="group-layout predictions-layout">`;
 
   // Left: match inputs
   html += `<div>`;
