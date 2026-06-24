@@ -427,7 +427,22 @@ function isPositionGuaranteed(pos, standings, matches, results) {
 
   // Teams below pos that could reach or exceed target's pts
   const challengers = standings.filter((s, i) => i > pos && maxPts[s.team.id] >= target.pts);
-  if (challengers.length === 0) return true; // pure pts dominance
+  if (challengers.length === 0) {
+    // Also check target can't move UP — e.g. Norway (2nd) beating France (1st) to swap positions.
+    // If target has a pending match against a higher-ranked team they could overtake, position isn't settled.
+    if (pos > 0) {
+      const couldMoveUp = standings.slice(0, pos).some(above => {
+        if (above.pts > target.pts + 3) return false; // too far ahead to catch
+        return matches.some(m =>
+          !results[m.id]?.played &&
+          ((m.home === target.team.id && m.away === above.team.id) ||
+           (m.home === above.team.id  && m.away === target.team.id))
+        );
+      });
+      if (couldMoveUp) return false;
+    }
+    return true;
+  }
 
   // For 1st place: also guaranteed if every challenger has already played target and lost H2H
   // (target wins any pts tie via head-to-head)
