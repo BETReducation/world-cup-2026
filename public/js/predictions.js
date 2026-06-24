@@ -142,7 +142,6 @@ async function loadAndRender() {
 
   $('loadingState').style.display = 'none';
   $('predictionsApp').style.display = 'block';
-  $('allTablesSection').style.display = 'block';
 
   if (browseMode) {
     $('playerName').textContent = 'Guest';
@@ -155,7 +154,6 @@ async function loadAndRender() {
 
   buildTabs();
   showGroup(activeGroup);
-  renderAllTables();
 
   if (userId && Object.keys(userPredictions).length > 0) {
     enterSavedState();
@@ -264,13 +262,6 @@ function showGroup(groupKey) {
   });
   html += `</div>`;
 
-  // Right: live predicted table
-  html += `
-    <div class="table-scroll-wrap">
-      <p class="table-heading">Predicted Standings</p>
-      <div id="liveTable_${groupKey}"></div>
-    </div>`;
-
   html += `</div></div>`;
   panels.innerHTML = html;
 
@@ -278,8 +269,6 @@ function showGroup(groupKey) {
     input.addEventListener('input', onPredInput);
     if (isSaved) input.classList.add('saved');
   });
-
-  renderLiveTable(groupKey);
 }
 
 // ── Input handler ─────────────────────────────────────────────────────────────
@@ -293,33 +282,9 @@ function onPredInput(e) {
   if (!userPredictions[match]) userPredictions[match] = { home: '', away: '' };
   userPredictions[match][side] = val === '' ? '' : Number(val);
 
-  renderLiveTable(activeGroup);
-  renderAllTables();
   $('saveStatus').textContent = '';
 }
 
-// ── Live table ────────────────────────────────────────────────────────────────
-
-function renderLiveTable(groupKey) {
-  const el = document.getElementById(`liveTable_${groupKey}`);
-  if (!el) return;
-  const group = fixtures.groups[groupKey];
-  renderTable(el, calcGroupTable(group.teams, group.matches, userPredictions));
-}
-
-// ── All tables grid ───────────────────────────────────────────────────────────
-
-function renderAllTables() {
-  const grid = $('allTablesGrid');
-  grid.innerHTML = '';
-  Object.entries(fixtures.groups).forEach(([key, group]) => {
-    const rows = calcGroupTable(group.teams, group.matches, userPredictions);
-    const div  = document.createElement('div');
-    div.className = 'card';
-    renderTable(div, rows, `Group ${key}`);
-    grid.appendChild(div);
-  });
-}
 
 // ── Saved / edit state ────────────────────────────────────────────────────────
 
