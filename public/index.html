@@ -423,7 +423,7 @@
     const cutoff = new Date(now.getTime() - 10 * 60 * 1000);
 
     // Section 1: Next 4 upcoming fixtures
-    const upcoming = allMatches.filter(m => m.kickoff > cutoff).slice(0, 4);
+    const upcoming = allMatches.filter(m => m.kickoff > cutoff).slice(0, 6);
     if (upcoming.length) {
       document.getElementById('nextFixturesList').innerHTML = upcoming.map(m => `
         <div class="fixture-row">
