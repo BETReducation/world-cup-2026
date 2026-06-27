@@ -402,7 +402,17 @@ function renderAll(s) {
       <div class="summary-icon">🎯</div>
       <div class="summary-value" style="font-size:14px;line-height:1.2;padding-top:2px;">${topPredictor.name}</div>
       <div class="summary-label" style="margin-top:4px;">Top Predictor · ${topPredictor.pct}%</div>
-    </div>` : '');
+    </div>` : '') + (() => {
+    const totalCards = (_liveData.yellowCards || []).reduce((sum, r) => sum + (r.count || 0), 0)
+                     + (_liveData.redCards    || []).reduce((sum, r) => sum + (r.count || 0), 0);
+    const ratio = s.totalGoals > 0 ? (totalCards / s.totalGoals).toFixed(2) : '—';
+    return `
+    <div class="summary-card">
+      <div class="summary-icon">🃏</div>
+      <div class="summary-value">${ratio}</div>
+      <div class="summary-label">FairFun Ratio</div>
+    </div>`;
+  })();
 
   // ── Highlights ──────────────────────────────────────────────────────────────
   const hl = s.highestGame, bw = s.biggestWin;
@@ -590,7 +600,7 @@ function renderLiveTables(live) {
   if (!el) return;
 
   const cats = [
-    { key: 'topScorers',  label: '⚽ Goalscorers',  col: 'Goals' },
+    { key: 'topScorers',  label: '⚽ Goalscorers',  col: 'Total Goals' },
     { key: 'ownGoals',    label: '🔴 Own Goals',    col: 'Goals' },
     { key: 'yellowCards', label: '🟨 Yellow Cards', col: 'Cards' },
     { key: 'redCards',    label: '🟥 Red Cards',    col: 'Cards' },
@@ -666,7 +676,7 @@ let _activeCategory = 'topScorers';
 let _activeTeam     = '';
 
 const LIVE_CATS = [
-  { key: 'topScorers',  label: '⚽ Goalscorers', col: 'Goals' },
+  { key: 'topScorers',  label: '⚽ Goalscorers', col: 'Total Goals' },
   { key: 'ownGoals',    label: '🔴 Own Goals',   col: 'Goals' },
   { key: 'yellowCards', label: '🟨 Yellow Cards', col: 'Cards' },
   { key: 'redCards',    label: '🟥 Red Cards',    col: 'Cards' },
