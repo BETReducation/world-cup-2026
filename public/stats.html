@@ -405,7 +405,7 @@ function renderAll(s) {
     </div>` : '') + (() => {
     const totalCards = (_liveData.yellowCards || []).reduce((sum, r) => sum + (r.count || 0), 0)
                      + (_liveData.redCards    || []).reduce((sum, r) => sum + (r.count || 0), 0);
-    const ratio = s.totalGoals > 0 ? (totalCards / s.totalGoals).toFixed(2) : '—';
+    const ratio = totalCards > 0 ? (s.totalGoals / totalCards).toFixed(2) : '—';
     return `
     <div class="summary-card">
       <div class="summary-icon">🃏</div>
