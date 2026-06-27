@@ -505,6 +505,14 @@ function renderAll(s) {
       </div>
     </div>
 
+    <div class="stats-section">
+      <div class="stats-section-hdr"><i class="fa-solid fa-scale-balanced"></i> FairFun Ratio — Historical Comparison</div>
+      <div class="stats-section-body">
+        <p style="font-size:12px;color:var(--muted);margin:0 0 12px;">Goals ÷ total cards per tournament. Higher = more goals relative to cards.</p>
+        <div class="chart-wrap" style="height:260px;"><canvas id="chartFairFun"></canvas></div>
+      </div>
+    </div>
+
 `;
 
   // ── Sub heading ────────────────────────────────────────────────────────────
@@ -589,6 +597,72 @@ function renderAll(s) {
     activeCharts.push(chart);
     const scroll = $('chartAccuracyScroll');
     scroll.scrollLeft = scroll.scrollWidth;
+  }
+
+  // ── Chart: FairFun Ratio historical ───────────────────────────────────────
+  {
+    const totalCards = (_liveData.yellowCards || []).reduce((s, r) => s + (r.count || 0), 0)
+                     + (_liveData.redCards    || []).reduce((s, r) => s + (r.count || 0), 0);
+    const current2026Ratio = totalCards > 0 && s.totalGoals > 0
+      ? parseFloat((s.totalGoals / totalCards).toFixed(2)) : null;
+
+    const historical = [
+      { year: '2006', ratio: parseFloat((147 / (345 + 28)).toFixed(2)) },
+      { year: '2010', ratio: parseFloat((143 / (260 + 17)).toFixed(2)) },
+      { year: '2014', ratio: parseFloat((171 / (187 + 10)).toFixed(2)) },
+      { year: '2018', ratio: parseFloat((169 / (219 +  4)).toFixed(2)) },
+      { year: '2022', ratio: parseFloat((172 / (227 +  4)).toFixed(2)) },
+    ];
+    if (current2026Ratio !== null) historical.push({ year: '2026 ★', ratio: current2026Ratio });
+
+    const labels = historical.map(d => d.year);
+    const ratios = historical.map(d => d.ratio);
+    const colors = historical.map(d => d.year.startsWith('2026') ? cc.accent : cc.teal);
+
+    const ctx = $('chartFairFun').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'FairFun Ratio (goals ÷ cards)',
+          data: ratios,
+          backgroundColor: colors,
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        ...baseChartOpts(cc),
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.parsed.y.toFixed(2)} goals per card`,
+            },
+          },
+          annotation: {
+            annotations: {
+              line1: {
+                type: 'line',
+                yMin: 1, yMax: 1,
+                borderColor: cc.muted,
+                borderWidth: 1,
+                borderDash: [4, 4],
+              },
+            },
+          },
+        },
+        scales: {
+          x: { ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 11 } }, grid: { color: cc.grid } },
+          y: {
+            ticks: { color: cc.text, font: { family: "'JetBrains Mono', monospace", size: 10 }, callback: v => v.toFixed(2) },
+            grid: { color: cc.grid },
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+    activeCharts.push(chart);
   }
 }
 
