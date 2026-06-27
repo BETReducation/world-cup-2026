@@ -259,7 +259,10 @@
 </nav>
 
 <div class="bracket-page">
-  <div class="bracket-title">Knockout Bracket</div>
+  <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div class="bracket-title">Knockout Bracket</div>
+    <div id="bracketUpdated" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;"></div>
+  </div>
   <div class="bracket-sub" id="bracketSub">Loading…</div>
   <div class="bracket-scroll">
     <div id="bracketGrid" class="bracket-grid"></div>
@@ -398,7 +401,11 @@ async function loadBracket() {
 
   const gamesPlayed = Object.values(results).filter(r => r.played).length;
   document.getElementById('bracketSub').textContent =
-    `${r32.length + r16.length + qf.length + sf.length + fin.length + tp.length} matches · ${gamesPlayed} group-stage results entered`;
+    `${r32.length + r16.length + qf.length + sf.length + fin.length + tp.length} matches · ${gamesPlayed} results entered`;
+
+  const now = new Date();
+  document.getElementById('bracketUpdated').textContent =
+    `Updated ${now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 
   const grid = document.getElementById('bracketGrid');
   grid.innerHTML = [
@@ -433,6 +440,11 @@ loadBracket().catch(err => {
   document.getElementById('bracketSub').textContent = 'Could not load bracket data.';
   console.error(err);
 });
+
+// Auto-refresh every 60 seconds
+setInterval(() => {
+  loadBracket().catch(console.error);
+}, 60000);
 </script>
 </body>
 </html>
