@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bracket · World Cup 2026</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+
+<style>
+/* ── Bracket page ─────────────────────────────────────────────────────── */
+.bracket-page {
+  padding: 24px 16px 60px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.bracket-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.bracket-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+/* ── Scrollable bracket container ─────────────────────────────────────── */
+.bracket-scroll {
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+.bracket-grid {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  min-width: 1100px;
+}
+
+/* ── Each round column ────────────────────────────────────────────────── */
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 148px;
+}
+.bracket-round-header {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 8px 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+/* Round of 32 gets slightly narrower */
+.bracket-round.r32 { min-width: 148px; }
+.bracket-round.final-col { min-width: 140px; }
+
+/* ── Match slot ────────────────────────────────────────────────────────── */
+.bracket-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  position: relative;
+  padding: 4px 8px;
+}
+
+/* Connector lines on right side of a slot */
+.bracket-slot-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: var(--border);
+}
+.bracket-round:last-child .bracket-slot-wrap::after,
+.bracket-round.final-col .bracket-slot-wrap::after,
+.bracket-round.third-col .bracket-slot-wrap::after {
+  display: none;
+}
+
+.bracket-match {
+  background: var(--card-bg, var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 12px;
+  cursor: default;
+  transition: border-color 0.15s;
+  position: relative;
+}
+.bracket-match:hover {
+  border-color: var(--accent);
+}
+
+.bracket-match-date {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  padding: 4px 8px 2px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.04em;
+}
+
+.bracket-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  min-height: 28px;
+  color: var(--text);
+  font-weight: 500;
+  position: relative;
+}
+.bracket-team:first-of-type {
+  border-bottom: 1px solid var(--border);
+}
+.bracket-team.winner {
+  background: var(--accent-dim);
+  font-weight: 700;
+  color: var(--accent);
+}
+.bracket-team.tbd {
+  color: var(--muted);
+  font-weight: 400;
+  font-style: italic;
+}
+.bracket-team .flag {
+  width: 18px;
+  height: 13px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.bracket-team .team-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+.bracket-team .score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-left: auto;
+  padding-left: 4px;
+  min-width: 16px;
+  text-align: right;
+}
+
+.bracket-match-num {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 8px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Final / Trophy col ───────────────────────────────────────────────── */
+.final-trophy {
+  text-align: center;
+  padding: 16px 8px 8px;
+  font-size: 28px;
+}
+.final-label {
+  text-align: center;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ── 3rd place section below bracket ──────────────────────────────────── */
+.bracket-third {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+.bracket-third-inner {
+  max-width: 300px;
+  width: 100%;
+}
+.bracket-third-label {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+/* ── Connector lines between rounds ───────────────────────────────────── */
+.bracket-connectors {
+  width: 16px;
+  position: relative;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .bracket-grid { min-width: 900px; }
+  .bracket-round { min-width: 130px; }
+  .bracket-round.r32 { min-width: 130px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">WC26 <span>Prediction League</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="predictions.html">Group Predictions</a>
+    <a href="knockout.html">Knockout Predictions</a>
+    <a href="bonus-extras.html">Tie Breakers</a>
+    <a href="results.html">Results</a>
+    <a href="stats.html">Stats</a>
+    <a href="bracket.html" class="active">Bracket</a>
+    <a href="member.html" id="navMemberLink" class="nav-member-link" style="display:none;"></a>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">☰</button>
+  </div>
+</nav>
+
+<div class="nav-drawer-overlay" id="navDrawerOverlay"></div>
+<nav class="nav-drawer" id="navDrawer" aria-label="Mobile navigation">
+  <div class="nav-drawer-head">
+    <a href="index.html" class="nav-drawer-logo">WC26</a>
+    <button class="nav-drawer-close" id="navDrawerClose" aria-label="Close menu">✕</button>
+  </div>
+  <div class="nav-drawer-links">
+    <a href="index.html">Home</a>
+    <a href="predictions.html">Group Predictions</a>
+    <a href="knockout.html">Knockout Predictions</a>
+    <a href="bonus-extras.html">Tie Breakers</a>
+    <a href="results.html">Results</a>
+    <a href="stats.html">Stats</a>
+    <a href="bracket.html">Bracket</a>
+  </div>
+  <div class="nav-drawer-footer" id="navDrawerUser"></div>
+</nav>
+
+<div class="bracket-page">
+  <div class="bracket-title">Knockout Bracket</div>
+  <div class="bracket-sub" id="bracketSub">Loading…</div>
+  <div class="bracket-scroll">
+    <div id="bracketGrid" class="bracket-grid"></div>
+  </div>
+  <div class="bracket-third" id="bracketThird" style="display:none;">
+    <div class="bracket-third-inner">
+      <div class="bracket-third-label">🥉 Third-place Play-off</div>
+      <div id="bracketThirdMatch"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/theme.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/auth.js"></script>
+<script>
+// ── Bracket page ────────────────────────────────────────────────────────────
+
+function fmtDate(dateStr, timeStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return `${day} · ${timeStr || ''} UTC`;
+}
+
+function flagHtml(flagCode) {
+  if (!flagCode) return '<span style="width:18px;display:inline-block;"></span>';
+  return `<span class="flag fi fi-${flagCode.toLowerCase()}" style="width:18px;height:13px;border-radius:2px;display:inline-block;vertical-align:middle;"></span>`;
+}
+
+function teamLabel(match, side) {
+  const teamKey  = side === 'home' ? 'home' : 'away';
+  const labelKey = side === 'home' ? 'homeLabel' : 'awayLabel';
+  const team     = match[teamKey];
+  const label    = match[labelKey] || '—';
+  const meta     = (window._teamsMeta || {})[team] || {};
+  const fc       = meta.flagCode || '';
+
+  // Strip flag emoji prefix from label for cleaner display
+  const cleanLabel = label.replace(/^[\u{1F1E0}-\u{1F1FF}\u{1F3F4}️‍️ ]+/u, '').trim();
+
+  return { name: cleanLabel || label, flagCode: fc, resolved: !!team };
+}
+
+function scoreOf(results, matchId, side) {
+  const r = (results || {})[matchId];
+  if (!r || !r.played) return null;
+  return side === 'home' ? r.home : r.away;
+}
+
+function winnerSide(results, matchId) {
+  const r = (results || {})[matchId];
+  if (!r || !r.played) return null;
+  if (r.home > r.away) return 'home';
+  if (r.away > r.home) return 'away';
+  return null; // draw (shouldn't happen in KO)
+}
+
+function renderMatch(match, results) {
+  const home   = teamLabel(match, 'home');
+  const away   = teamLabel(match, 'away');
+  const hScore = scoreOf(results, match.id, 'home');
+  const aScore = scoreOf(results, match.id, 'away');
+  const winner = winnerSide(results, match.id);
+  const played = hScore !== null;
+
+  const teamRow = (info, side) => {
+    const isWinner = played && winner === side;
+    const isTbd = !info.resolved;
+    return `
+      <div class="bracket-team ${isWinner ? 'winner' : ''} ${isTbd ? 'tbd' : ''}">
+        ${flagHtml(info.flagCode)}
+        <span class="team-name">${info.name}</span>
+        ${played ? `<span class="score">${side === 'home' ? hScore : aScore}</span>` : ''}
+      </div>`;
+  };
+
+  return `
+    <div class="bracket-match">
+      <div class="bracket-match-date">${fmtDate(match.date, match.time)}</div>
+      ${teamRow(home, 'home')}
+      ${teamRow(away, 'away')}
+      <span class="bracket-match-num">#${match.num}</span>
+    </div>`;
+}
+
+function buildRound(roundId, matches, results, label, extraClass) {
+  const slots = matches.map(m => `
+    <div class="bracket-slot-wrap">
+      ${renderMatch(m, results)}
+    </div>`).join('');
+
+  return `
+    <div class="bracket-round ${extraClass || ''}">
+      <div class="bracket-round-header">${label}</div>
+      ${slots}
+    </div>`;
+}
+
+async function loadBracket() {
+  const [fixtRes, resRes] = await Promise.all([
+    fetch('/api/fixtures'),
+    fetch('/api/results'),
+  ]);
+  const fixtData = await fixtRes.json();
+  const resData  = await resRes.json();
+  const results  = resData.results || {};
+  const ko       = fixtData.knockout || {};
+
+  // Build team meta map for flags
+  window._teamsMeta = {};
+  Object.values(fixtData.groups || {}).forEach(g => {
+    (g.teams || []).forEach(t => { window._teamsMeta[t.id] = t; });
+  });
+
+  // Round order for the bracket: left half → final → right half (mirror)
+  // Layout: R32(left8) | R16(left4) | QF(left2) | SF(left1) | FINAL | SF(right1) | QF(right2) | R16(right4) | R32(right8)
+  // The 16 R32 matches split: 1-8 on left, 9-16 on right
+
+  const r32 = (ko.R32 || {}).matches || [];
+  const r16 = (ko.R16 || {}).matches || [];
+  const qf  = (ko.QF  || {}).matches || [];
+  const sf  = (ko.SF  || {}).matches || [];
+  const fin = (ko.F   || {}).matches || [];
+  const tp  = (ko['3P'] || {}).matches || [];
+
+  // Split into left / right halves
+  const r32L = r32.slice(0, 8);
+  const r32R = r32.slice(8, 16);
+  const r16L = r16.slice(0, 4);
+  const r16R = r16.slice(4, 8);
+  const qfL  = qf.slice(0, 2);
+  const qfR  = qf.slice(2, 4);
+  const sfL  = sf.slice(0, 1);
+  const sfR  = sf.slice(1, 2);
+
+  const gamesPlayed = Object.values(results).filter(r => r.played).length;
+  document.getElementById('bracketSub').textContent =
+    `${r32.length + r16.length + qf.length + sf.length + fin.length + tp.length} matches · ${gamesPlayed} group-stage results entered`;
+
+  const grid = document.getElementById('bracketGrid');
+  grid.innerHTML = [
+    buildRound('R32L', r32L, results, 'Round of 32', 'r32'),
+    buildRound('R16L', r16L, results, 'Round of 16', ''),
+    buildRound('QFL',  qfL,  results, 'Quarter-final', ''),
+    buildRound('SFL',  sfL,  results, 'Semi-final', ''),
+    // Final column
+    `<div class="bracket-round final-col">
+       <div class="bracket-round-header">Final</div>
+       <div class="bracket-slot-wrap" style="justify-content:center;align-items:center;">
+         <div style="width:100%;">
+           ${fin[0] ? renderMatch(fin[0], results) : ''}
+           <div class="final-trophy">🏆</div>
+         </div>
+       </div>
+     </div>`,
+    buildRound('SFR',  sfR,  results, 'Semi-final', ''),
+    buildRound('QFR',  qfR,  results, 'Quarter-final', ''),
+    buildRound('R16R', r16R, results, 'Round of 16', ''),
+    buildRound('R32R', r32R, results, 'Round of 32', 'r32'),
+  ].join('');
+
+  // Third-place match below
+  if (tp[0]) {
+    document.getElementById('bracketThird').style.display = 'flex';
+    document.getElementById('bracketThirdMatch').innerHTML = renderMatch(tp[0], results);
+  }
+}
+
+loadBracket().catch(err => {
+  document.getElementById('bracketSub').textContent = 'Could not load bracket data.';
+  console.error(err);
+});
+</script>
+</body>
+</html>
