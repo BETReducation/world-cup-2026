@@ -600,7 +600,7 @@ function renderLiveTables(live) {
   if (!el) return;
 
   const cats = [
-    { key: 'topScorers',  label: '⚽ Goalscorers',  col: 'Total Goals' },
+    { key: 'topScorers',  label: '⚽ Total Goals',  col: 'Total Goals' },
     { key: 'ownGoals',    label: '🔴 Own Goals',    col: 'Goals' },
     { key: 'yellowCards', label: '🟨 Yellow Cards', col: 'Cards' },
     { key: 'redCards',    label: '🟥 Red Cards',    col: 'Cards' },
@@ -639,7 +639,10 @@ function renderLiveTables(live) {
   };
 
   const tabBar = cats.map(c => {
-    const count = (live[c.key] || []).length;
+    const entries = live[c.key] || [];
+    const count = c.key === 'topScorers'
+      ? entries.reduce((sum, r) => sum + (r.count || 0), 0)
+      : entries.length;
     if (!count) return '';
     return `<button class="live-tab-btn${c.key === _activeLiveTab ? ' active' : ''}"
               onclick="switchLiveTab('${c.key}')">${c.label}<span class="live-tab-count">${count}</span></button>`;
