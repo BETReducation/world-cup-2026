@@ -185,7 +185,7 @@ function showGroup(groupKey) {
       const result = results.results?.[m.id];
       const played = result?.played;
 
-      const hasComparison = played || isAdmin;
+      const hasComparison = played || isAdmin || lockStatus[m.round]?.locked;
       html += `
         <div class="result-row ${played ? '' : 'not-played'}${hasComparison ? ' has-predictions' : ''}"${hasComparison ? ` onclick="toggleComparison('cmp_${m.id}', this)"` : ''}>
           <div class="match-meta">${fmtDate(m.date, m.time)}${m.note ? `<span class="match-note">(${m.note})</span>` : ''}</div>
@@ -272,14 +272,14 @@ function showKoRound(roundKey) {
 
     const fmtKoSlot = s => {
       if (!s) return '?';
-      const m3 = s.match(/^3rd_([A-L]{2,})$/);
+      const m3 = s.match(/^3rd_([A-L]+)$/);
       if (m3) return `3rd(${m3[1]})`;
       if (/^[12][A-L]$/.test(s)) return s;
       const mWL = s.match(/^([WL]):(.+)$/);
       if (mWL) return `${mWL[1]}${mWL[2].replace('_', '-')}`;
       return s;
     };
-    const hasComparison = played || isAdmin;
+    const hasComparison = played || isAdmin || lockStatus[m.round]?.locked;
     html += `
       <div class="result-row ${played ? '' : 'not-played'}${hasComparison ? ' has-predictions' : ''}" id="row_${m.id}"${hasComparison ? ` onclick="toggleComparison('cmp_${m.id}', this)"` : ''}>
         <div class="match-meta">${fmtKoMatchDate(m.date, m.time)}</div>
