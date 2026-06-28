@@ -1103,7 +1103,7 @@
           "num": 79,
           "round": "R32",
           "homeSlot": "1A",
-          "awaySlot": "3rd_CEFHI",
+          "awaySlot": "3rd_E",
           "date": "2026-06-30",
           "time": "21:00",
           "venue": "Estadio Azteca, Mexico City"
@@ -1113,7 +1113,7 @@
           "num": 80,
           "round": "R32",
           "homeSlot": "1L",
-          "awaySlot": "3rd_EHIJK",
+          "awaySlot": "3rd_K",
           "date": "2026-07-01",
           "time": "12:00",
           "venue": "Mercedes-Benz Stadium, Atlanta"
@@ -1123,7 +1123,7 @@
           "num": 82,
           "round": "R32",
           "homeSlot": "1G",
-          "awaySlot": "3rd_AEHIJ",
+          "awaySlot": "3rd_I",
           "date": "2026-07-01",
           "time": "16:00",
           "venue": "Lumen Field, Seattle"
@@ -1133,7 +1133,7 @@
           "num": 81,
           "round": "R32",
           "homeSlot": "1D",
-          "awaySlot": "3rd_BEFIJ",
+          "awaySlot": "3rd_B",
           "date": "2026-07-01",
           "time": "20:00",
           "venue": "Levi's Stadium, Santa Clara"
@@ -1193,7 +1193,7 @@
           "num": 87,
           "round": "R32",
           "homeSlot": "1K",
-          "awaySlot": "3rd_DEIJL",
+          "awaySlot": "3rd_L",
           "date": "2026-07-03",
           "time": "21:30",
           "venue": "Arrowhead Stadium, Kansas City"
