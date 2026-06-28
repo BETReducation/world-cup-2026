@@ -490,8 +490,8 @@ function resolveSlot(slot, slotMap, resolvedMatches, results) {
 
 function formatSlotLabel(slot) {
   if (!slot) return 'TBD';
-  const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
-  if (m3rd) return `Best 3rd (${m3rd[1].split('').join('/')})`;
+  const m3rd = slot.match(/^3rd_([A-L]+)$/);
+  if (m3rd) return m3rd[1].length === 1 ? `3rd Place Group ${m3rd[1]}` : `Best 3rd (${m3rd[1].split('').join('/')})`;
   const mPos = slot.match(/^([12])([A-L])$/);
   if (mPos) return `${mPos[1] === '1' ? '1st' : '2nd'} Group ${mPos[2]}`;
   const mWL = slot.match(/^([WL]):(.+)$/);
@@ -528,7 +528,7 @@ function resolveKnockoutFixtures(fixtures, results) {
     for (const match of round.matches) {
       for (const slot of [match.homeSlot, match.awaySlot]) {
         if (!slot || slotMap[slot] !== undefined) continue;
-        const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
+        const m3rd = slot.match(/^3rd_([A-L]+)$/);
         if (!m3rd) continue;
         const groupLetters = m3rd[1];
         const allComplete = groupLetters.split('').every(
@@ -625,6 +625,24 @@ app.post('/api/admin/restore', requireAdmin, (req, res) => {
 app.post('/api/admin/clear-results', requireAdmin, (req, res) => {
   writeJSON(RESULTS_FILE, { results: {} });
   res.json({ ok: true });
+});
+
+app.post('/api/admin/clear-match-predictions', requireAdmin, (req, res) => {
+  const { matchIds } = req.body;
+  if (!Array.isArray(matchIds) || matchIds.length === 0)
+    return res.status(400).json({ error: 'matchIds array required' });
+  const data = readJSON(PREDICTIONS_FILE, { users: [] });
+  let cleared = 0;
+  for (const user of data.users) {
+    for (const matchId of matchIds) {
+      if (user.predictions && user.predictions[matchId] !== undefined) {
+        delete user.predictions[matchId];
+        cleared++;
+      }
+    }
+  }
+  writeJSON(PREDICTIONS_FILE, data);
+  res.json({ ok: true, cleared });
 });
 
 // Delete all non-admin accounts (keeps Gary's admin account)
