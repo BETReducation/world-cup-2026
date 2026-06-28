@@ -222,22 +222,22 @@
     "R32": {
       "name": "Round of 32",
       "matches": [
-        { "id": "R32_1",  "num": 73, "round": "R32", "homeSlot": "2A",  "awaySlot": "2B",        "date": "2026-06-28", "time": "15:00", "venue": "TBD" },
-        { "id": "R32_2",  "num": 76, "round": "R32", "homeSlot": "1C",  "awaySlot": "2F",        "date": "2026-06-29", "time": "13:00", "venue": "TBD" },
-        { "id": "R32_3",  "num": 74, "round": "R32", "homeSlot": "1E",  "awaySlot": "3rd_D",     "date": "2026-06-29", "time": "18:30", "venue": "TBD" },
-        { "id": "R32_4",  "num": 75, "round": "R32", "homeSlot": "1F",  "awaySlot": "2C",        "date": "2026-06-29", "time": "21:00", "venue": "TBD" },
-        { "id": "R32_5",  "num": 78, "round": "R32", "homeSlot": "2E",  "awaySlot": "2I",        "date": "2026-06-30", "time": "13:00", "venue": "TBD" },
-        { "id": "R32_6",  "num": 77, "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_F",     "date": "2026-06-30", "time": "17:00", "venue": "TBD" },
-        { "id": "R32_7",  "num": 79, "round": "R32", "homeSlot": "1A",  "awaySlot": "3rd_CEFHI", "date": "2026-06-30", "time": "21:00", "venue": "TBD" },
-        { "id": "R32_8",  "num": 80, "round": "R32", "homeSlot": "1L",  "awaySlot": "3rd_EHIJK", "date": "2026-07-01", "time": "12:00", "venue": "TBD" },
-        { "id": "R32_9",  "num": 82, "round": "R32", "homeSlot": "1G",  "awaySlot": "3rd_AEHIJ", "date": "2026-07-01", "time": "16:00", "venue": "TBD" },
-        { "id": "R32_10", "num": 81, "round": "R32", "homeSlot": "1D",  "awaySlot": "3rd_BEFIJ", "date": "2026-07-01", "time": "20:00", "venue": "TBD" },
-        { "id": "R32_11", "num": 85, "round": "R32", "homeSlot": "1B",  "awaySlot": "3rd_EFGIJ", "date": "2026-07-02", "time": "23:00", "venue": "TBD" },
-        { "id": "R32_12", "num": 84, "round": "R32", "homeSlot": "1H",  "awaySlot": "2J",        "date": "2026-07-02", "time": "15:00", "venue": "TBD" },
-        { "id": "R32_13", "num": 83, "round": "R32", "homeSlot": "2K",  "awaySlot": "2L",        "date": "2026-07-02", "time": "19:00", "venue": "TBD" },
-        { "id": "R32_14", "num": 88, "round": "R32", "homeSlot": "2D",  "awaySlot": "2G",        "date": "2026-07-03", "time": "14:00", "venue": "TBD" },
-        { "id": "R32_15", "num": 86, "round": "R32", "homeSlot": "1J",  "awaySlot": "2H",        "date": "2026-07-03", "time": "18:00", "venue": "TBD" },
-        { "id": "R32_16", "num": 87, "round": "R32", "homeSlot": "1K",  "awaySlot": "3rd_DEIJL", "date": "2026-07-03", "time": "21:30", "venue": "TBD" }
+        { "id": "R32_1",  "num": 73, "round": "R32", "homeSlot": "2A",  "awaySlot": "2B",        "date": "2026-06-28", "time": "15:00", "venue": "SoFi Stadium, Inglewood" },
+        { "id": "R32_2",  "num": 76, "round": "R32", "homeSlot": "1C",  "awaySlot": "2F",        "date": "2026-06-29", "time": "13:00", "venue": "NRG Stadium, Houston" },
+        { "id": "R32_3",  "num": 74, "round": "R32", "homeSlot": "1E",  "awaySlot": "3rd_D",     "date": "2026-06-29", "time": "16:30", "venue": "Gillette Stadium, Foxborough" },
+        { "id": "R32_4",  "num": 75, "round": "R32", "homeSlot": "1F",  "awaySlot": "2C",        "date": "2026-06-29", "time": "20:00", "venue": "Estadio BBVA, Guadalupe" },
+        { "id": "R32_5",  "num": 78, "round": "R32", "homeSlot": "2E",  "awaySlot": "2I",        "date": "2026-06-30", "time": "13:00", "venue": "AT&T Stadium, Arlington" },
+        { "id": "R32_6",  "num": 77, "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_F",     "date": "2026-06-30", "time": "17:00", "venue": "MetLife Stadium, East Rutherford" },
+        { "id": "R32_7",  "num": 79, "round": "R32", "homeSlot": "1A",  "awaySlot": "3rd_CEFHI", "date": "2026-06-30", "time": "20:00", "venue": "Estadio Azteca, Mexico City" },
+        { "id": "R32_8",  "num": 80, "round": "R32", "homeSlot": "1L",  "awaySlot": "3rd_EHIJK", "date": "2026-07-01", "time": "12:00", "venue": "Mercedes-Benz Stadium, Atlanta" },
+        { "id": "R32_9",  "num": 82, "round": "R32", "homeSlot": "1G",  "awaySlot": "3rd_AEHIJ", "date": "2026-07-01", "time": "16:00", "venue": "Lumen Field, Seattle" },
+        { "id": "R32_10", "num": 81, "round": "R32", "homeSlot": "1D",  "awaySlot": "3rd_BEFIJ", "date": "2026-07-01", "time": "20:00", "venue": "Levi's Stadium, Santa Clara" },
+        { "id": "R32_11", "num": 85, "round": "R32", "homeSlot": "1B",  "awaySlot": "3rd_EFGIJ", "date": "2026-07-02", "time": "23:00", "venue": "BC Place, Vancouver" },
+        { "id": "R32_12", "num": 84, "round": "R32", "homeSlot": "1H",  "awaySlot": "2J",        "date": "2026-07-02", "time": "15:00", "venue": "SoFi Stadium, Inglewood" },
+        { "id": "R32_13", "num": 83, "round": "R32", "homeSlot": "2K",  "awaySlot": "2L",        "date": "2026-07-02", "time": "19:00", "venue": "BMO Field, Toronto" },
+        { "id": "R32_14", "num": 88, "round": "R32", "homeSlot": "2D",  "awaySlot": "2G",        "date": "2026-07-03", "time": "14:00", "venue": "AT&T Stadium, Arlington" },
+        { "id": "R32_15", "num": 86, "round": "R32", "homeSlot": "1J",  "awaySlot": "2H",        "date": "2026-07-03", "time": "18:00", "venue": "Hard Rock Stadium, Miami" },
+        { "id": "R32_16", "num": 87, "round": "R32", "homeSlot": "1K",  "awaySlot": "3rd_DEIJL", "date": "2026-07-03", "time": "21:30", "venue": "Arrowhead Stadium, Kansas City" }
       ]
     },
     "R16": {
