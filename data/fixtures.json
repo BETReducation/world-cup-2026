@@ -1,284 +1,1388 @@
 {
   "note": "All times are Eastern Time (ET). Source: FIFA World Cup 2026 official schedule.",
   "lockDates": {
-    "1":   "2026-06-11T19:00:00Z",
-    "2":   "2026-06-18T16:00:00Z",
-    "3":   "2026-06-24T19:00:00Z",
+    "1": "2026-06-11T19:00:00Z",
+    "2": "2026-06-18T16:00:00Z",
+    "3": "2026-06-24T19:00:00Z",
     "R32": "2026-06-28T19:00:00Z",
     "R16": "2026-07-04T17:00:00Z",
-    "QF":  "2026-07-09T20:00:00Z",
-    "SF":  "2026-07-14T19:00:00Z",
-    "3P":  "2026-07-18T21:00:00Z",
-    "F":   "2026-07-19T19:00:00Z"
+    "QF": "2026-07-09T20:00:00Z",
+    "SF": "2026-07-14T19:00:00Z",
+    "3P": "2026-07-18T21:00:00Z",
+    "F": "2026-07-19T19:00:00Z"
   },
   "groups": {
     "A": {
       "name": "Group A",
       "teams": [
-        { "id": "MEX", "name": "Mexico",         "flag": "🇲🇽", "flagCode": "mx" },
-        { "id": "RSA", "name": "South Africa",   "flag": "🇿🇦", "flagCode": "za" },
-        { "id": "KOR", "name": "S.Korea", "flag": "🇰🇷", "flagCode": "kr" },
-        { "id": "CZE", "name": "Czechia",        "flag": "🇨🇿", "flagCode": "cz" }
+        {
+          "id": "MEX",
+          "name": "Mexico",
+          "flag": "🇲🇽",
+          "flagCode": "mx"
+        },
+        {
+          "id": "RSA",
+          "name": "South Africa",
+          "flag": "🇿🇦",
+          "flagCode": "za"
+        },
+        {
+          "id": "KOR",
+          "name": "S.Korea",
+          "flag": "🇰🇷",
+          "flagCode": "kr"
+        },
+        {
+          "id": "CZE",
+          "name": "Czechia",
+          "flag": "🇨🇿",
+          "flagCode": "cz"
+        }
       ],
       "matches": [
-        { "id": "A1", "home": "MEX", "away": "RSA", "round": 1, "date": "2026-06-11", "time": "15:00", "venue": "Mexico City" },
-        { "id": "A2", "home": "KOR", "away": "CZE", "round": 1, "date": "2026-06-11", "time": "22:00", "venue": "Guadalajara" },
-        { "id": "A3", "home": "CZE", "away": "RSA", "round": 2, "date": "2026-06-18", "time": "12:00", "venue": "Atlanta" },
-        { "id": "A4", "home": "MEX", "away": "KOR", "round": 2, "date": "2026-06-18", "time": "21:00", "venue": "Guadalajara" },
-        { "id": "A5", "home": "CZE", "away": "MEX", "round": 3, "date": "2026-06-24", "time": "21:00", "venue": "Mexico City" },
-        { "id": "A6", "home": "RSA", "away": "KOR", "round": 3, "date": "2026-06-24", "time": "21:00", "venue": "Monterrey" }
+        {
+          "id": "A1",
+          "home": "MEX",
+          "away": "RSA",
+          "round": 1,
+          "date": "2026-06-11",
+          "time": "15:00",
+          "venue": "Mexico City"
+        },
+        {
+          "id": "A2",
+          "home": "KOR",
+          "away": "CZE",
+          "round": 1,
+          "date": "2026-06-11",
+          "time": "22:00",
+          "venue": "Guadalajara"
+        },
+        {
+          "id": "A3",
+          "home": "CZE",
+          "away": "RSA",
+          "round": 2,
+          "date": "2026-06-18",
+          "time": "12:00",
+          "venue": "Atlanta"
+        },
+        {
+          "id": "A4",
+          "home": "MEX",
+          "away": "KOR",
+          "round": 2,
+          "date": "2026-06-18",
+          "time": "21:00",
+          "venue": "Guadalajara"
+        },
+        {
+          "id": "A5",
+          "home": "CZE",
+          "away": "MEX",
+          "round": 3,
+          "date": "2026-06-24",
+          "time": "21:00",
+          "venue": "Mexico City"
+        },
+        {
+          "id": "A6",
+          "home": "RSA",
+          "away": "KOR",
+          "round": 3,
+          "date": "2026-06-24",
+          "time": "21:00",
+          "venue": "Monterrey"
+        }
       ]
     },
     "B": {
       "name": "Group B",
       "teams": [
-        { "id": "CAN", "name": "Canada",               "flag": "🇨🇦", "flagCode": "ca" },
-        { "id": "BIH", "name": "Bosnia", "flag": "🇧🇦", "flagCode": "ba" },
-        { "id": "QAT", "name": "Qatar",                "flag": "🇶🇦", "flagCode": "qa" },
-        { "id": "SUI", "name": "Switzerland",          "flag": "🇨🇭", "flagCode": "ch" }
+        {
+          "id": "CAN",
+          "name": "Canada",
+          "flag": "🇨🇦",
+          "flagCode": "ca"
+        },
+        {
+          "id": "BIH",
+          "name": "Bosnia",
+          "flag": "🇧🇦",
+          "flagCode": "ba"
+        },
+        {
+          "id": "QAT",
+          "name": "Qatar",
+          "flag": "🇶🇦",
+          "flagCode": "qa"
+        },
+        {
+          "id": "SUI",
+          "name": "Switzerland",
+          "flag": "🇨🇭",
+          "flagCode": "ch"
+        }
       ],
       "matches": [
-        { "id": "B1", "home": "CAN", "away": "BIH", "round": 1, "date": "2026-06-12", "time": "15:00", "venue": "Toronto" },
-        { "id": "B2", "home": "QAT", "away": "SUI", "round": 1, "date": "2026-06-13", "time": "15:00", "venue": "San Francisco Bay Area" },
-        { "id": "B3", "home": "SUI", "away": "BIH", "round": 2, "date": "2026-06-18", "time": "15:00", "venue": "Los Angeles" },
-        { "id": "B4", "home": "CAN", "away": "QAT", "round": 2, "date": "2026-06-18", "time": "18:00", "venue": "Vancouver" },
-        { "id": "B5", "home": "SUI", "away": "CAN", "round": 3, "date": "2026-06-24", "time": "15:00", "venue": "Vancouver" },
-        { "id": "B6", "home": "BIH", "away": "QAT", "round": 3, "date": "2026-06-24", "time": "15:00", "venue": "Seattle" }
+        {
+          "id": "B1",
+          "home": "CAN",
+          "away": "BIH",
+          "round": 1,
+          "date": "2026-06-12",
+          "time": "15:00",
+          "venue": "Toronto"
+        },
+        {
+          "id": "B2",
+          "home": "QAT",
+          "away": "SUI",
+          "round": 1,
+          "date": "2026-06-13",
+          "time": "15:00",
+          "venue": "San Francisco Bay Area"
+        },
+        {
+          "id": "B3",
+          "home": "SUI",
+          "away": "BIH",
+          "round": 2,
+          "date": "2026-06-18",
+          "time": "15:00",
+          "venue": "Los Angeles"
+        },
+        {
+          "id": "B4",
+          "home": "CAN",
+          "away": "QAT",
+          "round": 2,
+          "date": "2026-06-18",
+          "time": "18:00",
+          "venue": "Vancouver"
+        },
+        {
+          "id": "B5",
+          "home": "SUI",
+          "away": "CAN",
+          "round": 3,
+          "date": "2026-06-24",
+          "time": "15:00",
+          "venue": "Vancouver"
+        },
+        {
+          "id": "B6",
+          "home": "BIH",
+          "away": "QAT",
+          "round": 3,
+          "date": "2026-06-24",
+          "time": "15:00",
+          "venue": "Seattle"
+        }
       ]
     },
     "C": {
       "name": "Group C",
       "teams": [
-        { "id": "BRA", "name": "Brazil",   "flag": "🇧🇷", "flagCode": "br" },
-        { "id": "MAR", "name": "Morocco",  "flag": "🇲🇦", "flagCode": "ma" },
-        { "id": "HAI", "name": "Haiti",    "flag": "🇭🇹", "flagCode": "ht" },
-        { "id": "SCO", "name": "Scotland", "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "flagCode": "gb-sct" }
+        {
+          "id": "BRA",
+          "name": "Brazil",
+          "flag": "🇧🇷",
+          "flagCode": "br"
+        },
+        {
+          "id": "MAR",
+          "name": "Morocco",
+          "flag": "🇲🇦",
+          "flagCode": "ma"
+        },
+        {
+          "id": "HAI",
+          "name": "Haiti",
+          "flag": "🇭🇹",
+          "flagCode": "ht"
+        },
+        {
+          "id": "SCO",
+          "name": "Scotland",
+          "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+          "flagCode": "gb-sct"
+        }
       ],
       "matches": [
-        { "id": "C1", "home": "HAI", "away": "SCO", "round": 1, "date": "2026-06-13", "time": "21:00", "venue": "Boston" },
-        { "id": "C2", "home": "BRA", "away": "MAR", "round": 1, "date": "2026-06-13", "time": "18:00", "venue": "New York / New Jersey" },
-        { "id": "C3", "home": "BRA", "away": "HAI", "round": 2, "date": "2026-06-19", "time": "20:30", "venue": "Philadelphia" },
-        { "id": "C4", "home": "SCO", "away": "MAR", "round": 2, "date": "2026-06-19", "time": "18:00", "venue": "Boston" },
-        { "id": "C5", "home": "SCO", "away": "BRA", "round": 3, "date": "2026-06-24", "time": "18:00", "venue": "Miami" },
-        { "id": "C6", "home": "MAR", "away": "HAI", "round": 3, "date": "2026-06-24", "time": "18:00", "venue": "Atlanta" }
+        {
+          "id": "C1",
+          "home": "HAI",
+          "away": "SCO",
+          "round": 1,
+          "date": "2026-06-13",
+          "time": "21:00",
+          "venue": "Boston"
+        },
+        {
+          "id": "C2",
+          "home": "BRA",
+          "away": "MAR",
+          "round": 1,
+          "date": "2026-06-13",
+          "time": "18:00",
+          "venue": "New York / New Jersey"
+        },
+        {
+          "id": "C3",
+          "home": "BRA",
+          "away": "HAI",
+          "round": 2,
+          "date": "2026-06-19",
+          "time": "20:30",
+          "venue": "Philadelphia"
+        },
+        {
+          "id": "C4",
+          "home": "SCO",
+          "away": "MAR",
+          "round": 2,
+          "date": "2026-06-19",
+          "time": "18:00",
+          "venue": "Boston"
+        },
+        {
+          "id": "C5",
+          "home": "SCO",
+          "away": "BRA",
+          "round": 3,
+          "date": "2026-06-24",
+          "time": "18:00",
+          "venue": "Miami"
+        },
+        {
+          "id": "C6",
+          "home": "MAR",
+          "away": "HAI",
+          "round": 3,
+          "date": "2026-06-24",
+          "time": "18:00",
+          "venue": "Atlanta"
+        }
       ]
     },
     "D": {
       "name": "Group D",
       "teams": [
-        { "id": "USA", "name": "USA",       "flag": "🇺🇸", "flagCode": "us" },
-        { "id": "PAR", "name": "Paraguay",  "flag": "🇵🇾", "flagCode": "py" },
-        { "id": "AUS", "name": "Australia", "flag": "🇦🇺", "flagCode": "au" },
-        { "id": "TUR", "name": "Turkey",   "flag": "🇹🇷", "flagCode": "tr" }
+        {
+          "id": "USA",
+          "name": "USA",
+          "flag": "🇺🇸",
+          "flagCode": "us"
+        },
+        {
+          "id": "PAR",
+          "name": "Paraguay",
+          "flag": "🇵🇾",
+          "flagCode": "py"
+        },
+        {
+          "id": "AUS",
+          "name": "Australia",
+          "flag": "🇦🇺",
+          "flagCode": "au"
+        },
+        {
+          "id": "TUR",
+          "name": "Turkey",
+          "flag": "🇹🇷",
+          "flagCode": "tr"
+        }
       ],
       "matches": [
-        { "id": "D1", "home": "USA", "away": "PAR", "round": 1, "date": "2026-06-12", "time": "21:00", "venue": "Los Angeles" },
-        { "id": "D2", "home": "AUS", "away": "TUR", "round": 1, "date": "2026-06-14", "time": "00:00", "venue": "Vancouver", "note": "Played Saturday 13 Jun local time in the US" },
-        { "id": "D3", "home": "TUR", "away": "PAR", "round": 2, "date": "2026-06-19", "time": "23:00", "venue": "San Francisco Bay Area" },
-        { "id": "D4", "home": "USA", "away": "AUS", "round": 2, "date": "2026-06-19", "time": "15:00", "venue": "Seattle" },
-        { "id": "D5", "home": "TUR", "away": "USA", "round": 3, "date": "2026-06-25", "time": "22:00", "venue": "Los Angeles" },
-        { "id": "D6", "home": "PAR", "away": "AUS", "round": 3, "date": "2026-06-25", "time": "22:00", "venue": "San Francisco Bay Area" }
+        {
+          "id": "D1",
+          "home": "USA",
+          "away": "PAR",
+          "round": 1,
+          "date": "2026-06-12",
+          "time": "21:00",
+          "venue": "Los Angeles"
+        },
+        {
+          "id": "D2",
+          "home": "AUS",
+          "away": "TUR",
+          "round": 1,
+          "date": "2026-06-14",
+          "time": "00:00",
+          "venue": "Vancouver",
+          "note": "Played Saturday 13 Jun local time in the US"
+        },
+        {
+          "id": "D3",
+          "home": "TUR",
+          "away": "PAR",
+          "round": 2,
+          "date": "2026-06-19",
+          "time": "23:00",
+          "venue": "San Francisco Bay Area"
+        },
+        {
+          "id": "D4",
+          "home": "USA",
+          "away": "AUS",
+          "round": 2,
+          "date": "2026-06-19",
+          "time": "15:00",
+          "venue": "Seattle"
+        },
+        {
+          "id": "D5",
+          "home": "TUR",
+          "away": "USA",
+          "round": 3,
+          "date": "2026-06-25",
+          "time": "22:00",
+          "venue": "Los Angeles"
+        },
+        {
+          "id": "D6",
+          "home": "PAR",
+          "away": "AUS",
+          "round": 3,
+          "date": "2026-06-25",
+          "time": "22:00",
+          "venue": "San Francisco Bay Area"
+        }
       ]
     },
     "E": {
       "name": "Group E",
       "teams": [
-        { "id": "GER", "name": "Germany",       "flag": "🇩🇪", "flagCode": "de" },
-        { "id": "CUW", "name": "Curaçao",       "flag": "🇨🇼", "flagCode": "cw" },
-        { "id": "CIV", "name": "Ivory Coast", "flag": "🇨🇮", "flagCode": "ci" },
-        { "id": "ECU", "name": "Ecuador",       "flag": "🇪🇨", "flagCode": "ec" }
+        {
+          "id": "GER",
+          "name": "Germany",
+          "flag": "🇩🇪",
+          "flagCode": "de"
+        },
+        {
+          "id": "CUW",
+          "name": "Curaçao",
+          "flag": "🇨🇼",
+          "flagCode": "cw"
+        },
+        {
+          "id": "CIV",
+          "name": "Ivory Coast",
+          "flag": "🇨🇮",
+          "flagCode": "ci"
+        },
+        {
+          "id": "ECU",
+          "name": "Ecuador",
+          "flag": "🇪🇨",
+          "flagCode": "ec"
+        }
       ],
       "matches": [
-        { "id": "E1", "home": "CIV", "away": "ECU", "round": 1, "date": "2026-06-14", "time": "19:00", "venue": "Philadelphia" },
-        { "id": "E2", "home": "GER", "away": "CUW", "round": 1, "date": "2026-06-14", "time": "13:00", "venue": "Houston" },
-        { "id": "E3", "home": "GER", "away": "CIV", "round": 2, "date": "2026-06-20", "time": "16:00", "venue": "Toronto" },
-        { "id": "E4", "home": "ECU", "away": "CUW", "round": 2, "date": "2026-06-20", "time": "20:00", "venue": "Kansas City" },
-        { "id": "E5", "home": "CUW", "away": "CIV", "round": 3, "date": "2026-06-25", "time": "16:00", "venue": "Philadelphia" },
-        { "id": "E6", "home": "ECU", "away": "GER", "round": 3, "date": "2026-06-25", "time": "16:00", "venue": "New York / New Jersey" }
+        {
+          "id": "E1",
+          "home": "CIV",
+          "away": "ECU",
+          "round": 1,
+          "date": "2026-06-14",
+          "time": "19:00",
+          "venue": "Philadelphia"
+        },
+        {
+          "id": "E2",
+          "home": "GER",
+          "away": "CUW",
+          "round": 1,
+          "date": "2026-06-14",
+          "time": "13:00",
+          "venue": "Houston"
+        },
+        {
+          "id": "E3",
+          "home": "GER",
+          "away": "CIV",
+          "round": 2,
+          "date": "2026-06-20",
+          "time": "16:00",
+          "venue": "Toronto"
+        },
+        {
+          "id": "E4",
+          "home": "ECU",
+          "away": "CUW",
+          "round": 2,
+          "date": "2026-06-20",
+          "time": "20:00",
+          "venue": "Kansas City"
+        },
+        {
+          "id": "E5",
+          "home": "CUW",
+          "away": "CIV",
+          "round": 3,
+          "date": "2026-06-25",
+          "time": "16:00",
+          "venue": "Philadelphia"
+        },
+        {
+          "id": "E6",
+          "home": "ECU",
+          "away": "GER",
+          "round": 3,
+          "date": "2026-06-25",
+          "time": "16:00",
+          "venue": "New York / New Jersey"
+        }
       ]
     },
     "F": {
       "name": "Group F",
       "teams": [
-        { "id": "NED", "name": "Netherlands", "flag": "🇳🇱", "flagCode": "nl" },
-        { "id": "JPN", "name": "Japan",       "flag": "🇯🇵", "flagCode": "jp" },
-        { "id": "SWE", "name": "Sweden",      "flag": "🇸🇪", "flagCode": "se" },
-        { "id": "TUN", "name": "Tunisia",     "flag": "🇹🇳", "flagCode": "tn" }
+        {
+          "id": "NED",
+          "name": "Netherlands",
+          "flag": "🇳🇱",
+          "flagCode": "nl"
+        },
+        {
+          "id": "JPN",
+          "name": "Japan",
+          "flag": "🇯🇵",
+          "flagCode": "jp"
+        },
+        {
+          "id": "SWE",
+          "name": "Sweden",
+          "flag": "🇸🇪",
+          "flagCode": "se"
+        },
+        {
+          "id": "TUN",
+          "name": "Tunisia",
+          "flag": "🇹🇳",
+          "flagCode": "tn"
+        }
       ],
       "matches": [
-        { "id": "F1", "home": "NED", "away": "JPN", "round": 1, "date": "2026-06-14", "time": "16:00", "venue": "Dallas" },
-        { "id": "F2", "home": "SWE", "away": "TUN", "round": 1, "date": "2026-06-14", "time": "22:00", "venue": "Monterrey" },
-        { "id": "F3", "home": "NED", "away": "SWE", "round": 2, "date": "2026-06-20", "time": "13:00", "venue": "Houston" },
-        { "id": "F4", "home": "TUN", "away": "JPN", "round": 2, "date": "2026-06-20", "time": "00:00", "venue": "Monterrey" },
-        { "id": "F5", "home": "JPN", "away": "SWE", "round": 3, "date": "2026-06-25", "time": "19:00", "venue": "Dallas" },
-        { "id": "F6", "home": "TUN", "away": "NED", "round": 3, "date": "2026-06-25", "time": "19:00", "venue": "Kansas City" }
+        {
+          "id": "F1",
+          "home": "NED",
+          "away": "JPN",
+          "round": 1,
+          "date": "2026-06-14",
+          "time": "16:00",
+          "venue": "Dallas"
+        },
+        {
+          "id": "F2",
+          "home": "SWE",
+          "away": "TUN",
+          "round": 1,
+          "date": "2026-06-14",
+          "time": "22:00",
+          "venue": "Monterrey"
+        },
+        {
+          "id": "F3",
+          "home": "NED",
+          "away": "SWE",
+          "round": 2,
+          "date": "2026-06-20",
+          "time": "13:00",
+          "venue": "Houston"
+        },
+        {
+          "id": "F4",
+          "home": "TUN",
+          "away": "JPN",
+          "round": 2,
+          "date": "2026-06-20",
+          "time": "00:00",
+          "venue": "Monterrey"
+        },
+        {
+          "id": "F5",
+          "home": "JPN",
+          "away": "SWE",
+          "round": 3,
+          "date": "2026-06-25",
+          "time": "19:00",
+          "venue": "Dallas"
+        },
+        {
+          "id": "F6",
+          "home": "TUN",
+          "away": "NED",
+          "round": 3,
+          "date": "2026-06-25",
+          "time": "19:00",
+          "venue": "Kansas City"
+        }
       ]
     },
     "G": {
       "name": "Group G",
       "teams": [
-        { "id": "BEL", "name": "Belgium",     "flag": "🇧🇪", "flagCode": "be" },
-        { "id": "EGY", "name": "Egypt",       "flag": "🇪🇬", "flagCode": "eg" },
-        { "id": "IRN", "name": "Iran",     "flag": "🇮🇷", "flagCode": "ir" },
-        { "id": "NZL", "name": "New Zealand", "flag": "🇳🇿", "flagCode": "nz" }
+        {
+          "id": "BEL",
+          "name": "Belgium",
+          "flag": "🇧🇪",
+          "flagCode": "be"
+        },
+        {
+          "id": "EGY",
+          "name": "Egypt",
+          "flag": "🇪🇬",
+          "flagCode": "eg"
+        },
+        {
+          "id": "IRN",
+          "name": "Iran",
+          "flag": "🇮🇷",
+          "flagCode": "ir"
+        },
+        {
+          "id": "NZL",
+          "name": "New Zealand",
+          "flag": "🇳🇿",
+          "flagCode": "nz"
+        }
       ],
       "matches": [
-        { "id": "G1", "home": "IRN", "away": "NZL", "round": 1, "date": "2026-06-15", "time": "21:00", "venue": "Los Angeles" },
-        { "id": "G2", "home": "BEL", "away": "EGY", "round": 1, "date": "2026-06-15", "time": "15:00", "venue": "Seattle" },
-        { "id": "G3", "home": "BEL", "away": "IRN", "round": 2, "date": "2026-06-21", "time": "15:00", "venue": "Los Angeles" },
-        { "id": "G4", "home": "NZL", "away": "EGY", "round": 2, "date": "2026-06-21", "time": "21:00", "venue": "Vancouver" },
-        { "id": "G5", "home": "EGY", "away": "IRN", "round": 3, "date": "2026-06-26", "time": "23:00", "venue": "Seattle" },
-        { "id": "G6", "home": "NZL", "away": "BEL", "round": 3, "date": "2026-06-26", "time": "23:00", "venue": "Vancouver" }
+        {
+          "id": "G1",
+          "home": "IRN",
+          "away": "NZL",
+          "round": 1,
+          "date": "2026-06-15",
+          "time": "21:00",
+          "venue": "Los Angeles"
+        },
+        {
+          "id": "G2",
+          "home": "BEL",
+          "away": "EGY",
+          "round": 1,
+          "date": "2026-06-15",
+          "time": "15:00",
+          "venue": "Seattle"
+        },
+        {
+          "id": "G3",
+          "home": "BEL",
+          "away": "IRN",
+          "round": 2,
+          "date": "2026-06-21",
+          "time": "15:00",
+          "venue": "Los Angeles"
+        },
+        {
+          "id": "G4",
+          "home": "NZL",
+          "away": "EGY",
+          "round": 2,
+          "date": "2026-06-21",
+          "time": "21:00",
+          "venue": "Vancouver"
+        },
+        {
+          "id": "G5",
+          "home": "EGY",
+          "away": "IRN",
+          "round": 3,
+          "date": "2026-06-26",
+          "time": "23:00",
+          "venue": "Seattle"
+        },
+        {
+          "id": "G6",
+          "home": "NZL",
+          "away": "BEL",
+          "round": 3,
+          "date": "2026-06-26",
+          "time": "23:00",
+          "venue": "Vancouver"
+        }
       ]
     },
     "H": {
       "name": "Group H",
       "teams": [
-        { "id": "ESP", "name": "Spain",        "flag": "🇪🇸", "flagCode": "es" },
-        { "id": "CPV", "name": "Cape Verde",   "flag": "🇨🇻", "flagCode": "cv" },
-        { "id": "KSA", "name": "Saudi Arabia", "flag": "🇸🇦", "flagCode": "sa" },
-        { "id": "URU", "name": "Uruguay",      "flag": "🇺🇾", "flagCode": "uy" }
+        {
+          "id": "ESP",
+          "name": "Spain",
+          "flag": "🇪🇸",
+          "flagCode": "es"
+        },
+        {
+          "id": "CPV",
+          "name": "Cape Verde",
+          "flag": "🇨🇻",
+          "flagCode": "cv"
+        },
+        {
+          "id": "KSA",
+          "name": "Saudi Arabia",
+          "flag": "🇸🇦",
+          "flagCode": "sa"
+        },
+        {
+          "id": "URU",
+          "name": "Uruguay",
+          "flag": "🇺🇾",
+          "flagCode": "uy"
+        }
       ],
       "matches": [
-        { "id": "H1", "home": "KSA", "away": "URU", "round": 1, "date": "2026-06-15", "time": "18:00", "venue": "Miami" },
-        { "id": "H2", "home": "ESP", "away": "CPV", "round": 1, "date": "2026-06-15", "time": "12:00", "venue": "Atlanta" },
-        { "id": "H3", "home": "URU", "away": "CPV", "round": 2, "date": "2026-06-21", "time": "18:00", "venue": "Miami" },
-        { "id": "H4", "home": "ESP", "away": "KSA", "round": 2, "date": "2026-06-21", "time": "12:00", "venue": "Atlanta" },
-        { "id": "H5", "home": "CPV", "away": "KSA", "round": 3, "date": "2026-06-26", "time": "20:00", "venue": "Houston" },
-        { "id": "H6", "home": "URU", "away": "ESP", "round": 3, "date": "2026-06-26", "time": "20:00", "venue": "Guadalajara" }
+        {
+          "id": "H1",
+          "home": "KSA",
+          "away": "URU",
+          "round": 1,
+          "date": "2026-06-15",
+          "time": "18:00",
+          "venue": "Miami"
+        },
+        {
+          "id": "H2",
+          "home": "ESP",
+          "away": "CPV",
+          "round": 1,
+          "date": "2026-06-15",
+          "time": "12:00",
+          "venue": "Atlanta"
+        },
+        {
+          "id": "H3",
+          "home": "URU",
+          "away": "CPV",
+          "round": 2,
+          "date": "2026-06-21",
+          "time": "18:00",
+          "venue": "Miami"
+        },
+        {
+          "id": "H4",
+          "home": "ESP",
+          "away": "KSA",
+          "round": 2,
+          "date": "2026-06-21",
+          "time": "12:00",
+          "venue": "Atlanta"
+        },
+        {
+          "id": "H5",
+          "home": "CPV",
+          "away": "KSA",
+          "round": 3,
+          "date": "2026-06-26",
+          "time": "20:00",
+          "venue": "Houston"
+        },
+        {
+          "id": "H6",
+          "home": "URU",
+          "away": "ESP",
+          "round": 3,
+          "date": "2026-06-26",
+          "time": "20:00",
+          "venue": "Guadalajara"
+        }
       ]
     },
     "I": {
       "name": "Group I",
       "teams": [
-        { "id": "FRA", "name": "France",  "flag": "🇫🇷", "flagCode": "fr" },
-        { "id": "SEN", "name": "Senegal", "flag": "🇸🇳", "flagCode": "sn" },
-        { "id": "IRQ", "name": "Iraq",    "flag": "🇮🇶", "flagCode": "iq" },
-        { "id": "NOR", "name": "Norway",  "flag": "🇳🇴", "flagCode": "no" }
+        {
+          "id": "FRA",
+          "name": "France",
+          "flag": "🇫🇷",
+          "flagCode": "fr"
+        },
+        {
+          "id": "SEN",
+          "name": "Senegal",
+          "flag": "🇸🇳",
+          "flagCode": "sn"
+        },
+        {
+          "id": "IRQ",
+          "name": "Iraq",
+          "flag": "🇮🇶",
+          "flagCode": "iq"
+        },
+        {
+          "id": "NOR",
+          "name": "Norway",
+          "flag": "🇳🇴",
+          "flagCode": "no"
+        }
       ],
       "matches": [
-        { "id": "I1", "home": "FRA", "away": "SEN", "round": 1, "date": "2026-06-16", "time": "15:00", "venue": "New York / New Jersey" },
-        { "id": "I2", "home": "IRQ", "away": "NOR", "round": 1, "date": "2026-06-16", "time": "18:00", "venue": "Boston" },
-        { "id": "I3", "home": "NOR", "away": "SEN", "round": 2, "date": "2026-06-22", "time": "20:00", "venue": "New York / New Jersey" },
-        { "id": "I4", "home": "FRA", "away": "IRQ", "round": 2, "date": "2026-06-22", "time": "17:00", "venue": "Philadelphia" },
-        { "id": "I5", "home": "NOR", "away": "FRA", "round": 3, "date": "2026-06-26", "time": "15:00", "venue": "Boston" },
-        { "id": "I6", "home": "SEN", "away": "IRQ", "round": 3, "date": "2026-06-26", "time": "15:00", "venue": "Toronto" }
+        {
+          "id": "I1",
+          "home": "FRA",
+          "away": "SEN",
+          "round": 1,
+          "date": "2026-06-16",
+          "time": "15:00",
+          "venue": "New York / New Jersey"
+        },
+        {
+          "id": "I2",
+          "home": "IRQ",
+          "away": "NOR",
+          "round": 1,
+          "date": "2026-06-16",
+          "time": "18:00",
+          "venue": "Boston"
+        },
+        {
+          "id": "I3",
+          "home": "NOR",
+          "away": "SEN",
+          "round": 2,
+          "date": "2026-06-22",
+          "time": "20:00",
+          "venue": "New York / New Jersey"
+        },
+        {
+          "id": "I4",
+          "home": "FRA",
+          "away": "IRQ",
+          "round": 2,
+          "date": "2026-06-22",
+          "time": "17:00",
+          "venue": "Philadelphia"
+        },
+        {
+          "id": "I5",
+          "home": "NOR",
+          "away": "FRA",
+          "round": 3,
+          "date": "2026-06-26",
+          "time": "15:00",
+          "venue": "Boston"
+        },
+        {
+          "id": "I6",
+          "home": "SEN",
+          "away": "IRQ",
+          "round": 3,
+          "date": "2026-06-26",
+          "time": "15:00",
+          "venue": "Toronto"
+        }
       ]
     },
     "J": {
       "name": "Group J",
       "teams": [
-        { "id": "ARG", "name": "Argentina", "flag": "🇦🇷", "flagCode": "ar" },
-        { "id": "ALG", "name": "Algeria",   "flag": "🇩🇿", "flagCode": "dz" },
-        { "id": "AUT", "name": "Austria",   "flag": "🇦🇹", "flagCode": "at" },
-        { "id": "JOR", "name": "Jordan",    "flag": "🇯🇴", "flagCode": "jo" }
+        {
+          "id": "ARG",
+          "name": "Argentina",
+          "flag": "🇦🇷",
+          "flagCode": "ar"
+        },
+        {
+          "id": "ALG",
+          "name": "Algeria",
+          "flag": "🇩🇿",
+          "flagCode": "dz"
+        },
+        {
+          "id": "AUT",
+          "name": "Austria",
+          "flag": "🇦🇹",
+          "flagCode": "at"
+        },
+        {
+          "id": "JOR",
+          "name": "Jordan",
+          "flag": "🇯🇴",
+          "flagCode": "jo"
+        }
       ],
       "matches": [
-        { "id": "J1", "home": "ARG", "away": "ALG", "round": 1, "date": "2026-06-16", "time": "21:00", "venue": "Kansas City" },
-        { "id": "J2", "home": "AUT", "away": "JOR", "round": 1, "date": "2026-06-16", "time": "00:00", "venue": "San Francisco Bay Area" },
-        { "id": "J3", "home": "ARG", "away": "AUT", "round": 2, "date": "2026-06-22", "time": "13:00", "venue": "Dallas" },
-        { "id": "J4", "home": "JOR", "away": "ALG", "round": 2, "date": "2026-06-22", "time": "23:00", "venue": "San Francisco Bay Area" },
-        { "id": "J5", "home": "ALG", "away": "AUT", "round": 3, "date": "2026-06-27", "time": "22:00", "venue": "Kansas City" },
-        { "id": "J6", "home": "JOR", "away": "ARG", "round": 3, "date": "2026-06-27", "time": "22:00", "venue": "Dallas" }
+        {
+          "id": "J1",
+          "home": "ARG",
+          "away": "ALG",
+          "round": 1,
+          "date": "2026-06-16",
+          "time": "21:00",
+          "venue": "Kansas City"
+        },
+        {
+          "id": "J2",
+          "home": "AUT",
+          "away": "JOR",
+          "round": 1,
+          "date": "2026-06-16",
+          "time": "00:00",
+          "venue": "San Francisco Bay Area"
+        },
+        {
+          "id": "J3",
+          "home": "ARG",
+          "away": "AUT",
+          "round": 2,
+          "date": "2026-06-22",
+          "time": "13:00",
+          "venue": "Dallas"
+        },
+        {
+          "id": "J4",
+          "home": "JOR",
+          "away": "ALG",
+          "round": 2,
+          "date": "2026-06-22",
+          "time": "23:00",
+          "venue": "San Francisco Bay Area"
+        },
+        {
+          "id": "J5",
+          "home": "ALG",
+          "away": "AUT",
+          "round": 3,
+          "date": "2026-06-27",
+          "time": "22:00",
+          "venue": "Kansas City"
+        },
+        {
+          "id": "J6",
+          "home": "JOR",
+          "away": "ARG",
+          "round": 3,
+          "date": "2026-06-27",
+          "time": "22:00",
+          "venue": "Dallas"
+        }
       ]
     },
     "K": {
       "name": "Group K",
       "teams": [
-        { "id": "POR", "name": "Portugal",   "flag": "🇵🇹", "flagCode": "pt" },
-        { "id": "COD", "name": "Congo DR",   "flag": "🇨🇩", "flagCode": "cd" },
-        { "id": "UZB", "name": "Uzbekistan", "flag": "🇺🇿", "flagCode": "uz" },
-        { "id": "COL", "name": "Colombia",   "flag": "🇨🇴", "flagCode": "co" }
+        {
+          "id": "POR",
+          "name": "Portugal",
+          "flag": "🇵🇹",
+          "flagCode": "pt"
+        },
+        {
+          "id": "COD",
+          "name": "Congo DR",
+          "flag": "🇨🇩",
+          "flagCode": "cd"
+        },
+        {
+          "id": "UZB",
+          "name": "Uzbekistan",
+          "flag": "🇺🇿",
+          "flagCode": "uz"
+        },
+        {
+          "id": "COL",
+          "name": "Colombia",
+          "flag": "🇨🇴",
+          "flagCode": "co"
+        }
       ],
       "matches": [
-        { "id": "K1", "home": "POR", "away": "COD", "round": 1, "date": "2026-06-17", "time": "13:00", "venue": "Houston" },
-        { "id": "K2", "home": "UZB", "away": "COL", "round": 1, "date": "2026-06-17", "time": "22:00", "venue": "Mexico City" },
-        { "id": "K3", "home": "POR", "away": "UZB", "round": 2, "date": "2026-06-23", "time": "13:00", "venue": "Houston" },
-        { "id": "K4", "home": "COL", "away": "COD", "round": 2, "date": "2026-06-23", "time": "22:00", "venue": "Guadalajara" },
-        { "id": "K5", "home": "COL", "away": "POR", "round": 3, "date": "2026-06-27", "time": "19:30", "venue": "Miami" },
-        { "id": "K6", "home": "COD", "away": "UZB", "round": 3, "date": "2026-06-27", "time": "19:30", "venue": "Atlanta" }
+        {
+          "id": "K1",
+          "home": "POR",
+          "away": "COD",
+          "round": 1,
+          "date": "2026-06-17",
+          "time": "13:00",
+          "venue": "Houston"
+        },
+        {
+          "id": "K2",
+          "home": "UZB",
+          "away": "COL",
+          "round": 1,
+          "date": "2026-06-17",
+          "time": "22:00",
+          "venue": "Mexico City"
+        },
+        {
+          "id": "K3",
+          "home": "POR",
+          "away": "UZB",
+          "round": 2,
+          "date": "2026-06-23",
+          "time": "13:00",
+          "venue": "Houston"
+        },
+        {
+          "id": "K4",
+          "home": "COL",
+          "away": "COD",
+          "round": 2,
+          "date": "2026-06-23",
+          "time": "22:00",
+          "venue": "Guadalajara"
+        },
+        {
+          "id": "K5",
+          "home": "COL",
+          "away": "POR",
+          "round": 3,
+          "date": "2026-06-27",
+          "time": "19:30",
+          "venue": "Miami"
+        },
+        {
+          "id": "K6",
+          "home": "COD",
+          "away": "UZB",
+          "round": 3,
+          "date": "2026-06-27",
+          "time": "19:30",
+          "venue": "Atlanta"
+        }
       ]
     },
     "L": {
       "name": "Group L",
       "teams": [
-        { "id": "ENG", "name": "England", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "flagCode": "gb-eng" },
-        { "id": "CRO", "name": "Croatia", "flag": "🇭🇷", "flagCode": "hr" },
-        { "id": "GHA", "name": "Ghana",   "flag": "🇬🇭", "flagCode": "gh" },
-        { "id": "PAN", "name": "Panama",  "flag": "🇵🇦", "flagCode": "pa" }
+        {
+          "id": "ENG",
+          "name": "England",
+          "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+          "flagCode": "gb-eng"
+        },
+        {
+          "id": "CRO",
+          "name": "Croatia",
+          "flag": "🇭🇷",
+          "flagCode": "hr"
+        },
+        {
+          "id": "GHA",
+          "name": "Ghana",
+          "flag": "🇬🇭",
+          "flagCode": "gh"
+        },
+        {
+          "id": "PAN",
+          "name": "Panama",
+          "flag": "🇵🇦",
+          "flagCode": "pa"
+        }
       ],
       "matches": [
-        { "id": "L1", "home": "GHA", "away": "PAN", "round": 1, "date": "2026-06-17", "time": "19:00", "venue": "Toronto" },
-        { "id": "L2", "home": "ENG", "away": "CRO", "round": 1, "date": "2026-06-17", "time": "16:00", "venue": "Dallas" },
-        { "id": "L3", "home": "ENG", "away": "GHA", "round": 2, "date": "2026-06-23", "time": "16:00", "venue": "Boston" },
-        { "id": "L4", "home": "PAN", "away": "CRO", "round": 2, "date": "2026-06-23", "time": "19:00", "venue": "Toronto" },
-        { "id": "L5", "home": "PAN", "away": "ENG", "round": 3, "date": "2026-06-27", "time": "17:00", "venue": "New York / New Jersey" },
-        { "id": "L6", "home": "CRO", "away": "GHA", "round": 3, "date": "2026-06-27", "time": "17:00", "venue": "Philadelphia" }
+        {
+          "id": "L1",
+          "home": "GHA",
+          "away": "PAN",
+          "round": 1,
+          "date": "2026-06-17",
+          "time": "19:00",
+          "venue": "Toronto"
+        },
+        {
+          "id": "L2",
+          "home": "ENG",
+          "away": "CRO",
+          "round": 1,
+          "date": "2026-06-17",
+          "time": "16:00",
+          "venue": "Dallas"
+        },
+        {
+          "id": "L3",
+          "home": "ENG",
+          "away": "GHA",
+          "round": 2,
+          "date": "2026-06-23",
+          "time": "16:00",
+          "venue": "Boston"
+        },
+        {
+          "id": "L4",
+          "home": "PAN",
+          "away": "CRO",
+          "round": 2,
+          "date": "2026-06-23",
+          "time": "19:00",
+          "venue": "Toronto"
+        },
+        {
+          "id": "L5",
+          "home": "PAN",
+          "away": "ENG",
+          "round": 3,
+          "date": "2026-06-27",
+          "time": "17:00",
+          "venue": "New York / New Jersey"
+        },
+        {
+          "id": "L6",
+          "home": "CRO",
+          "away": "GHA",
+          "round": 3,
+          "date": "2026-06-27",
+          "time": "17:00",
+          "venue": "Philadelphia"
+        }
       ]
     }
   },
-
   "knockout": {
     "R32": {
       "name": "Round of 32",
       "matches": [
-        { "id": "R32_1",  "num": 73, "round": "R32", "homeSlot": "2A",  "awaySlot": "2B",        "date": "2026-06-28", "time": "15:00", "venue": "SoFi Stadium, Inglewood" },
-        { "id": "R32_2",  "num": 76, "round": "R32", "homeSlot": "1C",  "awaySlot": "2F",        "date": "2026-06-29", "time": "13:00", "venue": "NRG Stadium, Houston" },
-        { "id": "R32_3",  "num": 74, "round": "R32", "homeSlot": "1E",  "awaySlot": "3rd_D",     "date": "2026-06-29", "time": "16:30", "venue": "Gillette Stadium, Foxborough" },
-        { "id": "R32_4",  "num": 75, "round": "R32", "homeSlot": "1F",  "awaySlot": "2C",        "date": "2026-06-29", "time": "20:00", "venue": "Estadio BBVA, Guadalupe" },
-        { "id": "R32_5",  "num": 78, "round": "R32", "homeSlot": "2E",  "awaySlot": "2I",        "date": "2026-06-30", "time": "13:00", "venue": "AT&T Stadium, Arlington" },
-        { "id": "R32_6",  "num": 77, "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_F",     "date": "2026-06-30", "time": "17:00", "venue": "MetLife Stadium, East Rutherford" },
-        { "id": "R32_7",  "num": 79, "round": "R32", "homeSlot": "1A",  "awaySlot": "3rd_CEFHI", "date": "2026-06-30", "time": "20:00", "venue": "Estadio Azteca, Mexico City" },
-        { "id": "R32_8",  "num": 80, "round": "R32", "homeSlot": "1L",  "awaySlot": "3rd_EHIJK", "date": "2026-07-01", "time": "12:00", "venue": "Mercedes-Benz Stadium, Atlanta" },
-        { "id": "R32_9",  "num": 82, "round": "R32", "homeSlot": "1G",  "awaySlot": "3rd_AEHIJ", "date": "2026-07-01", "time": "16:00", "venue": "Lumen Field, Seattle" },
-        { "id": "R32_10", "num": 81, "round": "R32", "homeSlot": "1D",  "awaySlot": "3rd_BEFIJ", "date": "2026-07-01", "time": "20:00", "venue": "Levi's Stadium, Santa Clara" },
-        { "id": "R32_11", "num": 85, "round": "R32", "homeSlot": "1B",  "awaySlot": "3rd_EFGIJ", "date": "2026-07-02", "time": "23:00", "venue": "BC Place, Vancouver" },
-        { "id": "R32_12", "num": 84, "round": "R32", "homeSlot": "1H",  "awaySlot": "2J",        "date": "2026-07-02", "time": "15:00", "venue": "SoFi Stadium, Inglewood" },
-        { "id": "R32_13", "num": 83, "round": "R32", "homeSlot": "2K",  "awaySlot": "2L",        "date": "2026-07-02", "time": "19:00", "venue": "BMO Field, Toronto" },
-        { "id": "R32_14", "num": 88, "round": "R32", "homeSlot": "2D",  "awaySlot": "2G",        "date": "2026-07-03", "time": "14:00", "venue": "AT&T Stadium, Arlington" },
-        { "id": "R32_15", "num": 86, "round": "R32", "homeSlot": "1J",  "awaySlot": "2H",        "date": "2026-07-03", "time": "18:00", "venue": "Hard Rock Stadium, Miami" },
-        { "id": "R32_16", "num": 87, "round": "R32", "homeSlot": "1K",  "awaySlot": "3rd_DEIJL", "date": "2026-07-03", "time": "21:30", "venue": "Arrowhead Stadium, Kansas City" }
+        {
+          "id": "R32_1",
+          "num": 73,
+          "round": "R32",
+          "homeSlot": "2A",
+          "awaySlot": "2B",
+          "date": "2026-06-28",
+          "time": "15:00",
+          "venue": "SoFi Stadium, Inglewood"
+        },
+        {
+          "id": "R32_2",
+          "num": 76,
+          "round": "R32",
+          "homeSlot": "1C",
+          "awaySlot": "2F",
+          "date": "2026-06-29",
+          "time": "13:00",
+          "venue": "NRG Stadium, Houston"
+        },
+        {
+          "id": "R32_3",
+          "num": 74,
+          "round": "R32",
+          "homeSlot": "1E",
+          "awaySlot": "3rd_D",
+          "date": "2026-06-29",
+          "time": "16:30",
+          "venue": "Gillette Stadium, Foxborough"
+        },
+        {
+          "id": "R32_4",
+          "num": 75,
+          "round": "R32",
+          "homeSlot": "1F",
+          "awaySlot": "2C",
+          "date": "2026-06-29",
+          "time": "20:00",
+          "venue": "Estadio BBVA, Guadalupe"
+        },
+        {
+          "id": "R32_5",
+          "num": 78,
+          "round": "R32",
+          "homeSlot": "2E",
+          "awaySlot": "2I",
+          "date": "2026-06-30",
+          "time": "13:00",
+          "venue": "AT&T Stadium, Arlington"
+        },
+        {
+          "id": "R32_6",
+          "num": 77,
+          "round": "R32",
+          "homeSlot": "1I",
+          "awaySlot": "3rd_F",
+          "date": "2026-06-30",
+          "time": "17:00",
+          "venue": "MetLife Stadium, East Rutherford"
+        },
+        {
+          "id": "R32_7",
+          "num": 79,
+          "round": "R32",
+          "homeSlot": "1A",
+          "awaySlot": "3rd_CEFHI",
+          "date": "2026-06-30",
+          "time": "20:00",
+          "venue": "Estadio Azteca, Mexico City"
+        },
+        {
+          "id": "R32_8",
+          "num": 80,
+          "round": "R32",
+          "homeSlot": "1L",
+          "awaySlot": "3rd_EHIJK",
+          "date": "2026-07-01",
+          "time": "12:00",
+          "venue": "Mercedes-Benz Stadium, Atlanta"
+        },
+        {
+          "id": "R32_9",
+          "num": 82,
+          "round": "R32",
+          "homeSlot": "1G",
+          "awaySlot": "3rd_AEHIJ",
+          "date": "2026-07-01",
+          "time": "16:00",
+          "venue": "Lumen Field, Seattle"
+        },
+        {
+          "id": "R32_10",
+          "num": 81,
+          "round": "R32",
+          "homeSlot": "1D",
+          "awaySlot": "3rd_BEFIJ",
+          "date": "2026-07-01",
+          "time": "20:00",
+          "venue": "Levi's Stadium, Santa Clara"
+        },
+        {
+          "id": "R32_12",
+          "num": 84,
+          "round": "R32",
+          "homeSlot": "1H",
+          "awaySlot": "2J",
+          "date": "2026-07-02",
+          "time": "15:00",
+          "venue": "SoFi Stadium, Inglewood"
+        },
+        {
+          "id": "R32_13",
+          "num": 83,
+          "round": "R32",
+          "homeSlot": "2K",
+          "awaySlot": "2L",
+          "date": "2026-07-02",
+          "time": "19:00",
+          "venue": "BMO Field, Toronto"
+        },
+        {
+          "id": "R32_11",
+          "num": 85,
+          "round": "R32",
+          "homeSlot": "1B",
+          "awaySlot": "3rd_EFGIJ",
+          "date": "2026-07-02",
+          "time": "23:00",
+          "venue": "BC Place, Vancouver"
+        },
+        {
+          "id": "R32_14",
+          "num": 88,
+          "round": "R32",
+          "homeSlot": "2D",
+          "awaySlot": "2G",
+          "date": "2026-07-03",
+          "time": "14:00",
+          "venue": "AT&T Stadium, Arlington"
+        },
+        {
+          "id": "R32_15",
+          "num": 86,
+          "round": "R32",
+          "homeSlot": "1J",
+          "awaySlot": "2H",
+          "date": "2026-07-03",
+          "time": "18:00",
+          "venue": "Hard Rock Stadium, Miami"
+        },
+        {
+          "id": "R32_16",
+          "num": 87,
+          "round": "R32",
+          "homeSlot": "1K",
+          "awaySlot": "3rd_DEIJL",
+          "date": "2026-07-03",
+          "time": "21:30",
+          "venue": "Arrowhead Stadium, Kansas City"
+        }
       ]
     },
     "R16": {
       "name": "Round of 16",
       "matches": [
-        { "id": "R16_1", "num": 89, "round": "R16", "homeSlot": "W:R32_1",  "awaySlot": "W:R32_9",  "date": "2026-07-04", "time": "17:00", "venue": "TBD" },
-        { "id": "R16_2", "num": 90, "round": "R16", "homeSlot": "W:R32_2",  "awaySlot": "W:R32_10", "date": "2026-07-04", "time": "13:00", "venue": "TBD" },
-        { "id": "R16_3", "num": 91, "round": "R16", "homeSlot": "W:R32_3",  "awaySlot": "W:R32_11", "date": "2026-07-05", "time": "16:00", "venue": "TBD" },
-        { "id": "R16_4", "num": 92, "round": "R16", "homeSlot": "W:R32_4",  "awaySlot": "W:R32_12", "date": "2026-07-05", "time": "20:00", "venue": "TBD" },
-        { "id": "R16_5", "num": 93, "round": "R16", "homeSlot": "W:R32_5",  "awaySlot": "W:R32_13", "date": "2026-07-06", "time": "15:00", "venue": "TBD" },
-        { "id": "R16_6", "num": 94, "round": "R16", "homeSlot": "W:R32_6",  "awaySlot": "W:R32_14", "date": "2026-07-06", "time": "20:00", "venue": "TBD" },
-        { "id": "R16_7", "num": 95, "round": "R16", "homeSlot": "W:R32_7",  "awaySlot": "W:R32_15", "date": "2026-07-07", "time": "12:00", "venue": "TBD" },
-        { "id": "R16_8", "num": 96, "round": "R16", "homeSlot": "W:R32_8",  "awaySlot": "W:R32_16", "date": "2026-07-07", "time": "16:00", "venue": "TBD" }
+        {
+          "id": "R16_2",
+          "num": 90,
+          "round": "R16",
+          "homeSlot": "W:R32_2",
+          "awaySlot": "W:R32_10",
+          "date": "2026-07-04",
+          "time": "13:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_1",
+          "num": 89,
+          "round": "R16",
+          "homeSlot": "W:R32_1",
+          "awaySlot": "W:R32_9",
+          "date": "2026-07-04",
+          "time": "17:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_3",
+          "num": 91,
+          "round": "R16",
+          "homeSlot": "W:R32_3",
+          "awaySlot": "W:R32_11",
+          "date": "2026-07-05",
+          "time": "16:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_4",
+          "num": 92,
+          "round": "R16",
+          "homeSlot": "W:R32_4",
+          "awaySlot": "W:R32_12",
+          "date": "2026-07-05",
+          "time": "20:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_5",
+          "num": 93,
+          "round": "R16",
+          "homeSlot": "W:R32_5",
+          "awaySlot": "W:R32_13",
+          "date": "2026-07-06",
+          "time": "15:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_6",
+          "num": 94,
+          "round": "R16",
+          "homeSlot": "W:R32_6",
+          "awaySlot": "W:R32_14",
+          "date": "2026-07-06",
+          "time": "20:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_7",
+          "num": 95,
+          "round": "R16",
+          "homeSlot": "W:R32_7",
+          "awaySlot": "W:R32_15",
+          "date": "2026-07-07",
+          "time": "12:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_8",
+          "num": 96,
+          "round": "R16",
+          "homeSlot": "W:R32_8",
+          "awaySlot": "W:R32_16",
+          "date": "2026-07-07",
+          "time": "16:00",
+          "venue": "TBD"
+        }
       ]
     },
     "QF": {
       "name": "Quarter-finals",
       "matches": [
-        { "id": "QF_1", "num":  97, "round": "QF", "homeSlot": "W:R16_1", "awaySlot": "W:R16_2", "date": "2026-07-09", "time": "16:00", "venue": "TBD" },
-        { "id": "QF_2", "num":  98, "round": "QF", "homeSlot": "W:R16_3", "awaySlot": "W:R16_4", "date": "2026-07-10", "time": "15:00", "venue": "TBD" },
-        { "id": "QF_3", "num":  99, "round": "QF", "homeSlot": "W:R16_5", "awaySlot": "W:R16_6", "date": "2026-07-11", "time": "17:00", "venue": "TBD" },
-        { "id": "QF_4", "num": 100, "round": "QF", "homeSlot": "W:R16_7", "awaySlot": "W:R16_8", "date": "2026-07-11", "time": "21:00", "venue": "TBD" }
+        {
+          "id": "QF_1",
+          "num": 97,
+          "round": "QF",
+          "homeSlot": "W:R16_1",
+          "awaySlot": "W:R16_2",
+          "date": "2026-07-09",
+          "time": "16:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "QF_2",
+          "num": 98,
+          "round": "QF",
+          "homeSlot": "W:R16_3",
+          "awaySlot": "W:R16_4",
+          "date": "2026-07-10",
+          "time": "15:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "QF_3",
+          "num": 99,
+          "round": "QF",
+          "homeSlot": "W:R16_5",
+          "awaySlot": "W:R16_6",
+          "date": "2026-07-11",
+          "time": "17:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "QF_4",
+          "num": 100,
+          "round": "QF",
+          "homeSlot": "W:R16_7",
+          "awaySlot": "W:R16_8",
+          "date": "2026-07-11",
+          "time": "21:00",
+          "venue": "TBD"
+        }
       ]
     },
     "SF": {
       "name": "Semi-finals",
       "matches": [
-        { "id": "SF_1", "num": 101, "round": "SF", "homeSlot": "W:QF_1", "awaySlot": "W:QF_2", "date": "2026-07-14", "time": "15:00", "venue": "TBD" },
-        { "id": "SF_2", "num": 102, "round": "SF", "homeSlot": "W:QF_3", "awaySlot": "W:QF_4", "date": "2026-07-15", "time": "15:00", "venue": "TBD" }
+        {
+          "id": "SF_1",
+          "num": 101,
+          "round": "SF",
+          "homeSlot": "W:QF_1",
+          "awaySlot": "W:QF_2",
+          "date": "2026-07-14",
+          "time": "15:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "SF_2",
+          "num": 102,
+          "round": "SF",
+          "homeSlot": "W:QF_3",
+          "awaySlot": "W:QF_4",
+          "date": "2026-07-15",
+          "time": "15:00",
+          "venue": "TBD"
+        }
       ]
     },
     "3P": {
       "name": "Third-place Play-off",
       "matches": [
-        { "id": "3P_1", "num": 103, "round": "3P", "homeSlot": "L:SF_1", "awaySlot": "L:SF_2", "date": "2026-07-18", "time": "17:00", "venue": "TBD" }
+        {
+          "id": "3P_1",
+          "num": 103,
+          "round": "3P",
+          "homeSlot": "L:SF_1",
+          "awaySlot": "L:SF_2",
+          "date": "2026-07-18",
+          "time": "17:00",
+          "venue": "TBD"
+        }
       ]
     },
     "F": {
       "name": "Final",
       "matches": [
-        { "id": "F_1", "num": 104, "round": "F", "homeSlot": "W:SF_1", "awaySlot": "W:SF_2", "date": "2026-07-19", "time": "15:00", "venue": "New York / New Jersey" }
+        {
+          "id": "F_1",
+          "num": 104,
+          "round": "F",
+          "homeSlot": "W:SF_1",
+          "awaySlot": "W:SF_2",
+          "date": "2026-07-19",
+          "time": "15:00",
+          "venue": "New York / New Jersey"
+        }
       ]
     }
   }
