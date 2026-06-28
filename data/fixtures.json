@@ -227,7 +227,7 @@
         { "id": "R32_3",  "num": 74, "round": "R32", "homeSlot": "1E",  "awaySlot": "3rd_D",     "date": "2026-06-29", "time": "18:30", "venue": "TBD" },
         { "id": "R32_4",  "num": 75, "round": "R32", "homeSlot": "1F",  "awaySlot": "2C",        "date": "2026-06-29", "time": "21:00", "venue": "TBD" },
         { "id": "R32_5",  "num": 78, "round": "R32", "homeSlot": "2E",  "awaySlot": "2I",        "date": "2026-06-30", "time": "13:00", "venue": "TBD" },
-        { "id": "R32_6",  "num": 77, "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_CDFGH", "date": "2026-06-30", "time": "17:00", "venue": "TBD" },
+        { "id": "R32_6",  "num": 77, "round": "R32", "homeSlot": "1I",  "awaySlot": "3rd_F",     "date": "2026-06-30", "time": "17:00", "venue": "TBD" },
         { "id": "R32_7",  "num": 79, "round": "R32", "homeSlot": "1A",  "awaySlot": "3rd_CEFHI", "date": "2026-06-30", "time": "21:00", "venue": "TBD" },
         { "id": "R32_8",  "num": 80, "round": "R32", "homeSlot": "1L",  "awaySlot": "3rd_EHIJK", "date": "2026-07-01", "time": "12:00", "venue": "TBD" },
         { "id": "R32_9",  "num": 82, "round": "R32", "homeSlot": "1G",  "awaySlot": "3rd_AEHIJ", "date": "2026-07-01", "time": "16:00", "venue": "TBD" },
