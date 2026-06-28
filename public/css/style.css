@@ -1232,6 +1232,22 @@ footer span {
 .nav-member-link { color: var(--accent) !important; display: inline-flex; align-items: center; gap: 6px; }
 
 /* ── Knockout round label ────────────────────────────────────────────────── */
+.bracket-halves {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.bracket-half-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.bracket-half-list { display: flex; flex-direction: column; gap: 6px; }
+
 .ko-round-header {
   display: flex;
   align-items: center;

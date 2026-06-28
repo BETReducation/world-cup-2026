@@ -18,25 +18,25 @@
         {
           "id": "MEX",
           "name": "Mexico",
-          "flag": "🇲🇽",
+          "flag": "\ud83c\uddf2\ud83c\uddfd",
           "flagCode": "mx"
         },
         {
           "id": "RSA",
           "name": "South Africa",
-          "flag": "🇿🇦",
+          "flag": "\ud83c\uddff\ud83c\udde6",
           "flagCode": "za"
         },
         {
           "id": "KOR",
           "name": "S.Korea",
-          "flag": "🇰🇷",
+          "flag": "\ud83c\uddf0\ud83c\uddf7",
           "flagCode": "kr"
         },
         {
           "id": "CZE",
           "name": "Czechia",
-          "flag": "🇨🇿",
+          "flag": "\ud83c\udde8\ud83c\uddff",
           "flagCode": "cz"
         }
       ],
@@ -103,25 +103,25 @@
         {
           "id": "CAN",
           "name": "Canada",
-          "flag": "🇨🇦",
+          "flag": "\ud83c\udde8\ud83c\udde6",
           "flagCode": "ca"
         },
         {
           "id": "BIH",
           "name": "Bosnia",
-          "flag": "🇧🇦",
+          "flag": "\ud83c\udde7\ud83c\udde6",
           "flagCode": "ba"
         },
         {
           "id": "QAT",
           "name": "Qatar",
-          "flag": "🇶🇦",
+          "flag": "\ud83c\uddf6\ud83c\udde6",
           "flagCode": "qa"
         },
         {
           "id": "SUI",
           "name": "Switzerland",
-          "flag": "🇨🇭",
+          "flag": "\ud83c\udde8\ud83c\udded",
           "flagCode": "ch"
         }
       ],
@@ -188,25 +188,25 @@
         {
           "id": "BRA",
           "name": "Brazil",
-          "flag": "🇧🇷",
+          "flag": "\ud83c\udde7\ud83c\uddf7",
           "flagCode": "br"
         },
         {
           "id": "MAR",
           "name": "Morocco",
-          "flag": "🇲🇦",
+          "flag": "\ud83c\uddf2\ud83c\udde6",
           "flagCode": "ma"
         },
         {
           "id": "HAI",
           "name": "Haiti",
-          "flag": "🇭🇹",
+          "flag": "\ud83c\udded\ud83c\uddf9",
           "flagCode": "ht"
         },
         {
           "id": "SCO",
           "name": "Scotland",
-          "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+          "flag": "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc73\udb40\udc63\udb40\udc74\udb40\udc7f",
           "flagCode": "gb-sct"
         }
       ],
@@ -273,25 +273,25 @@
         {
           "id": "USA",
           "name": "USA",
-          "flag": "🇺🇸",
+          "flag": "\ud83c\uddfa\ud83c\uddf8",
           "flagCode": "us"
         },
         {
           "id": "PAR",
           "name": "Paraguay",
-          "flag": "🇵🇾",
+          "flag": "\ud83c\uddf5\ud83c\uddfe",
           "flagCode": "py"
         },
         {
           "id": "AUS",
           "name": "Australia",
-          "flag": "🇦🇺",
+          "flag": "\ud83c\udde6\ud83c\uddfa",
           "flagCode": "au"
         },
         {
           "id": "TUR",
           "name": "Turkey",
-          "flag": "🇹🇷",
+          "flag": "\ud83c\uddf9\ud83c\uddf7",
           "flagCode": "tr"
         }
       ],
@@ -359,25 +359,25 @@
         {
           "id": "GER",
           "name": "Germany",
-          "flag": "🇩🇪",
+          "flag": "\ud83c\udde9\ud83c\uddea",
           "flagCode": "de"
         },
         {
           "id": "CUW",
-          "name": "Curaçao",
-          "flag": "🇨🇼",
+          "name": "Cura\u00e7ao",
+          "flag": "\ud83c\udde8\ud83c\uddfc",
           "flagCode": "cw"
         },
         {
           "id": "CIV",
           "name": "Ivory Coast",
-          "flag": "🇨🇮",
+          "flag": "\ud83c\udde8\ud83c\uddee",
           "flagCode": "ci"
         },
         {
           "id": "ECU",
           "name": "Ecuador",
-          "flag": "🇪🇨",
+          "flag": "\ud83c\uddea\ud83c\udde8",
           "flagCode": "ec"
         }
       ],
@@ -444,25 +444,25 @@
         {
           "id": "NED",
           "name": "Netherlands",
-          "flag": "🇳🇱",
+          "flag": "\ud83c\uddf3\ud83c\uddf1",
           "flagCode": "nl"
         },
         {
           "id": "JPN",
           "name": "Japan",
-          "flag": "🇯🇵",
+          "flag": "\ud83c\uddef\ud83c\uddf5",
           "flagCode": "jp"
         },
         {
           "id": "SWE",
           "name": "Sweden",
-          "flag": "🇸🇪",
+          "flag": "\ud83c\uddf8\ud83c\uddea",
           "flagCode": "se"
         },
         {
           "id": "TUN",
           "name": "Tunisia",
-          "flag": "🇹🇳",
+          "flag": "\ud83c\uddf9\ud83c\uddf3",
           "flagCode": "tn"
         }
       ],
@@ -529,25 +529,25 @@
         {
           "id": "BEL",
           "name": "Belgium",
-          "flag": "🇧🇪",
+          "flag": "\ud83c\udde7\ud83c\uddea",
           "flagCode": "be"
         },
         {
           "id": "EGY",
           "name": "Egypt",
-          "flag": "🇪🇬",
+          "flag": "\ud83c\uddea\ud83c\uddec",
           "flagCode": "eg"
         },
         {
           "id": "IRN",
           "name": "Iran",
-          "flag": "🇮🇷",
+          "flag": "\ud83c\uddee\ud83c\uddf7",
           "flagCode": "ir"
         },
         {
           "id": "NZL",
           "name": "New Zealand",
-          "flag": "🇳🇿",
+          "flag": "\ud83c\uddf3\ud83c\uddff",
           "flagCode": "nz"
         }
       ],
@@ -614,25 +614,25 @@
         {
           "id": "ESP",
           "name": "Spain",
-          "flag": "🇪🇸",
+          "flag": "\ud83c\uddea\ud83c\uddf8",
           "flagCode": "es"
         },
         {
           "id": "CPV",
           "name": "Cape Verde",
-          "flag": "🇨🇻",
+          "flag": "\ud83c\udde8\ud83c\uddfb",
           "flagCode": "cv"
         },
         {
           "id": "KSA",
           "name": "Saudi Arabia",
-          "flag": "🇸🇦",
+          "flag": "\ud83c\uddf8\ud83c\udde6",
           "flagCode": "sa"
         },
         {
           "id": "URU",
           "name": "Uruguay",
-          "flag": "🇺🇾",
+          "flag": "\ud83c\uddfa\ud83c\uddfe",
           "flagCode": "uy"
         }
       ],
@@ -699,25 +699,25 @@
         {
           "id": "FRA",
           "name": "France",
-          "flag": "🇫🇷",
+          "flag": "\ud83c\uddeb\ud83c\uddf7",
           "flagCode": "fr"
         },
         {
           "id": "SEN",
           "name": "Senegal",
-          "flag": "🇸🇳",
+          "flag": "\ud83c\uddf8\ud83c\uddf3",
           "flagCode": "sn"
         },
         {
           "id": "IRQ",
           "name": "Iraq",
-          "flag": "🇮🇶",
+          "flag": "\ud83c\uddee\ud83c\uddf6",
           "flagCode": "iq"
         },
         {
           "id": "NOR",
           "name": "Norway",
-          "flag": "🇳🇴",
+          "flag": "\ud83c\uddf3\ud83c\uddf4",
           "flagCode": "no"
         }
       ],
@@ -784,25 +784,25 @@
         {
           "id": "ARG",
           "name": "Argentina",
-          "flag": "🇦🇷",
+          "flag": "\ud83c\udde6\ud83c\uddf7",
           "flagCode": "ar"
         },
         {
           "id": "ALG",
           "name": "Algeria",
-          "flag": "🇩🇿",
+          "flag": "\ud83c\udde9\ud83c\uddff",
           "flagCode": "dz"
         },
         {
           "id": "AUT",
           "name": "Austria",
-          "flag": "🇦🇹",
+          "flag": "\ud83c\udde6\ud83c\uddf9",
           "flagCode": "at"
         },
         {
           "id": "JOR",
           "name": "Jordan",
-          "flag": "🇯🇴",
+          "flag": "\ud83c\uddef\ud83c\uddf4",
           "flagCode": "jo"
         }
       ],
@@ -869,25 +869,25 @@
         {
           "id": "POR",
           "name": "Portugal",
-          "flag": "🇵🇹",
+          "flag": "\ud83c\uddf5\ud83c\uddf9",
           "flagCode": "pt"
         },
         {
           "id": "COD",
           "name": "Congo DR",
-          "flag": "🇨🇩",
+          "flag": "\ud83c\udde8\ud83c\udde9",
           "flagCode": "cd"
         },
         {
           "id": "UZB",
           "name": "Uzbekistan",
-          "flag": "🇺🇿",
+          "flag": "\ud83c\uddfa\ud83c\uddff",
           "flagCode": "uz"
         },
         {
           "id": "COL",
           "name": "Colombia",
-          "flag": "🇨🇴",
+          "flag": "\ud83c\udde8\ud83c\uddf4",
           "flagCode": "co"
         }
       ],
@@ -954,25 +954,25 @@
         {
           "id": "ENG",
           "name": "England",
-          "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+          "flag": "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f",
           "flagCode": "gb-eng"
         },
         {
           "id": "CRO",
           "name": "Croatia",
-          "flag": "🇭🇷",
+          "flag": "\ud83c\udded\ud83c\uddf7",
           "flagCode": "hr"
         },
         {
           "id": "GHA",
           "name": "Ghana",
-          "flag": "🇬🇭",
+          "flag": "\ud83c\uddec\ud83c\udded",
           "flagCode": "gh"
         },
         {
           "id": "PAN",
           "name": "Panama",
-          "flag": "🇵🇦",
+          "flag": "\ud83c\uddf5\ud83c\udde6",
           "flagCode": "pa"
         }
       ],
@@ -1039,26 +1039,6 @@
       "name": "Round of 32",
       "matches": [
         {
-          "id": "R32_1",
-          "num": 73,
-          "round": "R32",
-          "homeSlot": "2A",
-          "awaySlot": "2B",
-          "date": "2026-06-28",
-          "time": "15:00",
-          "venue": "SoFi Stadium, Inglewood"
-        },
-        {
-          "id": "R32_2",
-          "num": 76,
-          "round": "R32",
-          "homeSlot": "1C",
-          "awaySlot": "2F",
-          "date": "2026-06-29",
-          "time": "13:00",
-          "venue": "NRG Stadium, Houston"
-        },
-        {
           "id": "R32_3",
           "num": 74,
           "round": "R32",
@@ -1067,6 +1047,26 @@
           "date": "2026-06-29",
           "time": "16:30",
           "venue": "Gillette Stadium, Foxborough"
+        },
+        {
+          "id": "R32_6",
+          "num": 77,
+          "round": "R32",
+          "homeSlot": "1I",
+          "awaySlot": "3rd_F",
+          "date": "2026-06-30",
+          "time": "17:00",
+          "venue": "MetLife Stadium, East Rutherford"
+        },
+        {
+          "id": "R32_1",
+          "num": 73,
+          "round": "R32",
+          "homeSlot": "2A",
+          "awaySlot": "2B",
+          "date": "2026-06-28",
+          "time": "15:00",
+          "venue": "SoFi Stadium, Inglewood"
         },
         {
           "id": "R32_4",
@@ -1079,6 +1079,56 @@
           "venue": "Estadio BBVA, Guadalupe"
         },
         {
+          "id": "R32_13",
+          "num": 83,
+          "round": "R32",
+          "homeSlot": "2K",
+          "awaySlot": "2L",
+          "date": "2026-07-02",
+          "time": "19:00",
+          "venue": "BMO Field, Toronto"
+        },
+        {
+          "id": "R32_12",
+          "num": 84,
+          "round": "R32",
+          "homeSlot": "1H",
+          "awaySlot": "2J",
+          "date": "2026-07-02",
+          "time": "15:00",
+          "venue": "SoFi Stadium, Inglewood"
+        },
+        {
+          "id": "R32_10",
+          "num": 81,
+          "round": "R32",
+          "homeSlot": "1D",
+          "awaySlot": "3rd_B",
+          "date": "2026-07-01",
+          "time": "20:00",
+          "venue": "Levi's Stadium, Santa Clara"
+        },
+        {
+          "id": "R32_9",
+          "num": 82,
+          "round": "R32",
+          "homeSlot": "1G",
+          "awaySlot": "3rd_I",
+          "date": "2026-07-01",
+          "time": "16:00",
+          "venue": "Lumen Field, Seattle"
+        },
+        {
+          "id": "R32_2",
+          "num": 76,
+          "round": "R32",
+          "homeSlot": "1C",
+          "awaySlot": "2F",
+          "date": "2026-06-29",
+          "time": "13:00",
+          "venue": "NRG Stadium, Houston"
+        },
+        {
           "id": "R32_5",
           "num": 78,
           "round": "R32",
@@ -1087,16 +1137,6 @@
           "date": "2026-06-30",
           "time": "13:00",
           "venue": "AT&T Stadium, Arlington"
-        },
-        {
-          "id": "R32_6",
-          "num": 77,
-          "round": "R32",
-          "homeSlot": "1I",
-          "awaySlot": "3rd_F",
-          "date": "2026-06-30",
-          "time": "17:00",
-          "venue": "MetLife Stadium, East Rutherford"
         },
         {
           "id": "R32_7",
@@ -1119,54 +1159,14 @@
           "venue": "Mercedes-Benz Stadium, Atlanta"
         },
         {
-          "id": "R32_9",
-          "num": 82,
+          "id": "R32_15",
+          "num": 86,
           "round": "R32",
-          "homeSlot": "1G",
-          "awaySlot": "3rd_I",
-          "date": "2026-07-01",
-          "time": "16:00",
-          "venue": "Lumen Field, Seattle"
-        },
-        {
-          "id": "R32_10",
-          "num": 81,
-          "round": "R32",
-          "homeSlot": "1D",
-          "awaySlot": "3rd_B",
-          "date": "2026-07-01",
-          "time": "20:00",
-          "venue": "Levi's Stadium, Santa Clara"
-        },
-        {
-          "id": "R32_12",
-          "num": 84,
-          "round": "R32",
-          "homeSlot": "1H",
-          "awaySlot": "2J",
-          "date": "2026-07-02",
-          "time": "15:00",
-          "venue": "SoFi Stadium, Inglewood"
-        },
-        {
-          "id": "R32_13",
-          "num": 83,
-          "round": "R32",
-          "homeSlot": "2K",
-          "awaySlot": "2L",
-          "date": "2026-07-02",
-          "time": "19:00",
-          "venue": "BMO Field, Toronto"
-        },
-        {
-          "id": "R32_11",
-          "num": 85,
-          "round": "R32",
-          "homeSlot": "1B",
-          "awaySlot": "3rd_J",
-          "date": "2026-07-02",
-          "time": "23:00",
-          "venue": "BC Place, Vancouver"
+          "homeSlot": "1J",
+          "awaySlot": "2H",
+          "date": "2026-07-03",
+          "time": "18:00",
+          "venue": "Hard Rock Stadium, Miami"
         },
         {
           "id": "R32_14",
@@ -1179,14 +1179,14 @@
           "venue": "AT&T Stadium, Arlington"
         },
         {
-          "id": "R32_15",
-          "num": 86,
+          "id": "R32_11",
+          "num": 85,
           "round": "R32",
-          "homeSlot": "1J",
-          "awaySlot": "2H",
-          "date": "2026-07-03",
-          "time": "18:00",
-          "venue": "Hard Rock Stadium, Miami"
+          "homeSlot": "1B",
+          "awaySlot": "3rd_J",
+          "date": "2026-07-02",
+          "time": "23:00",
+          "venue": "BC Place, Vancouver"
         },
         {
           "id": "R32_16",
@@ -1204,30 +1204,30 @@
       "name": "Round of 16",
       "matches": [
         {
-          "id": "R16_2",
-          "num": 90,
-          "round": "R16",
-          "homeSlot": "W:R32_3",
-          "awaySlot": "W:R32_1",
-          "date": "2026-07-04",
-          "time": "13:00",
-          "venue": "TBD"
-        },
-        {
           "id": "R16_1",
           "num": 89,
           "round": "R16",
-          "homeSlot": "W:R32_6",
-          "awaySlot": "W:R32_13",
+          "homeSlot": "W:R32_3",
+          "awaySlot": "W:R32_6",
           "date": "2026-07-04",
           "time": "17:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_2",
+          "num": 90,
+          "round": "R16",
+          "homeSlot": "W:R32_1",
+          "awaySlot": "W:R32_4",
+          "date": "2026-07-04",
+          "time": "13:00",
           "venue": "TBD"
         },
         {
           "id": "R16_3",
           "num": 91,
           "round": "R16",
-          "homeSlot": "W:R32_4",
+          "homeSlot": "W:R32_13",
           "awaySlot": "W:R32_12",
           "date": "2026-07-05",
           "time": "16:00",
@@ -1247,8 +1247,8 @@
           "id": "R16_5",
           "num": 93,
           "round": "R16",
-          "homeSlot": "W:R32_7",
-          "awaySlot": "W:R32_8",
+          "homeSlot": "W:R32_2",
+          "awaySlot": "W:R32_5",
           "date": "2026-07-06",
           "time": "15:00",
           "venue": "TBD"
@@ -1257,8 +1257,8 @@
           "id": "R16_6",
           "num": 94,
           "round": "R16",
-          "homeSlot": "W:R32_2",
-          "awaySlot": "W:R32_5",
+          "homeSlot": "W:R32_7",
+          "awaySlot": "W:R32_8",
           "date": "2026-07-06",
           "time": "20:00",
           "venue": "TBD"
@@ -1267,8 +1267,8 @@
           "id": "R16_7",
           "num": 95,
           "round": "R16",
-          "homeSlot": "W:R32_14",
-          "awaySlot": "W:R32_16",
+          "homeSlot": "W:R32_15",
+          "awaySlot": "W:R32_14",
           "date": "2026-07-07",
           "time": "12:00",
           "venue": "TBD"
@@ -1277,8 +1277,8 @@
           "id": "R16_8",
           "num": 96,
           "round": "R16",
-          "homeSlot": "W:R32_15",
-          "awaySlot": "W:R32_11",
+          "homeSlot": "W:R32_11",
+          "awaySlot": "W:R32_16",
           "date": "2026-07-07",
           "time": "16:00",
           "venue": "TBD"
@@ -1302,8 +1302,8 @@
           "id": "QF_2",
           "num": 98,
           "round": "QF",
-          "homeSlot": "W:R16_5",
-          "awaySlot": "W:R16_6",
+          "homeSlot": "W:R16_3",
+          "awaySlot": "W:R16_4",
           "date": "2026-07-10",
           "time": "15:00",
           "venue": "TBD"
@@ -1312,8 +1312,8 @@
           "id": "QF_3",
           "num": 99,
           "round": "QF",
-          "homeSlot": "W:R16_3",
-          "awaySlot": "W:R16_4",
+          "homeSlot": "W:R16_5",
+          "awaySlot": "W:R16_6",
           "date": "2026-07-11",
           "time": "17:00",
           "venue": "TBD"

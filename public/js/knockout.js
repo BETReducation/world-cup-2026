@@ -42,7 +42,7 @@ function fmtKoDate(dateStr, timeStr) {
 function fmtSlot(slot) {
   if (!slot) return '?';
   // 3rd-place group slot
-  const m3rd = slot.match(/^3rd_([A-L]{2,})$/);
+  const m3rd = slot.match(/^3rd_([A-L]+)$/);
   if (m3rd) return `3rd(${m3rd[1]})`;
   // Group position: "1A", "2B" etc.
   if (/^[12][A-L]$/.test(slot)) return slot;
@@ -230,6 +230,41 @@ function buildTabs() {
   });
 }
 
+function buildMatchRow(m, locked, browseMode, userId, koPredictions, isSaved) {
+  const home       = m.home ? getTeam(m.home) : null;
+  const away       = m.away ? getTeam(m.away) : null;
+  const homeName   = home ? home.name  : (m.homeLabel || m.homeSlot || 'TBD');
+  const awayName   = away ? away.name  : (m.awayLabel || m.awaySlot || 'TBD');
+  const homeFlag   = home ? home.flagCode : '';
+  const awayFlag   = away ? away.flagCode : '';
+  const teamsKnown = !!(m.home && m.away);
+  const inputActive = teamsKnown && !locked && !browseMode && userId;
+  const dis        = inputActive ? '' : 'disabled';
+  const cls        = locked ? 'round-locked' : '';
+  const pred       = koPredictions[m.id] || { home: '', away: '' };
+  return `
+    <div class="match-row ${cls}" id="row_${m.id}">
+      <div class="match-meta">${m.num ? `<span class="match-num">#${m.num}</span>` : ''}${fmtKoDate(m.date, m.time)}</div>
+      <div class="team-name">
+        ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
+      </div>
+      <div class="score-input">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.home}" ${dis}
+          data-match="${m.id}" data-side="home" class="ko-pred-input"
+          autocomplete="off" aria-label="${homeName} goals">
+        <span class="score-sep">–</span>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.away}" ${dis}
+          data-match="${m.id}" data-side="away" class="ko-pred-input"
+          autocomplete="off" aria-label="${awayName} goals">
+        <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>
+      </div>
+      <div class="team-name right">
+        ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
+      </div>
+      ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
+    </div>`;
+}
+
 // ── Round panel ───────────────────────────────────────────────────────────────
 
 function showRound(roundKey) {
@@ -254,41 +289,35 @@ function showRound(roundKey) {
   </div>`;
   html += `<div class="match-list">`;
 
-  const sortedMatches = [...round.matches].sort((a, b) => (a.num || 0) - (b.num || 0));
-  for (const m of sortedMatches) {
-    const home       = m.home ? getTeam(m.home) : null;
-    const away       = m.away ? getTeam(m.away) : null;
-    const homeName   = home ? home.name  : (m.homeLabel || m.homeSlot || 'TBD');
-    const awayName   = away ? away.name  : (m.awayLabel || m.awaySlot || 'TBD');
-    const homeFlag   = home ? home.flagCode : '';
-    const awayFlag   = away ? away.flagCode : '';
-    const teamsKnown = !!(m.home && m.away);
-    const inputActive = teamsKnown && !locked && !browseMode && userId;
-    const dis        = inputActive ? '' : 'disabled';
-    const cls        = locked ? 'round-locked' : '';
-    const pred       = koPredictions[m.id] || { home: '', away: '' };
+  // R32 is already ordered in bracket position; other rounds stay as-is
+  const sortedMatches = roundKey === 'R32'
+    ? [...round.matches]
+    : [...round.matches].sort((a, b) => (a.num || 0) - (b.num || 0));
 
-    html += `
-      <div class="match-row ${cls}" id="row_${m.id}">
-        <div class="match-meta">${m.num ? `<span class="match-num">#${m.num}</span>` : ''}${fmtKoDate(m.date, m.time)}</div>
-        <div class="team-name">
-          ${homeFlag ? `<span class="flag fi fi-${homeFlag}"></span>` : ''}${homeName}
-        </div>
-        <div class="score-input">
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.home}" ${dis}
-            data-match="${m.id}" data-side="home" class="ko-pred-input"
-            autocomplete="off" aria-label="${homeName} goals">
-          <span class="score-sep">–</span>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${pred.away}" ${dis}
-            data-match="${m.id}" data-side="away" class="ko-pred-input"
-            autocomplete="off" aria-label="${awayName} goals">
-          <div class="slot-hint">${fmtSlot(m.homeSlot)} vs ${fmtSlot(m.awaySlot)}</div>
-        </div>
-        <div class="team-name right">
-          ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
-        </div>
-        ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
-      </div>`;
+  if (roundKey === 'R32') {
+    // Two-column bracket layout: left half (positions 0-7) and right half (8-15)
+    const halves = [sortedMatches.slice(0, 8), sortedMatches.slice(8)];
+    const halfLabels = ['Left Half', 'Right Half'];
+    html += `<div class="bracket-halves">`;
+    halves.forEach((halfMatches, hi) => {
+      html += `<div class="bracket-half"><div class="bracket-half-label">${halfLabels[hi]}</div><div class="match-list bracket-half-list">`;
+      for (const m of halfMatches) {
+        html += buildMatchRow(m, locked, browseMode, userId, koPredictions, isSaved);
+      }
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+    html += `</div>`;
+    panels.innerHTML = html;
+    panels.querySelectorAll('.ko-pred-input').forEach(input => {
+      input.addEventListener('input', onPredInput);
+      if (isSaved) input.classList.add('saved');
+    });
+    return;
+  }
+
+  for (const m of sortedMatches) {
+    html += buildMatchRow(m, locked, browseMode, userId, koPredictions, isSaved);
   }
 
   html += `</div></div>`;
