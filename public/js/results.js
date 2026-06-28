@@ -405,22 +405,17 @@ async function renderLeaderboard() {
     return;
   }
 
-  const matchRound  = {};
-  const roundTotals = {};
+  const groupMatchIds = new Set();
   let totalGroupMatches = 0;
   Object.values(fixtures.groups).forEach(g => {
-    g.matches.forEach(m => {
-      matchRound[m.id] = m.round;
-      roundTotals[m.round] = (roundTotals[m.round] || 0) + 1;
-      totalGroupMatches++;
-    });
+    g.matches.forEach(m => { groupMatchIds.add(m.id); totalGroupMatches++; });
   });
-  const groupRounds = Object.keys(roundTotals).sort();
 
-  const koMatchIds = new Set();
+  const koMatchRound = {};
   let totalKoMatches = 0;
-  Object.values(fixtures.knockout || {}).forEach(r => {
-    (r.matches || []).forEach(m => { koMatchIds.add(m.id); totalKoMatches++; });
+  KO_ROUND_ORDER.forEach(rk => {
+    const r = (fixtures.knockout || {})[rk];
+    (r?.matches || []).forEach(m => { koMatchRound[m.id] = rk; totalKoMatches++; });
   });
 
   const totalMatches = totalGroupMatches + totalKoMatches;
@@ -447,31 +442,17 @@ async function renderLeaderboard() {
     }
     const preds = predsByUser[p.id] || {};
 
-    const roundCounts = {};
-    groupRounds.forEach(r => { roundCounts[r] = 0; });
-
-    let koPredCount = 0;
-    let koPts = 0;
-    Object.entries(preds).forEach(([matchId, pred]) => {
-      if (pred.home === '' || pred.away === '') return;
-      if (koMatchIds.has(matchId)) {
-        koPredCount++;
-      } else {
-        const r = matchRound[matchId];
-        if (r !== undefined) roundCounts[r]++;
-      }
-    });
+    const koRoundPts = {};
+    KO_ROUND_ORDER.forEach(rk => { koRoundPts[rk] = 0; });
     Object.entries(p.matchPoints || {}).forEach(([matchId, pts]) => {
-      if (koMatchIds.has(matchId)) koPts += pts;
+      const rk = koMatchRound[matchId];
+      if (rk) koRoundPts[rk] += pts;
     });
 
-    const roundCells = groupRounds.map(r =>
-      `<td style="font-family:'JetBrains Mono',monospace; color:var(--muted);">${roundCounts[r]}/${roundTotals[r]}</td>`
-    ).join('');
-
-    const koCell = totalKoMatches > 0
-      ? `<td style="font-family:'JetBrains Mono',monospace; color:${koPts > 0 ? 'var(--teal)' : 'var(--muted)'};">${koPts > 0 ? '+' : ''}${koPts}</td>`
-      : '';
+    const koCells = KO_ROUND_ORDER.map(rk => {
+      const pts = koRoundPts[rk];
+      return `<td style="font-family:'JetBrains Mono',monospace; color:${pts > 0 ? 'var(--teal)' : 'var(--muted)'};">${pts > 0 ? '+' + pts : pts}</td>`;
+    }).join('');
 
     return `
     <tr>
@@ -480,19 +461,15 @@ async function renderLeaderboard() {
       <td class="total-pts">${p.totalPoints}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${p.correctResults}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${p.correctScores}</td>
-      ${roundCells}
-      ${koCell}
+      ${koCells}
       <td style="font-family:'JetBrains Mono',monospace; color:var(--muted);">${p.predictionsEntered}/${totalMatches}</td>
     </tr>`;
   }).join('');
 
-  const roundHeaders = groupRounds.map(r =>
-    `<th title="Round ${r} predictions entered">R${r}</th>`
+  const KO_ROUND_LABELS = { R32: 'R32', R16: 'R16', QF: 'QF', SF: 'SF', '3P': '3rd', F: 'Final' };
+  const koHeaders = KO_ROUND_ORDER.map(rk =>
+    `<th title="${KO_ROUND_LABELS[rk]} points">${KO_ROUND_LABELS[rk]}</th>`
   ).join('');
-
-  const koHeader = totalKoMatches > 0
-    ? `<th title="Knockout points">KO Pts</th>`
-    : '';
 
   el.innerHTML = `
     <table class="leaderboard-table">
@@ -503,8 +480,7 @@ async function renderLeaderboard() {
           <th title="Total points">Pts</th>
           <th title="Correct results (3 pts)">Results</th>
           <th title="Exact scores (+2 pts)">Exact</th>
-          ${roundHeaders}
-          ${koHeader}
+          ${koHeaders}
           <th title="Total predictions entered">Entered</th>
         </tr>
       </thead>
