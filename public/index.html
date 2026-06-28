@@ -177,11 +177,6 @@
     <div id="nextDeadlineContent"></div>
   </div>
 
-  <!-- Section 3: Confirmed Knockout Fixtures -->
-  <div id="confirmedKOCard" class="live-card" style="display:none;">
-    <div class="live-card-hdr"><i class="fa-solid fa-shield-halved"></i> Confirmed Knockout Fixtures</div>
-    <div id="confirmedKOList"></div>
-  </div>
 
 </div>
 
@@ -474,28 +469,8 @@
       document.getElementById('nextDeadlineCard').style.display = '';
     }
 
-    // Section 3: Confirmed KO fixtures
-    const confirmedKO = allMatches.filter(m => m.isKO && m.homeResolved && m.awayResolved);
-    if (confirmedKO.length) {
-      document.getElementById('confirmedKOList').innerHTML = confirmedKO.map(m => `
-        <div class="fixture-row">
-          <div class="fixture-stage">${m.label}</div>
-          <div class="fixture-teams">
-            <div class="fixture-team home">${flagHtml(m.ht.flagCode)} ${m.ht.name}</div>
-            <div class="fixture-vs">vs</div>
-            <div class="fixture-team away">${m.at.name} ${flagHtml(m.at.flagCode)}</div>
-          </div>
-          <div class="fixture-times">
-            <span>${fmtDay(m.kickoff)}</span>
-            <span><span class="fixture-tz">UK</span> ${fmtTime(m.kickoff, 'Europe/London', m.date)}</span>
-            <span><span class="fixture-tz">VN</span> ${fmtTime(m.kickoff, 'Asia/Ho_Chi_Minh', m.date)}</span>
-          </div>
-        </div>`).join('');
-      document.getElementById('confirmedKOCard').style.display = '';
-    }
-
     // Show dashboard if any card is visible
-    if (upcoming.length || nextDl || confirmedKO.length) {
+    if (upcoming.length || nextDl) {
       document.getElementById('liveDashboard').style.display = '';
     }
   } catch (e) {
