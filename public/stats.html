@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-GB" data-theme="dark">
+<html lang="en-GB" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -304,7 +304,7 @@ const $ = id => document.getElementById(id);
 // ── Theme ──────────────────────────────────────────────────────────────────────
 const themeToggle = $('themeToggle');
 const html = document.documentElement;
-const savedTheme = localStorage.getItem('wc26_theme') || 'dark';
+const savedTheme = localStorage.getItem('wc26_theme') || 'light';
 html.dataset.theme = savedTheme;
 themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-regular fa-sun"></i>';
 themeToggle.addEventListener('click', () => {
