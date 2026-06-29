@@ -238,9 +238,10 @@ function buildMatchRow(m, locked, browseMode, userId, koPredictions, isSaved) {
   const homeFlag   = home ? home.flagCode : '';
   const awayFlag   = away ? away.flagCode : '';
   const teamsKnown = !!(m.home && m.away);
-  const inputActive = teamsKnown && !locked && !browseMode && userId;
+  const matchLocked = locked || !!m.locked;
+  const inputActive = teamsKnown && !matchLocked && !browseMode && userId;
   const dis        = inputActive ? '' : 'disabled';
-  const cls        = locked ? 'round-locked' : '';
+  const cls        = matchLocked ? 'round-locked' : '';
   const pred       = koPredictions[m.id] || { home: '', away: '' };
   return `
     <div class="match-row ${cls}" id="row_${m.id}">
@@ -261,7 +262,7 @@ function buildMatchRow(m, locked, browseMode, userId, koPredictions, isSaved) {
       <div class="team-name right">
         ${awayName}${awayFlag ? `<span class="flag fi fi-${awayFlag}"></span>` : ''}
       </div>
-      ${locked ? '<span class="lock-badge">LOCKED</span>' : ''}
+      ${matchLocked ? '<span class="lock-badge">LOCKED</span>' : ''}
     </div>`;
 }
 
