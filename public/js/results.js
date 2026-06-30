@@ -288,7 +288,12 @@ function showKoRound(roundKey) {
         </div>
         <div class="ko-score-col">
           <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
-          ${played && result.winner ? `<div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:center;">${result.winner === 'home' ? homeName : awayName} on pens</div>` : ''}
+          ${played && (result.etHome != null || result.winner) ? (() => {
+            const parts = [];
+            if (result.etHome != null) parts.push(`AET ${result.etHome}–${result.etAway}`);
+            if (result.winner) parts.push(`${result.winner === 'home' ? homeName : awayName} on pens`);
+            return `<div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:center;">${parts.join(' · ')}</div>`;
+          })() : ''}
           <div class="slot-hint">${fmtKoSlot(m.homeSlot)} vs ${fmtKoSlot(m.awaySlot)}</div>
         </div>
         <div class="team-name right">
@@ -304,16 +309,24 @@ function showKoRound(roundKey) {
     if (isAdmin && teamsKnown) {
       const h = played ? result.home : '';
       const a = played ? result.away : '';
+      const etH = played ? (result.etHome ?? '') : '';
+      const etA = played ? (result.etAway ?? '') : '';
       const savedWinner = played ? (result.winner || '') : '';
+      const selStyle = `font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 6px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);`;
       html += `
         <div class="admin-panel">
-          <h4>${homeName} vs ${awayName} — record result (90 mins)</h4>
-          <div class="score-entry">
+          <h4>${homeName} vs ${awayName} — record result</h4>
+          <div class="score-entry" style="flex-wrap:wrap;gap:8px;">
+            <span style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;">90 mins</span>
             <input type="number" min="0" max="20" value="${h}" id="h_${m.id}" placeholder="0">
             <span class="score-sep">–</span>
             <input type="number" min="0" max="20" value="${a}" id="a_${m.id}" placeholder="0">
-            <select id="winner_${m.id}" style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 6px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);">
-              <option value="">ET/Pens winner?</option>
+            <span style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:8px;">AET</span>
+            <input type="number" min="0" max="20" value="${etH}" id="eth_${m.id}" placeholder="–" style="width:42px;">
+            <span class="score-sep">–</span>
+            <input type="number" min="0" max="20" value="${etA}" id="eta_${m.id}" placeholder="–" style="width:42px;">
+            <select id="winner_${m.id}" style="${selStyle}margin-left:8px;">
+              <option value="">Pens winner?</option>
               <option value="home" ${savedWinner === 'home' ? 'selected' : ''}>${homeName}</option>
               <option value="away" ${savedWinner === 'away' ? 'selected' : ''}>${awayName}</option>
             </select>
@@ -544,6 +557,10 @@ async function deleteResult(matchId) {
 async function saveKoResult(matchId) {
   const h = parseInt(document.getElementById(`h_${matchId}`).value);
   const a = parseInt(document.getElementById(`a_${matchId}`).value);
+  const ethEl = document.getElementById(`eth_${matchId}`);
+  const etaEl = document.getElementById(`eta_${matchId}`);
+  const etHome = ethEl && ethEl.value !== '' ? parseInt(ethEl.value) : null;
+  const etAway = etaEl && etaEl.value !== '' ? parseInt(etaEl.value) : null;
   const winnerEl = document.getElementById(`winner_${matchId}`);
   const winner = winnerEl ? winnerEl.value || null : null;
   const status = document.getElementById(`status_${matchId}`);
@@ -553,7 +570,7 @@ async function saveKoResult(matchId) {
 
   status.textContent = 'Saving…';
   try {
-    await API.saveResult(matchId, h, a, adminPassword, winner);
+    await API.saveResult(matchId, h, a, adminPassword, winner, etHome, etAway);
     [fixtures, results] = await Promise.all([API.fixtures(), API.results()]);
     allTeams = buildKoTeamsMap(fixtures);
     await renderLeaderboard();

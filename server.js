@@ -968,7 +968,7 @@ app.get('/api/leaderboard/previous', (req, res) => {
 });
 
 app.post('/api/results', requireAdmin, (req, res) => {
-  const { matchId, homeGoals, awayGoals, winner } = req.body;
+  const { matchId, homeGoals, awayGoals, winner, etHome, etAway } = req.body;
   if (!matchId || homeGoals === undefined || awayGoals === undefined)
     return res.status(400).json({ error: 'matchId, homeGoals, awayGoals required' });
   if (winner && winner !== 'home' && winner !== 'away')
@@ -980,6 +980,8 @@ app.post('/api/results', requireAdmin, (req, res) => {
     played: true, recordedAt: new Date().toISOString()
   };
   if (winner) entry.winner = winner;
+  if (etHome != null) entry.etHome = parseInt(etHome);
+  if (etAway != null) entry.etAway = parseInt(etAway);
   data.results[matchId] = entry;
   writeJSON(RESULTS_FILE, data);
   res.json({ success: true });
