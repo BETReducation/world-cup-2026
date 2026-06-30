@@ -483,6 +483,9 @@ function resolveSlot(slot, slotMap, resolvedMatches, results) {
     if (!result?.played) return null;
     if (result.home > result.away) return type === 'W' ? resolved.home : resolved.away;
     if (result.away > result.home) return type === 'W' ? resolved.away : resolved.home;
+    // Draw at 90 mins — use explicit winner (ET/pens)
+    if (result.winner === 'home') return type === 'W' ? resolved.home : resolved.away;
+    if (result.winner === 'away') return type === 'W' ? resolved.away : resolved.home;
     return null;
   }
   return null;
@@ -965,15 +968,19 @@ app.get('/api/leaderboard/previous', (req, res) => {
 });
 
 app.post('/api/results', requireAdmin, (req, res) => {
-  const { matchId, homeGoals, awayGoals } = req.body;
+  const { matchId, homeGoals, awayGoals, winner } = req.body;
   if (!matchId || homeGoals === undefined || awayGoals === undefined)
     return res.status(400).json({ error: 'matchId, homeGoals, awayGoals required' });
+  if (winner && winner !== 'home' && winner !== 'away')
+    return res.status(400).json({ error: 'winner must be "home" or "away"' });
   snapshotLeaderboard();
   const data = readJSON(RESULTS_FILE, { results: {} });
-  data.results[matchId] = {
+  const entry = {
     home: parseInt(homeGoals), away: parseInt(awayGoals),
     played: true, recordedAt: new Date().toISOString()
   };
+  if (winner) entry.winner = winner;
+  data.results[matchId] = entry;
   writeJSON(RESULTS_FILE, data);
   res.json({ success: true });
 });

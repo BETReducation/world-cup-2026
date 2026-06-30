@@ -288,6 +288,7 @@ function showKoRound(roundKey) {
         </div>
         <div class="ko-score-col">
           <div class="scoreline">${played ? `${result.home} – ${result.away}` : 'vs'}</div>
+          ${played && result.winner ? `<div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:center;">${result.winner === 'home' ? homeName : awayName} on pens</div>` : ''}
           <div class="slot-hint">${fmtKoSlot(m.homeSlot)} vs ${fmtKoSlot(m.awaySlot)}</div>
         </div>
         <div class="team-name right">
@@ -303,6 +304,7 @@ function showKoRound(roundKey) {
     if (isAdmin && teamsKnown) {
       const h = played ? result.home : '';
       const a = played ? result.away : '';
+      const savedWinner = played ? (result.winner || '') : '';
       html += `
         <div class="admin-panel">
           <h4>${homeName} vs ${awayName} — record result (90 mins)</h4>
@@ -310,6 +312,11 @@ function showKoRound(roundKey) {
             <input type="number" min="0" max="20" value="${h}" id="h_${m.id}" placeholder="0">
             <span class="score-sep">–</span>
             <input type="number" min="0" max="20" value="${a}" id="a_${m.id}" placeholder="0">
+            <select id="winner_${m.id}" style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 6px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);">
+              <option value="">ET/Pens winner?</option>
+              <option value="home" ${savedWinner === 'home' ? 'selected' : ''}>${homeName}</option>
+              <option value="away" ${savedWinner === 'away' ? 'selected' : ''}>${awayName}</option>
+            </select>
             <button class="btn btn-primary btn-sm" onclick="saveKoResult('${m.id}')">Save</button>
             ${played ? `<button class="btn btn-danger btn-sm" onclick="deleteKoResult('${m.id}')">Clear</button>` : ''}
             <span id="status_${m.id}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent);"></span>
@@ -537,13 +544,16 @@ async function deleteResult(matchId) {
 async function saveKoResult(matchId) {
   const h = parseInt(document.getElementById(`h_${matchId}`).value);
   const a = parseInt(document.getElementById(`a_${matchId}`).value);
+  const winnerEl = document.getElementById(`winner_${matchId}`);
+  const winner = winnerEl ? winnerEl.value || null : null;
   const status = document.getElementById(`status_${matchId}`);
 
   if (isNaN(h) || isNaN(a)) { status.textContent = '⚠ Enter both scores'; return; }
+  if (h === a && !winner) { status.textContent = '⚠ Draw — pick ET/Pens winner'; return; }
 
   status.textContent = 'Saving…';
   try {
-    await API.saveResult(matchId, h, a, adminPassword);
+    await API.saveResult(matchId, h, a, adminPassword, winner);
     [fixtures, results] = await Promise.all([API.fixtures(), API.results()]);
     allTeams = buildKoTeamsMap(fixtures);
     await renderLeaderboard();

@@ -73,9 +73,11 @@ const API = {
     if (token) headers['x-session-token']  = token;
     return fetch('/api/admin/verify', { headers }).then(r => r.ok);
   },
-  saveResult(matchId, hg, ag, pwd = null) {
+  saveResult(matchId, hg, ag, pwd = null, winner = null) {
     const { token } = Session.load();
-    return API.post('/api/results', { matchId, homeGoals: hg, awayGoals: ag }, pwd, token);
+    const body = { matchId, homeGoals: hg, awayGoals: ag };
+    if (winner) body.winner = winner;
+    return API.post('/api/results', body, pwd, token);
   },
   deleteResult: (matchId, pwd = null) => API.del(`/api/results/${matchId}`, pwd),
 
