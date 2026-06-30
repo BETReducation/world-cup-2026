@@ -318,25 +318,28 @@ function winnerSide(results, matchId) {
   if (!r || !r.played) return null;
   if (r.home > r.away) return 'home';
   if (r.away > r.home) return 'away';
-  return null; // draw (shouldn't happen in KO)
+  return r.winner || null; // ET/pens
 }
 
 function renderMatch(match, results) {
   const home   = teamLabel(match, 'home');
   const away   = teamLabel(match, 'away');
+  const r      = (results || {})[match.id];
   const hScore = scoreOf(results, match.id, 'home');
   const aScore = scoreOf(results, match.id, 'away');
   const winner = winnerSide(results, match.id);
   const played = hScore !== null;
+  const wentToPens = played && r?.winner && r.home === r.away;
 
   const teamRow = (info, side) => {
     const isWinner = played && winner === side;
     const isTbd = !info.resolved;
+    const score = side === 'home' ? hScore : aScore;
     return `
       <div class="bracket-team ${isWinner ? 'winner' : ''} ${isTbd ? 'tbd' : ''}">
         ${flagHtml(info.flagCode)}
         <span class="team-name">${info.name}</span>
-        ${played ? `<span class="score">${side === 'home' ? hScore : aScore}</span>` : ''}
+        ${played ? `<span class="score">${score}${wentToPens && isWinner ? '<sup style="font-size:8px;letter-spacing:0.03em;opacity:0.8;margin-left:2px;">P</sup>' : ''}</span>` : ''}
       </div>`;
   };
 
