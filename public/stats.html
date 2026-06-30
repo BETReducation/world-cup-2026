@@ -170,7 +170,12 @@
       color: var(--muted);
       padding: 6px 10px 10px;
       border-bottom: 1px solid var(--border);
+      user-select: none;
     }
+    .acc-table th[data-col]:hover { color: var(--text); }
+    .acc-table th[data-col].sort-asc .sort-arrow::after  { content: ' ▲'; }
+    .acc-table th[data-col].sort-desc .sort-arrow::after { content: ' ▼'; }
+    .acc-table th[data-col] .sort-arrow::after { content: ' ⇅'; opacity: 0.35; }
     .acc-table td {
       padding: 9px 10px;
       border-bottom: 1px solid var(--border2);
@@ -446,16 +451,16 @@ function renderAll(s) {
     </div>`).join('');
 
   // ── Player accuracy table ───────────────────────────────────────────────────
-  const playerRows = (s.playerAccuracy || []).map((p, i) => `
+  const playerRows = (s.playerAccuracy || []).map(p => `
     <tr>
-      <td style="font-weight:600;">${i + 1}. ${p.name}</td>
-      <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${p.correct}/${p.total}</td>
-      <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${p.exact}</td>
+      <td style="font-weight:600;">${p.name}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:center;" data-val="${p.correct}">${p.correct}/${p.total}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:center;" data-val="${p.exact}">${p.exact}</td>
       <td class="acc-bar-col">
         <div class="acc-bar-wrap"><div class="acc-bar" style="width:${p.pct}%"></div></div>
       </td>
-      <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);text-align:right;">${p.pct}%</td>
-      <td style="font-family:'JetBrains Mono',monospace;color:var(--muted);text-align:right;" title="Average goals off per match">${p.avgVariance != null ? '±' + p.avgVariance : '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);text-align:right;" data-val="${p.pct}">${p.pct}%</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--muted);text-align:right;" data-val="${p.avgVariance ?? -1}" title="Average goals off per match">${p.avgVariance != null ? '±' + p.avgVariance : '—'}</td>
     </tr>`).join('');
 
   el.innerHTML = `
@@ -509,9 +514,16 @@ function renderAll(s) {
     <div class="stats-section" id="sectionPlayerAccuracy">
       <div class="stats-section-hdr"><i class="fa-solid fa-trophy"></i> Player Prediction Accuracy</div>
       <div class="stats-section-body" style="padding:0;">
-        <table class="acc-table">
-          <thead><tr><th>Player</th><th style="text-align:center;">Correct</th><th style="text-align:center;">Exact</th><th class="acc-bar-col">Accuracy</th><th></th><th style="text-align:right;" title="Average goals off per match">Avg Variance</th></tr></thead>
-          <tbody>${playerRows}</tbody>
+        <table class="acc-table" id="accTable">
+          <thead><tr>
+            <th>Player</th>
+            <th style="text-align:center;cursor:pointer;" data-col="1" title="Sort by correct">Correct <span class="sort-arrow"></span></th>
+            <th style="text-align:center;cursor:pointer;" data-col="2" title="Sort by exact">Exact <span class="sort-arrow"></span></th>
+            <th class="acc-bar-col">Accuracy</th>
+            <th style="cursor:pointer;" data-col="4" title="Sort by %"><span class="sort-arrow"></span> %</th>
+            <th style="text-align:right;cursor:pointer;" data-col="5" title="Sort by variance">Avg Variance <span class="sort-arrow"></span></th>
+          </tr></thead>
+          <tbody id="accTableBody">${playerRows}</tbody>
         </table>
       </div>
     </div>
@@ -710,6 +722,30 @@ function renderAll(s) {
     });
     activeCharts.push(chart);
   }
+}
+
+// ── Player accuracy table sort ─────────────────────────────────────────────────
+{
+  let sortCol = null, sortDir = 1;
+  document.addEventListener('click', e => {
+    const th = e.target.closest('th[data-col]');
+    if (!th || !th.closest('#accTable')) return;
+    const col = parseInt(th.dataset.col);
+    if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = -1; }
+    // Update header classes
+    document.querySelectorAll('#accTable thead th[data-col]').forEach(h => {
+      h.classList.remove('sort-asc', 'sort-desc');
+      if (parseInt(h.dataset.col) === col) h.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+    });
+    const tbody = document.getElementById('accTableBody');
+    const rows = [...tbody.querySelectorAll('tr')];
+    rows.sort((a, b) => {
+      const av = parseFloat(a.children[col].dataset.val ?? 0);
+      const bv = parseFloat(b.children[col].dataset.val ?? 0);
+      return (av - bv) * sortDir;
+    });
+    rows.forEach(r => tbody.appendChild(r));
+  });
 }
 
 // ── Live tables (scorers / cards) ──────────────────────────────────────────────
