@@ -527,7 +527,7 @@ nav.site-nav {
   align-items: center;
   justify-content: center;
   align-self: stretch;
-  flex-shrink: 0;
+  flex: 0 0 160px;
 }
 
 .score-input input[type="text"] {
@@ -705,7 +705,7 @@ nav.site-nav {
 }
 
 .scoreline {
-  flex: 0 0 76px;
+  flex: 0 0 76px; /* width in group-stage row; overridden when inside .ko-score-col */
   text-align: center;
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.25rem;
@@ -720,6 +720,7 @@ nav.site-nav {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+.ko-score-col .scoreline { flex: none; }
 
 /* ── Comparison panel ────────────────────────────────────────────────────── */
 .comparison-panel {
