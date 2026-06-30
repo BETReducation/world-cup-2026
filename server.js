@@ -1048,7 +1048,7 @@ app.get('/api/stats', (req, res) => {
     g.matches.forEach(m => { matchInfo[m.id] = { home: teamName[m.home] || m.home, away: teamName[m.away] || m.away, date: m.date }; })
   );
   Object.values(fixtures.knockout || {}).forEach(r =>
-    (r.matches || []).forEach(m => { matchInfo[m.id] = { home: m.homeLabel || teamName[m.home] || m.home || '?', away: m.awayLabel || teamName[m.away] || m.away || '?' }; })
+    (r.matches || []).forEach(m => { matchInfo[m.id] = { home: m.homeLabel || teamName[m.home] || m.home || '?', away: m.awayLabel || teamName[m.away] || m.away || '?', date: m.date || '', ko: true, num: m.num }; })
   );
 
   const played = Object.entries(results).filter(([, r]) => r.played);
@@ -1205,10 +1205,18 @@ app.get('/api/stats', (req, res) => {
     .sort((a, b) => b[1] - a[1])
     .map(([s, c]) => ({ scoreline: s, count: c }));
 
-  // Accuracy per match (for chart)
-  const accuracyChart = Object.entries(matchAccuracy)
-    .map(([id, m]) => ({ id, label: `${m.homeTeam} v ${m.awayTeam}`, pct: m.pct, date: matchInfo[id]?.date || '' }))
+  // Accuracy per match (for chart) — split into group stage and knockout
+  const allAccuracyEntries = Object.entries(matchAccuracy)
+    .map(([id, m]) => {
+      const info = matchInfo[id] || {};
+      return { id, label: `${m.homeTeam} v ${m.awayTeam}`, pct: m.pct, date: info.date || '', ko: !!info.ko, num: info.num || 0 };
+    });
+  const accuracyChart = allAccuracyEntries
+    .filter(e => !e.ko)
     .sort((a, b) => a.date !== b.date ? a.date.localeCompare(b.date) : a.id.localeCompare(b.id));
+  const koAccuracyChart = allAccuracyEntries
+    .filter(e => e.ko)
+    .sort((a, b) => a.num !== b.num ? a.num - b.num : a.id.localeCompare(b.id));
 
   // Per-player prediction accuracy + variance
   const playerAccuracy = users.map(u => {
@@ -1261,6 +1269,7 @@ app.get('/api/stats', (req, res) => {
     goalsTimeline,
     scorelineDist,
     accuracyChart,
+    koAccuracyChart,
     playerAccuracy,
   });
 });
