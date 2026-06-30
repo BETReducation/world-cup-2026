@@ -1032,9 +1032,10 @@ app.get('/api/leaderboard', (req, res) => res.json(calcLeaderboard()));
 // ── Tournament stats ───────────────────────────────────────────────────────────
 
 app.get('/api/stats', (req, res) => {
-  const fixtures  = readJSON(FIXTURES_FILE, { groups: {} });
-  const results   = readJSON(RESULTS_FILE,  { results: {} }).results || {};
-  const users     = readJSON(PREDICTIONS_FILE, { users: [] }).users;
+  const fixturesRaw = readJSON(FIXTURES_FILE, { groups: {} });
+  const results     = readJSON(RESULTS_FILE,  { results: {} }).results || {};
+  const users       = readJSON(PREDICTIONS_FILE, { users: [] }).users;
+  const fixtures    = resolveKnockoutFixtures(fixturesRaw, results);
 
   // Build team code -> full name lookup
   const teamName = {};
@@ -1048,7 +1049,7 @@ app.get('/api/stats', (req, res) => {
     g.matches.forEach(m => { matchInfo[m.id] = { home: teamName[m.home] || m.home, away: teamName[m.away] || m.away, date: m.date }; })
   );
   Object.values(fixtures.knockout || {}).forEach(r =>
-    (r.matches || []).forEach(m => { matchInfo[m.id] = { home: m.homeLabel || teamName[m.home] || m.home || '?', away: m.awayLabel || teamName[m.away] || m.away || '?', date: m.date || '', ko: true, num: m.num }; })
+    (r.matches || []).forEach(m => { matchInfo[m.id] = { home: teamName[m.home] || m.homeLabel || formatSlotLabel(m.homeSlot), away: teamName[m.away] || m.awayLabel || formatSlotLabel(m.awaySlot), date: m.date || '', ko: true, num: m.num }; })
   );
 
   const played = Object.entries(results).filter(([, r]) => r.played);
