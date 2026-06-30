@@ -525,6 +525,8 @@ nav.site-nav {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  align-self: stretch;
   flex-shrink: 0;
 }
 
