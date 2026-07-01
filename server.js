@@ -491,19 +491,28 @@ function resolveSlot(slot, slotMap, resolvedMatches, results) {
   return null;
 }
 
-function formatSlotLabel(slot) {
+function formatSlotLabel(slot, matchNumMap) {
   if (!slot) return 'TBD';
   const m3rd = slot.match(/^3rd_([A-L]+)$/);
   if (m3rd) return m3rd[1].length === 1 ? `3rd Place Group ${m3rd[1]}` : `Best 3rd (${m3rd[1].split('').join('/')})`;
   const mPos = slot.match(/^([12])([A-L])$/);
   if (mPos) return `${mPos[1] === '1' ? '1st' : '2nd'} Group ${mPos[2]}`;
   const mWL = slot.match(/^([WL]):(.+)$/);
-  if (mWL) return `${mWL[1] === 'W' ? 'Winner' : 'Loser'} ${mWL[2].replace('_', '-')}`;
+  if (mWL) {
+    const prefix = mWL[1] === 'W' ? 'Winner' : 'Loser';
+    const num = matchNumMap && matchNumMap[mWL[2]];
+    return num ? `${prefix} #${num}` : `${prefix} ${mWL[2].replace('_', '-')}`;
+  }
   return 'TBD';
 }
 
 function resolveKnockoutFixtures(fixtures, results) {
   if (!fixtures.knockout) return fixtures;
+  // Build matchId → num map for slot labels like "Winner #79"
+  const matchNumMap = {};
+  Object.values(fixtures.knockout).forEach(r =>
+    (r.matches || []).forEach(m => { if (m.num) matchNumMap[m.id] = m.num; })
+  );
   const slotMap = {};
   const thirdPlaceTeams = [];
 
@@ -561,8 +570,8 @@ function resolveKnockoutFixtures(fixtures, results) {
       match.away = awayId || null;
       const ht = homeId ? findTeamById(fixtures, homeId) : null;
       const at = awayId ? findTeamById(fixtures, awayId) : null;
-      match.homeLabel = ht ? `${ht.flag} ${ht.name}` : formatSlotLabel(match.homeSlot);
-      match.awayLabel = at ? `${at.flag} ${at.name}` : formatSlotLabel(match.awaySlot);
+      match.homeLabel = ht ? `${ht.flag} ${ht.name}` : formatSlotLabel(match.homeSlot, matchNumMap);
+      match.awayLabel = at ? `${at.flag} ${at.name}` : formatSlotLabel(match.awaySlot, matchNumMap);
     }
   }
   return fixtures;
