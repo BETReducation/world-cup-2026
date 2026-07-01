@@ -445,6 +445,23 @@ async function renderLeaderboard() {
     '<i class="fa-solid fa-medal" style="color:#c77d2e"></i>'
   ];
 
+  // Pre-compute totalScores per player to find the top-scorer
+  const playerTotals = board.map(p => {
+    let grpExact = 0, koExact = 0;
+    Object.entries(p.matchPoints || {}).forEach(([matchId, pts]) => {
+      if (pts === 5) {
+        if (groupMatchIds.has(matchId)) grpExact++;
+        else if (koMatchRound[matchId]) koExact++;
+      }
+    });
+    return grpExact + koExact;
+  });
+  const maxScore = Math.max(...playerTotals);
+  // Index of the first player with the highest exact scores (if not in top 3)
+  const topScoreIdx = playerTotals.findIndex((s, i) => s === maxScore && i > 2);
+
+  const rowClasses = ['row-gold', 'row-silver', 'row-bronze'];
+
   const rows = board.map((p, i) => {
     const currentPos = i + 1;
     const oldPos = prevPos[p.id];
@@ -470,6 +487,8 @@ async function renderLeaderboard() {
     const totalResults = grpResults + koResults;
     const totalScores  = grpExact  + koExact;
 
+    const rowClass = rowClasses[i] || (i === topScoreIdx ? 'row-top-score' : '');
+
     // Predictions entered per KO round
     const koRoundEntered = {};
     KO_ROUND_ORDER.forEach(rk => { koRoundEntered[rk] = 0; });
@@ -486,7 +505,7 @@ async function renderLeaderboard() {
     }).join('') : '';
 
     return `
-    <tr>
+    <tr class="${rowClass}">
       <td class="rank">${medals[i] || i + 1}${moveBadge}</td>
       <td>${p.name}</td>
       <td class="total-pts">${p.totalPoints}</td>

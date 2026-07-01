@@ -786,6 +786,11 @@ nav.site-nav {
 [data-theme="light"] .leaderboard-table td.col-total {
   background: rgba(180, 140, 0, 0.08);
 }
+/* Row colour takes priority over col-total tint */
+.leaderboard-table tr.row-gold   td.col-total,
+.leaderboard-table tr.row-silver td.col-total,
+.leaderboard-table tr.row-bronze td.col-total,
+.leaderboard-table tr.row-top-score td.col-total { background: inherit; }
 .leaderboard-table th {
   background: var(--surface2);
   color: var(--muted);
@@ -804,8 +809,14 @@ nav.site-nav {
   text-align: center;
 }
 .leaderboard-table td:nth-child(2) { text-align: left; font-weight: 600; }
-.leaderboard-table tr:nth-child(1) td { background: var(--gold-dim); }
-.leaderboard-table tr:nth-child(2) td { background: rgba(255,255,255,0.02); }
+.leaderboard-table tr.row-gold   td { background: rgba(240, 197,   0, 0.13); }
+.leaderboard-table tr.row-silver td { background: rgba(180, 190, 200, 0.13); }
+.leaderboard-table tr.row-bronze td { background: rgba(180, 110,  50, 0.13); }
+.leaderboard-table tr.row-top-score td { background: rgba(77, 201, 122, 0.10); }
+[data-theme="light"] .leaderboard-table tr.row-gold   td { background: rgba(240, 197,   0, 0.18); }
+[data-theme="light"] .leaderboard-table tr.row-silver td { background: rgba(140, 160, 180, 0.18); }
+[data-theme="light"] .leaderboard-table tr.row-bronze td { background: rgba(160,  90,  30, 0.13); }
+[data-theme="light"] .leaderboard-table tr.row-top-score td { background: rgba(26, 158, 79, 0.10); }
 .leaderboard-table td.rank {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
