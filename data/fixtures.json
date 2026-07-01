@@ -1205,23 +1205,23 @@
       "name": "Round of 16",
       "matches": [
         {
-          "id": "R16_1",
-          "num": 89,
-          "round": "R16",
-          "homeSlot": "W:R32_3",
-          "awaySlot": "W:R32_6",
-          "date": "2026-07-04",
-          "time": "17:00",
-          "venue": "TBD"
-        },
-        {
           "id": "R16_2",
-          "num": 90,
+          "num": 89,
           "round": "R16",
           "homeSlot": "W:R32_1",
           "awaySlot": "W:R32_4",
           "date": "2026-07-04",
           "time": "13:00",
+          "venue": "TBD"
+        },
+        {
+          "id": "R16_1",
+          "num": 90,
+          "round": "R16",
+          "homeSlot": "W:R32_3",
+          "awaySlot": "W:R32_6",
+          "date": "2026-07-04",
+          "time": "17:00",
           "venue": "TBD"
         },
         {
