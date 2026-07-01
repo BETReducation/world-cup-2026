@@ -778,6 +778,15 @@ nav.site-nav {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
+}
+.leaderboard-table th.col-total,
+.leaderboard-table td.col-total {
+  background: rgba(240, 197, 0, 0.08);
+}
+[data-theme="light"] .leaderboard-table th.col-total,
+[data-theme="light"] .leaderboard-table td.col-total {
+  background: rgba(180, 140, 0, 0.08);
 }
 .leaderboard-table th {
   background: var(--surface2);

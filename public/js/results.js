@@ -490,8 +490,8 @@ async function renderLeaderboard() {
       <td class="rank">${medals[i] || i + 1}${moveBadge}</td>
       <td>${p.name}</td>
       <td class="total-pts">${p.totalPoints}</td>
-      <td style="font-family:'JetBrains Mono',monospace;">${totalResults}</td>
-      <td style="font-family:'JetBrains Mono',monospace;">${totalScores}</td>
+      <td class="col-total" style="font-family:'JetBrains Mono',monospace;">${totalResults}</td>
+      <td class="col-total" style="font-family:'JetBrains Mono',monospace;">${totalScores}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${grpResults}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${grpExact}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${koResults}</td>
@@ -512,8 +512,8 @@ async function renderLeaderboard() {
           <th>#</th>
           <th>Player</th>
           <th title="Total points">Pts</th>
-          <th title="Total correct results (all stages)">Total Res</th>
-          <th title="Total exact scores (all stages)">Total Score</th>
+          <th class="col-total" title="Total correct results (all stages)">Total Res</th>
+          <th class="col-total" title="Total exact scores (all stages)">Total Score</th>
           <th title="Group stage correct results">Grp Res</th>
           <th title="Group stage exact scores">Grp Score</th>
           <th title="Knockout correct results">KO Res</th>
