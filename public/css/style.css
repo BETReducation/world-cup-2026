@@ -823,6 +823,12 @@ nav.site-nav {
 [data-theme="light"] .leaderboard-table tr.row-silver td { background: rgba(140, 160, 180, 0.18); }
 [data-theme="light"] .leaderboard-table tr.row-bronze td { background: rgba(160,  90,  30, 0.13); }
 [data-theme="light"] .leaderboard-table tr.row-top-score td { background: rgba(26, 158, 79, 0.10); }
+/* Light-mode overrides for highest-score cell — must come after row rules */
+[data-theme="light"] .leaderboard-table td.col-total-max                      { background: rgba(240, 197,   0, 0.32); }
+[data-theme="light"] .leaderboard-table tr.row-gold      td.col-total-max     { background: rgba(240, 197,   0, 0.45); }
+[data-theme="light"] .leaderboard-table tr.row-silver    td.col-total-max     { background: rgba(140, 160, 180, 0.45); }
+[data-theme="light"] .leaderboard-table tr.row-bronze    td.col-total-max     { background: rgba(160,  90,  30, 0.35); }
+[data-theme="light"] .leaderboard-table tr.row-top-score td.col-total-max     { background: rgba( 26, 158,  79, 0.28); }
 .leaderboard-table td.rank {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
