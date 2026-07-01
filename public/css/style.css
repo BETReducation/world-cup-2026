@@ -787,10 +787,16 @@ nav.site-nav {
   background: rgba(180, 140, 0, 0.08);
 }
 /* Row colour takes priority over col-total tint */
-.leaderboard-table tr.row-gold   td.col-total,
-.leaderboard-table tr.row-silver td.col-total,
-.leaderboard-table tr.row-bronze td.col-total,
+.leaderboard-table tr.row-gold      td.col-total,
+.leaderboard-table tr.row-silver    td.col-total,
+.leaderboard-table tr.row-bronze    td.col-total,
 .leaderboard-table tr.row-top-score td.col-total { background: inherit; }
+/* Highest total-score cell — darker shade of its row colour */
+.leaderboard-table td.col-total-max                      { background: rgba(240, 197,   0, 0.22); }
+.leaderboard-table tr.row-gold      td.col-total-max     { background: rgba(240, 197,   0, 0.35); }
+.leaderboard-table tr.row-silver    td.col-total-max     { background: rgba(180, 190, 200, 0.35); }
+.leaderboard-table tr.row-bronze    td.col-total-max     { background: rgba(180, 110,  50, 0.35); }
+.leaderboard-table tr.row-top-score td.col-total-max     { background: rgba( 77, 201, 122, 0.30); }
 .leaderboard-table th {
   background: var(--surface2);
   color: var(--muted);

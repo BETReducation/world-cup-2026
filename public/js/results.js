@@ -510,7 +510,7 @@ async function renderLeaderboard() {
       <td>${p.name}</td>
       <td class="total-pts">${p.totalPoints}</td>
       <td class="col-total" style="font-family:'JetBrains Mono',monospace;">${totalResults}</td>
-      <td class="col-total" style="font-family:'JetBrains Mono',monospace;">${totalScores}</td>
+      <td class="col-total${totalScores === maxScore ? ' col-total-max' : ''}" style="font-family:'JetBrains Mono',monospace;">${totalScores}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${grpResults}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${grpExact}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${koResults}</td>
