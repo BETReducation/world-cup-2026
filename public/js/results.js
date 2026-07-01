@@ -479,11 +479,11 @@ async function renderLeaderboard() {
     });
 
     const KO_ROUND_LABELS = { R32: 'R32', R16: 'R16', QF: 'QF', SF: 'SF', '3P': '3rd', F: 'Final' };
-    const koCells = KO_ROUND_ORDER.map(rk => {
+    const koCells = isAdmin ? KO_ROUND_ORDER.map(rk => {
       const entered = koRoundEntered[rk], total = koRoundTotal[rk];
       const full = entered === total;
       return `<td style="font-family:'JetBrains Mono',monospace; color:${full ? 'var(--teal)' : 'var(--muted)'};">${entered}/${total}</td>`;
-    }).join('');
+    }).join('') : '';
 
     return `
     <tr>
@@ -501,9 +501,9 @@ async function renderLeaderboard() {
   }).join('');
 
   const KO_ROUND_LABELS = { R32: 'R32', R16: 'R16', QF: 'QF', SF: 'SF', '3P': '3rd', F: 'Final' };
-  const koHeaders = KO_ROUND_ORDER.map(rk =>
+  const koHeaders = isAdmin ? KO_ROUND_ORDER.map(rk =>
     `<th title="${KO_ROUND_LABELS[rk]} predictions entered">${KO_ROUND_LABELS[rk]}</th>`
-  ).join('');
+  ).join('') : '';
 
   el.innerHTML = `
     <table class="leaderboard-table">
