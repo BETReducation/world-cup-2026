@@ -774,12 +774,16 @@ nav.site-nav {
 .pts-0 { background: var(--border); color: var(--muted); }
 
 /* ── Leaderboard ─────────────────────────────────────────────────────────── */
+#leaderboardContent { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .leaderboard-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-  table-layout: fixed;
+  table-layout: auto;
+  min-width: 900px;
 }
+.leaderboard-table th,
+.leaderboard-table td { white-space: nowrap; }
 .leaderboard-table td.col-total {
   background: rgba(240, 197, 0, 0.08);
 }
@@ -1536,11 +1540,6 @@ footer span {
   .comparison-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .comparison-panel table { min-width: 260px; }
 
-  /* Leaderboard: scrollable on mobile instead of squashing columns */
-  #leaderboardContent { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .leaderboard-table { table-layout: auto; min-width: 640px; }
-  .leaderboard-table th,
-  .leaderboard-table td { white-space: nowrap; }
 
   /* Deadline times: slightly smaller on mobile to prevent wrapping */
   .deadline-time { font-size: 11px; }
